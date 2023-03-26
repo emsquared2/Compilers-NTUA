@@ -29,11 +29,8 @@
 int lineno = 1;
 %}
 
-/* capital letters */
-L [A-Z]
-
-/* lowercase letters */
-l [a-z]
+/* letters */
+L [a-zA-Z]
 
 /* digits */
 D [0-9]
@@ -46,8 +43,6 @@ HEX [0-9a-fA-F]
 
 /* escape sequences */
 Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
-
-/* Esc [(\[tr0\'"])|x{HEX}{HEX}] */
 
 %x COMMENT
 
@@ -79,7 +74,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 "<-"        { return T_assign; }
 
 
-({L}|{l})({L}|{l}|{D}|\_)* { return T_id; }
+({L})({L}|{D}|\_)* { return T_id; }
 
 {D}+ { return T_const; }
 
@@ -99,9 +94,9 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 <COMMENT>"$$"        { BEGIN(INITIAL); }
 <COMMENT>\n          { lineno++; }
 <COMMENT>"$"         { /* nothing */ }
-<COMMENT>[^*\n]+     { /* nothing */ }
+<COMMENT>[^$\n]+     { /* nothing */ }
 
-$[^\$]*(\n)?         { lineno++; }
+$[^\$\n]*\n?          { lineno++; }
 
 .       { fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], lineno); exit(17); }
 

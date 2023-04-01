@@ -74,7 +74,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 "<-"        { return T_assign; }
 
 
-({L})({L}|{D}|\_)* { return T_id; }
+{L}({L}|{D}|\_)* { return T_id; }
 
 {D}+ { return T_const; }
 
@@ -95,8 +95,9 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 <COMMENT>\n          { lineno++; }
 <COMMENT>"$"         { /* nothing */ }
 <COMMENT>[^$\n]+     { /* nothing */ }
+<COMMENT><<EOF>>     { fprintf(stderr, "Unclosed comment\n"); exit(42); }
 
-$[^\$\n]*\n?          { lineno++; }
+$[^\$\n]*\n?         { lineno++; }
 
 .       { fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], lineno); exit(17); }
 

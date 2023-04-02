@@ -7,8 +7,6 @@
 #include "lexer.hpp"
 #include "parser.hpp"
 
-#define T_eof        0
-
 int lineno = 1;
 %}
 

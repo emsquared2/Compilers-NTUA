@@ -1,6 +1,10 @@
 %{
     #include <cstdio>
+    #include <stdio.h>
     #include "lexer.hpp"
+
+    #define YYDEBUG 1
+
 %}
 
 %token T_and        "and"
@@ -27,18 +31,23 @@
 %token T_const_str  
 %token T_ge         ">="     
 %token T_le         "<="
-%token T_assign  
+%token T_assign     "<-"
 
-
-%nonassoc '='
+%left T_or
+%left T_and
+%nonassoc T_not
+%nonassoc '=' '#' '>' '<' T_ge T_le
 %left '+' '-'
 %left '*' T_div T_mod
+
+%expect 1
+%define parse.error detailed
 
 %%
 
 program:
-    /* nothing */
-    | func-def
+    /* nothing */ 
+    | func-def 
 ;
 
 func-def:
@@ -46,32 +55,33 @@ func-def:
 ;
 
 header: 
-    "fun" T_id "(" fpar-def fpar-def-extended ")" ":" ret-type
+    "fun" T_id '(' fpar-def fpar-def-extended ')' ':' ret-type
 ;
 
 fpar-def-extended:
     /* nothing */
-    | ";" fpar-def fpar-def-extended
+    | ';' fpar-def fpar-def-extended
 ;
 
 fpar-def:
-    "ref" T_id id-extended ":" fpar-type
-    | T_id id-extended : fpar-type
+    "ref" T_id id-extended ':' fpar-type
+    | T_id id-extended ':' fpar-type
 ;
 
 id-extended:
     /* nothing */
-    | "," T_id id-extended
+    | ',' T_id id-extended
 ;
 
 fpar-type:
     data-type bracket-extended
-    | data-type "[" "]" bracket-extended
+    | data-type '[' ']' bracket-extended
+;
 
 bracket-extended:
     /* nothing */
-    | "[" T_const "]" bracket-extended // maybe check T_const
-;
+    | '[' T_const ']' bracket-extended
+; 
 
 data-type:
     "int"
@@ -85,17 +95,17 @@ ret-type:
 
 local-def:
     /* nothing*/
-    | local-def func-def
-    | local-def func-decl
-    | local-def var-def
+    | func-def local-def
+    | func-decl local-def
+    | var-def local-def
 ;
 
 func-decl:
-    header ";"
+    header ';'
 ;
 
 var-def:
-    "var" T_id id-extended ":" type ";"
+    "var" T_id id-extended ':' type ';'
 ;
 
 type:
@@ -103,7 +113,7 @@ type:
 ;
 
 block:
-    "{" stmt-list "}"
+    '{' stmt-list '}'
 ;
 
 stmt-list:
@@ -112,67 +122,68 @@ stmt-list:
 ;
 
 stmt:
-    ";"
-    | l-value "<-" expr ";" 
+    ';'
+    | l-value T_assign expr ';' 
     | block
-    | func-call ";"
+    | func-call ';'
     | "if" cond "then" stmt 
     | "if" cond "then" stmt "else" stmt
     | "while" cond "do" stmt 
-    | "return" ";"
-    | "return" expr ";"
+    | "return" ';'
+    | "return" expr ';'
 ;
 
 l-value:
     T_id 
     | T_const_str
-    | l-value "[" expr "]"
+    | l-value '[' expr ']'
 ;
 
 expr:
     T_const
     | T_const_char
     | l-value
-    | "(" expr ")"
+    | '(' expr ')'
     | func-call
-    | "+" expr
-    | "-" expr
-    | expr "+" expr
-    | expr "-" expr
-    | expr "*" expr
+    | '+' expr
+    | '-' expr
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
     | expr "div"  expr
     | expr "mod"  expr
 ;
 
 func-call: 
-    T_id "(" ")"
-    | T_id "(" expr expr-list ")"
+    T_id '(' ')'
+    | T_id '(' expr expr-list ')'
 ;
 
 expr-list:
     /* nothing */
-    | "," expr expr-list
+    | ',' expr expr-list
 ;
 
 cond: 
-    "(" cond ")"
+    '(' cond ')'
     | "not" cond
     | cond "and" cond
     | cond "or" cond
-    | expr "=" expr
-    | expr "#" expr
-    | expr "<" expr
-    | expr ">" expr
-    | expr "<=" expr
-    | expr ">=" expr
+    | expr '=' expr
+    | expr '#' expr
+    | expr '<' expr
+    | expr '>' expr
+    | expr T_le expr
+    | expr T_ge expr
 ;
-
-
-
 
 %%
 
 int main() {
+    // #ifdef YYDEBUG
+    //     int yydebug = 1;
+    // #endif
+
     int result = yyparse();
     if (result == 0) printf("Success.\n");
     return result;

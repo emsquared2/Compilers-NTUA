@@ -56,6 +56,7 @@ func-def:
 
 header: 
     "fun" T_id '(' fpar-def fpar-def-extended ')' ':' ret-type
+    | "fun" T_id '(' ')' ':' ret-type
 ;
 
 fpar-def-extended:

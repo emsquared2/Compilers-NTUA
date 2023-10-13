@@ -19,7 +19,7 @@ grace: lexer.o parser.o
 	$(CXX) $(CXXFLAGS) -o grace lexer.o parser.o
 
 clean: 
-	$(RM) lexer.cpp parser.cpp parser.hpp parser.output *.output *.o
+	$(RM) lexer.cpp parser.cpp parser.hpp parser.output *.output
 
 distclean: clean
 	$(RM) grace

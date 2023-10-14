@@ -162,8 +162,8 @@ expr:
     | l-value           { $$ = $1; }
     | '(' expr ')'      { $$ = $2; }
     | func-call         { $$ = $1; } // Check if run function needed.  
-    | '+' expr          { $$ = $2; }  // Might need change
-    | '-' expr          { $$ = -$2; } // Might need change
+    | '+' expr          { $$ = new Unop(std::string($1), $2); }
+    | '-' expr          { $$ = new Unop(std::string($1), $2); }
     | expr '+' expr     { $$ = new BinOp($1, std::string($2), $3);}
     | expr '-' expr     { $$ = new BinOp($1, std::string($2), $3);}
     | expr '*' expr     { $$ = new BinOp($1, std::string($2), $3);}

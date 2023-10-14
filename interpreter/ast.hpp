@@ -216,6 +216,34 @@ private:
     std::vector<Expr *> expr_list;
 };
 
+class UnOp : public Expr 
+{
+public:
+    UnOp(std::string s, Expr *e): op(s), right(e) {}
+    ~UnOp() {
+        delete right;
+    }
+    virtual void printOn(std::ostream &out) const override 
+    {
+        out << op << "(" << *right << ")"; 
+    }
+    virtual int eval() const override 
+    {
+        if(op == "+")
+        {
+            return right->eval();
+        }
+        else if (op == "-")
+        {
+            return -right->eval();
+        }
+    }
+
+private:
+    Expr *right;
+    std::string op;
+};
+
 class BinOp : public Expr
 {
 public:

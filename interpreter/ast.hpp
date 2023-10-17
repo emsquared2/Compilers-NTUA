@@ -8,6 +8,12 @@
 
 extern std::map<std::string, int> globals;
 
+enum Type
+{
+    TYPE_INT,
+    TYPE_BOOL
+};
+
 struct ExprList
 {
     std::vector<Expr *> expr_list;
@@ -59,10 +65,10 @@ public:
     {
         out << "ConstChar(" << var << ")";
     }
-    virtual char eval() const override
-    {
-        return var;
-    }
+    // virtual char eval() const override
+    // {
+    //     return var;
+    // }
 
 private:
     char var;
@@ -104,6 +110,90 @@ public:
 
 private:
     std::string var;
+};
+
+class IdList : public AST
+{
+public:
+    IdList() : idlist() {}
+    ~IdList()
+    {
+        for (Id *id : idlist)
+        {
+            delete id;
+        }
+    }
+    void append(Id *id)
+    {
+        idlist.push_back(id);
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "IdList(";
+        bool first = true;
+        for (Id *id : idlist)
+        {
+            if (!first)
+                out << ", ";
+            first = false;
+            out << id;
+        }
+        out << ")";
+    }
+
+private:
+    std::vector<Id *> idlist;
+};
+
+class ArrayDim : public AST
+{
+public:
+    ArrayDim() : dim() {}
+    ~ArrayDim()
+    {
+        for (Const *num : dim)
+        {
+            delete num;
+        }
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        for (Const *num : dim)
+        {
+            out << "[" << num << "]";
+        }
+    }
+    void append(Const *num)
+    {
+        dim.push_back(num);
+    }
+
+private:
+    std::vector<Const *> dim;
+};
+
+class ParamList : public AST
+{
+public:
+private:
+}
+
+class Decl : public AST
+{
+public:
+    Decl(IdList *idl, Type t) : idlist(idl), type(t) {}
+    ~Decl()
+    {
+        delete idlist;
+    }
+    virtual void printOn(std::ostream &out)
+    {
+        out << "Decl(var " << idlist << " : " << type << ")";
+    }
+
+private:
+    IdList *idlist;
+    Type type;
 };
 
 class ConstStr : public LValue
@@ -216,20 +306,21 @@ private:
     std::vector<Expr *> expr_list;
 };
 
-class UnOp : public Expr 
+class UnOp : public Expr
 {
 public:
-    UnOp(std::string s, Expr *e): op(s), right(e) {}
-    ~UnOp() {
+    UnOp(std::string s, Expr *e) : op(s), right(e) {}
+    ~UnOp()
+    {
         delete right;
     }
-    virtual void printOn(std::ostream &out) const override 
+    virtual void printOn(std::ostream &out) const override
     {
-        out << op << "(" << *right << ")"; 
+        out << op << "(" << *right << ")";
     }
-    virtual int eval() const override 
+    virtual int eval() const override
     {
-        if(op == "+")
+        if (op == "+")
         {
             return right->eval();
         }
@@ -316,11 +407,18 @@ class OpCond : public Cond
 {
 public:
     OpCond(Cond *l, std::string s, Cond *r) : left(l), op(s), right(r) {}
-    OpCond(std::string s, Cond *r) : op(s), right(r) {}
+    OpCond(std::string s, Cond *r) : left(), op(s), right(r) {}
     ~OpCond()
     {
         delete left;
         delete right;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << op << "(";
+        if (left != nullptr)
+            out << *left << ", ";
+        out << *right << ")";
     }
     virtual int eval() const override
     {
@@ -344,8 +442,32 @@ private:
     std::string op;
 };
 
+class Return : public Stmt
+{
+public:
+    Return() : expr(nullptr) {}
+    Return(Expr *e) : expr(e) {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "Return(";
+        if (expr != nullptr)
+            out << expr->eval();
+        out << ")";
+    }
+    virtual void run() const override
+    {
+    }
+    int ReturnValue()
+    {
+        return (expr != nullptr) ? expr->eval() : 0;
+    }
+
+private:
+    Expr *expr;
+};
+
 template <class T>
-class Block /*: public Stmt */
+class Block /*: public Stmt */ : public AST
 {
 public:
     Block() : stmt_list() {}

@@ -1,6 +1,7 @@
 %{
     #include <cstdio>
     #include <stdio.h>
+    #include <vector>
     #include "lexer.hpp"
 
     #define YYDEBUG 1
@@ -49,12 +50,22 @@
     Block *block;
     Cond *cond;
     Stmt *stmt;
+    Decl *decl;
+    IdList *idlist;
+    ParamList *paramlist;
+    ArrayDim *arraydim;
+    Type type; // as we deal with more  types might change 
 }
 
 %type<block> stmt-list, expr-list, block, program
 %type<expr> expr, l-value, func-call
+%type<decl> var-def
 %type<cond> cond
 %type<stmt> stmt
+%type<idlist> id-extended
+%type<paramlist> fpar-def-extended
+%type<arraydim> bracket-extended
+%type<type> data-type;
 
 %%
 
@@ -76,8 +87,8 @@ header:
 ;
 
 fpar-def-extended:
-    /* nothing */
-    | ';' fpar-def fpar-def-extended
+    /* nothing */                       { $$ = new ParamList();}
+    | ';' fpar-def fpar-def-extended    { $3->append($2); $$ = $3;}
 ;
 
 fpar-def:
@@ -86,8 +97,8 @@ fpar-def:
 ;
 
 id-extended:
-    /* nothing */
-    | ',' T_id id-extended
+    /* nothing */               { $$ = new IdList(); }
+    | ',' T_id id-extended      { $3->append($2); $$ = $3; }
 ;
 
 fpar-type:
@@ -96,13 +107,13 @@ fpar-type:
 ;
 
 bracket-extended:
-    /* nothing */
-    | '[' T_const ']' bracket-extended
+    /* nothing */                       { $$ = new ArrayDim(); }
+    | '[' T_const ']' bracket-extended  { $4->append($2); $$ = $4;}
 ; 
 
 data-type:
-    "int"
-    | "char"
+    "int"           { $$ = TYPE_INT;  }
+    | "char"        { $$ = TYPE_BOOL; }
 ;
 
 ret-type:
@@ -122,11 +133,11 @@ func-decl:
 ;
 
 var-def:
-    "var" T_id id-extended ':' type ';'
+    "var" T_id id-extended ':' type ';'     { $3->append($2); $$ = new Decl($3, $5); }
 ;
 
 type:
-    data-type bracket-extended
+    data-type bracket-extended      { $$ = new Type($1, $2); }
 ;
 
 block:
@@ -146,8 +157,8 @@ stmt:
     | "if" cond "then" stmt                 { $$ = new If($2, $4); }
     | "if" cond "then" stmt "else" stmt     { $$ = new If($2, $4, $6); }
     | "while" cond "do" stmt                { $$ = new While($2, $4); }
-    | "return" ';'                          { }
-    | "return" expr ';'                     { $$ = $2; }    
+    | "return" ';'                          { $$ = new Return(); }
+    | "return" expr ';'                     { $$ = new Return($2); }    
 ;
 
 l-value:                   

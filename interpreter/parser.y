@@ -10,6 +10,7 @@
 
 
 %token T_and        "and"
+%token T_bool       "bool"
 %token T_char       "char"
 %token T_div        "div"
 %token T_do         "do"
@@ -27,20 +28,7 @@
 %token T_var        "var"
 %token T_while      "while"
 
-%token T_id         
-%token T_const      
-%token T_const_char 
-%token T_const_str  
-%token T_ge         ">="     
-%token T_le         "<="
-%token T_assign     "<-"
-
-%left T_or
-%left T_and
-%nonassoc T_not
-%nonassoc '=' '#' '>' '<' T_ge T_le
-%left '+' '-'
-%left '*' T_div T_mod
+         
 
 %expect 1
 %define parse.error detailed
@@ -48,29 +36,68 @@
 %union {
     Expr *expr;
     Block *block;
+    ExprList *exprlist;
     Cond *cond;
     Stmt *stmt;
     Decl *decl;
+    FParam *fparam;
+    Header *header;
+    FuncDecl *funcdecl;
+    FuncDef *funcdef;
+    LocalDef *localdef;
     IdList *idlist;
     ParamList *paramlist;
     ArrayDim *arraydim;
     Type type; // as we deal with more  types might change 
+    DataType *datatype;
+    RetType *rettype;
+    FParType *fpartype;
+    Id *id;
+    Const *cons;
+    ConstChar *constchar;
+    ConstStr *conststr;
+    std::string op;
 }
 
-%type<block> stmt-list, expr-list, block, program
-%type<expr> expr, l-value, func-call
+%token<id> T_id
+%token<cons> T_const      
+%token<constchar> T_const_char 
+%token<conststr> T_const_str  
+%token<op> T_ge         ">="     
+%token<op> T_le         "<="
+%token<op> T_assign     "<-"
+
+%left<op> T_or
+%left<op> T_and
+%nonassoc<op> T_not
+%nonassoc<op> "=" "#" ">" "<" T_ge T_le
+%left "+" "-"
+%left "*" T_div T_mod
+
+%type<block> stmt-list block program
+%type<exprlist> expr-list
+%type<expr> expr l-value func-call
 %type<decl> var-def
 %type<cond> cond
 %type<stmt> stmt
+%type<fparam> fpar-def
+%type<header> header
+%type<funcdecl> func-decl
+%type<funcdef> func-def
+%type<localdef> local-def
 %type<idlist> id-extended
 %type<paramlist> fpar-def-extended
 %type<arraydim> bracket-extended
-%type<type> data-type;
+%type<type> type;
+%type<datatype> data-type
+%type<rettype> ret-type
+%type<fpartype> fpar-type
+
 
 %%
 
 program:
-    /* nothing */ 
+    /* nothing */   { std:cout << "Empty program" << std::endl; }
     | func-def  {  
         std:cout << "AST" << *$1 << std::endl;
         //$$ = $1; 
@@ -78,12 +105,12 @@ program:
 ;
 
 func-def:
-    header local-def block 
+    header local-def block      { $$ = new FuncDef($1, $2, $3); }
 ;
 
 header: 
-    "fun" T_id '(' fpar-def fpar-def-extended ')' ':' ret-type
-    | "fun" T_id '(' ')' ':' ret-type
+    "fun" T_id '(' fpar-def fpar-def-extended ')' ':' ret-type  { $5->append($4); $$ = new Header($2, $8, $5); }
+    | "fun" T_id '(' ')' ':' ret-type                           { $$ = new Header($2, $6); }
 ;
 
 fpar-def-extended:
@@ -92,8 +119,8 @@ fpar-def-extended:
 ;
 
 fpar-def:
-    "ref" T_id id-extended ':' fpar-type
-    | T_id id-extended ':' fpar-type
+    "ref" T_id id-extended ':' fpar-type { $3->append($2); $$ = new FParam($3, $5, true);}
+    | T_id id-extended ':' fpar-type     { $2->append($1); $$ = new FParam($2, $4);}
 ;
 
 id-extended:
@@ -101,35 +128,35 @@ id-extended:
     | ',' T_id id-extended      { $3->append($2); $$ = $3; }
 ;
 
-fpar-type:
-    data-type bracket-extended
-    | data-type '[' ']' bracket-extended
+fpar-type: // use $2->isEmpty() to identify simple params (int / char) from arrays
+    data-type bracket-extended              { $$ = new FParType($1, $2); }
+    | data-type '[' ']' bracket-extended    { $$ = new FParType($1, $2, true); }
 ;
 
 bracket-extended:
-    /* nothing */                       { $$ = new ArrayDim(); }
+    /* nothing */                       { $$ = new ArrayDim(); } // use
     | '[' T_const ']' bracket-extended  { $4->append($2); $$ = $4;}
 ; 
 
 data-type:
-    "int"           { $$ = TYPE_INT;  }
-    | "char"        { $$ = TYPE_BOOL; }
+    "int"           /* { $$ = TYPE_INT;  } */ { $$ = new DataType($1);}
+    | "char"        /* { $$ = TYPE_BOOL; } */ { $$ = new DataType($1);}
 ;
 
 ret-type:
-    data-type
-    | "nothing"
+    data-type       { $$ = new RetType($1); }
+    | "nothing"     { $$ = new RetType();   }
 ;
 
 local-def:
-    /* nothing*/
-    | func-def local-def
-    | func-decl local-def
-    | var-def local-def
+    /* nothing*/                { $$ = new LocalDef(); }
+    | func-def local-def        { $2->append($1); $$ = $2; }
+    | func-decl local-def       { $2->append($1); $$ = $2; }
+    | var-def local-def         { $2->append($1); $$ = $2; }
 ;
 
 func-decl:
-    header ';'
+    header ';'  { $$ = new FuncDecl($1); }
 ;
 
 var-def:
@@ -150,7 +177,7 @@ stmt-list:
 ;
 
 stmt:
-    ';'
+    ';'                                     
     | l-value T_assign expr ';'             { $$ = new Assign($1, $3); }
     | block                                 { $$ = $1; }
     | func-call ';'                         { $$ = $1; }
@@ -184,11 +211,11 @@ expr:
 
 func-call: 
     T_id '(' ')'                    { $$ = new Call($1); }
-    | T_id '(' expr expr-list ')'   { $$ = new Call($1, $3, $4); }
+    | T_id '(' expr expr-list ')'   { $4->append($3); $$ = new Call($1, $4); }
 ;
 
 expr-list:
-    /* nothing */           { $$ = new Block();}
+    /* nothing */           { $$ = new Expr_list();}
     | ',' expr expr-list    { $3->append($2); $$ = $3;}
 ;
 

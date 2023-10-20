@@ -32,6 +32,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 %%
 
 "and"       { return T_and; }
+"bool"      { return T_bool; }
 "char"      { return T_char; }
 "div"       { return T_div; }
 "do"        { return T_do; }

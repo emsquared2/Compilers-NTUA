@@ -5,19 +5,20 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <variant>
 
 extern std::map<std::string, int> globals;
 
-enum Type
-{
-    TYPE_INT,
-    TYPE_BOOL
-};
+// enum Type
+// {
+//     TYPE_INT,
+//     TYPE_BOOL
+// };
 
-struct ExprList
-{
-    std::vector<Expr *> expr_list;
-};
+// struct ExprList
+// {
+//     std::vector<Expr *> expr_list;
+// };
 
 class AST
 {
@@ -112,6 +113,98 @@ private:
     std::string var;
 };
 
+class FuncDef : public AST
+{
+public:
+    FuncDef(Header *h, LocalDef *ld, Block *b) : header(h), localdef(ld), block(b) {}
+    ~FuncDef()
+    {
+        delete header;
+        delete localdef;
+        delete block;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "FuncDef(";
+        out << *header << *localdef << *block;
+        out << ")";
+    }
+
+private:
+    Header *header;
+    LocalDef *localdef;
+    Block *block;
+};
+
+class LocalDef : public AST
+{
+public:
+    LocalDef() : locals() {}
+    ~LocalDef()
+    {
+        for (std::variant<FuncDef *, FuncDecl *, Decl *> &local : locals)
+        {
+            std::visit([](auto &&arg)
+                       { delete arg; },
+                       local);
+        }
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "LocalDef(";
+        for (const auto &local : locals)
+        {
+            std::visit([&out](auto &&arg)
+                       { out << *arg; },
+                       local);
+        }
+        out << ")";
+    }
+    template <typename T>
+    void append(T *object)
+    {
+        locals.push_back(object);
+    }
+
+private:
+    std::vector<std::variant<FuncDef *, FuncDecl *, Decl *>> locals;
+};
+
+class Type : public AST 
+{
+    public:
+    Type(DataType *t, ArrayDim *d) : type(t), dim(d) {}
+    ~Type() {
+        delete type;
+        delete dim;
+    }
+    virtual void printOn(std::ostream &out) const override {
+        out << "Type(" << *type << *dim <<")";
+    }
+    private:
+    DataType *type;
+    ArrayDim *dim;
+};
+
+class FParam : public AST
+{
+public:
+    FParam(IdList *idl, Type *t, bool ref = false) : idlist(idl), type(t), ref(ref) {}
+    ~FParam() { delete idlist; }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "FParam(";
+        if (ref)
+            out << "ref ";
+        out << *idlist << " : " << *type;
+    }
+
+private:
+    IdList *idlist;
+    Type *type;
+    bool ref;
+};
+
 class IdList : public AST
 {
 public:
@@ -163,6 +256,9 @@ public:
             out << "[" << num << "]";
         }
     }
+    bool isEmpty() {
+        return dim.empty();
+    }
     void append(Const *num)
     {
         dim.push_back(num);
@@ -172,16 +268,107 @@ private:
     std::vector<Const *> dim;
 };
 
+class ExprList : public AST
+{
+public:
+    ExprList() : expr_list() {}
+    ~ExprList()
+    {
+        for (Expr *expr : expr_list)
+        {
+            delete expr;
+        }
+    }
+    void append(Expr *e) { expr_list.push_back(e); }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "ExprList(";
+        bool first = true;
+        for (Expr *e : expr_list)
+        {
+            if (!first)
+                out << ",";
+            first = false;
+            out << *e;
+        }
+        out << ")";
+    }
+
+private:
+    std::vector<Expr *> expr_list;
+};
+
 class ParamList : public AST
 {
 public:
+    ParamList() : params() {}
+    ~ParamList()
+    {
+        for (FParam *param : params)
+        {
+            delete param;
+        }
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        bool last = true;
+        for (FParam *param : params)
+        {
+            out << param;
+            if (param != params.back())
+                out << " ; ";
+        }
+    }
+    void append(FParam *param)
+    {
+        params.push_back(param);
+    }
+
 private:
-}
+    std::vector<FParam *> params;
+};
+
+class Header : public AST
+{
+public:
+    Header(Id *id, Type *t, ParamList *pl = nullptr) : id(id), type(t), paramlist(pl) {}
+    ~Header()
+    {
+        delete id;
+        delete paramlist;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "Header(fun " << id << "(";
+        if (paramlist != nullptr)
+            out << paramlist;
+        out << ") :" << *type;
+    }
+
+private:
+    Id *id;
+    Type *type;
+    ParamList *paramlist;
+};
+
+class FuncDecl : public AST
+{
+public:
+    FuncDecl(Header *h) : header(h) {}
+    ~FuncDecl() { delete header; }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "FuncDecl(" << *header << ")";
+    }
+
+private:
+    Header *header;
+};
 
 class Decl : public AST
 {
 public:
-    Decl(IdList *idl, Type t) : idlist(idl), type(t) {}
+    Decl(IdList *idl, Type *t) : idlist(idl), type(t) {}
     ~Decl()
     {
         delete idlist;
@@ -193,7 +380,7 @@ public:
 
 private:
     IdList *idlist;
-    Type type;
+    Type *type;
 };
 
 class ConstStr : public LValue
@@ -270,40 +457,22 @@ class Call : public Expr
 {
 public:
     Call(std::string s) : id(s) {}
-    Call(std::string s, Expr *e, Block<Expr> e_list) : id(s)
-    {
-        expr_list.push_back(e);
-        for (Expr *e : e_list.getList())
-        {
-            expr_list.push_back(e);
-        }
-    }
+    Call(std::string s, ExprList *e_list) : id(s), expr_list(e_list) {}
     ~Call()
     {
-        for (Expr *e : expr_list)
-        {
-            delete e;
-        }
-        expr_list.clear();
+        delete expr_list;
     }
     virtual void printOn(std::ostream &out) const override
     {
         bool first = true;
-        out << "Call( " << id << " ( ";
-        for (Expr *e : expr_list)
-        {
-            if (!first)
-                out << ", ";
-            out << *e;
-            first = false;
-        }
-        out << " ))";
+        out << "Call( " << id << " ( " << expr_list << "))";
     }
     // TODO: Implement how a function is run.
 
 private:
     std::string id;
-    std::vector<Expr *> expr_list;
+    //std::vector<Expr *> expr_list;
+    ExprList *expr_list;
 };
 
 class UnOp : public Expr
@@ -445,13 +614,12 @@ private:
 class Return : public Stmt
 {
 public:
-    Return() : expr(nullptr) {}
-    Return(Expr *e) : expr(e) {}
+    Return(Expr *e = nullptr) : expr(e) {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "Return(";
         if (expr != nullptr)
-            out << expr->eval();
+            out << expr;
         out << ")";
     }
     virtual void run() const override
@@ -466,22 +634,21 @@ private:
     Expr *expr;
 };
 
-template <class T>
-class Block /*: public Stmt */ : public AST
+class Block : public AST
 {
 public:
     Block() : stmt_list() {}
     ~Block()
     {
-        for (T *s : stmt_list)
+        for (Stmt *s : stmt_list)
             delete s;
     }
-    void append(T *s) { stmt_list.push_back(s); }
+    void append(Stmt *s) { stmt_list.push_back(s); }
     virtual void printOn(std::ostream &out) const override
     {
         out << "Block(";
         bool first = true;
-        for (T *s : stmt_list)
+        for (Stmt *s : stmt_list)
         {
             if (!first)
                 out << ",";
@@ -490,18 +657,18 @@ public:
         }
         out << ")";
     }
-    virtual void run() const override
-    {
-        for (T *s : stmt_list)
-            s->run();
-    }
-    std::vector<T *> getList()
+    // virtual void run() const override
+    // {
+    //     for (Stmt *s : stmt_list)
+    //         s->run();
+    // }
+    std::vector<Stmt *> getList()
     {
         return stmt_list;
     }
 
 private:
-    std::vector<T *> stmt_list;
+    std::vector<Stmt *> stmt_list;
 };
 
 class If : public Stmt
@@ -556,6 +723,59 @@ public:
 private:
     Cond *cond;
     Stmt *stmt;
+};
+
+class DataType : public AST
+{
+public:
+    DataType(std::string t) : type(t) {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "DataType(" << type;
+    }
+
+private:
+    std::string type;
+};
+
+class RetType : public AST
+{
+public:
+    RetType(DataType *t) : type(t) {}
+    ~RetType() { delete type; }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "RetType(";
+        if (type == nullptr)
+            out << "nothing)";
+        else
+            out << *type << ")";
+    }
+
+private:
+    DataType *type;
+};
+
+class FParType : public AST
+{
+public:
+    FParType(DataType *t, ArrayDim *d, bool dl = false) : type(t), dim(d), dimlen(dl) {}
+    ~FParType()
+    {
+        delete type;
+        delete dim;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "FParType(";
+        if (dimlen)
+            out << "[ ]";
+        out << dim << ")";
+    }
+private:
+    DataType *type;
+    ArrayDim *dim;
+    bool dimlen;
 };
 
 #endif __AST_HPP__

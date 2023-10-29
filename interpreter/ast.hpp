@@ -644,7 +644,10 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "CallExpr( " << *id << " ( " << *expr_list << "))";
+        out << "CallExpr( " << *id << " ( ";
+        if (expr_list != nullptr)
+            out << *expr_list;
+        out << "))";
     }
     // TODO: Implement how a function is run.
     virtual int eval() const override
@@ -667,7 +670,10 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "CallStmt( " << *id << " ( " << *expr_list << "));";
+        out << "CallStmt( " << *id << " ( ";
+        if (expr_list != nullptr)
+            out << *expr_list;
+        out << "))";
     }
     // TODO: Implement how a function is run.
     // virtual int eval() const override

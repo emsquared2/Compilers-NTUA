@@ -55,13 +55,13 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 "<-"        { return T_assign; }
 
 
-{L}({L}|{D}|\_)* { return T_id; }
+{L}({L}|{D}|\_)* { yylval.str = strdup(yytext); return T_id; }
 
-{D}+ { return T_const; }
+{D}+ { yylval.num = std::stoi(yytext); return T_const; }
 
-\'([^\'\"\\]|{Esc})\' { return T_const_char; }
+\'([^\'\"\\]|{Esc})\' { yylval.c = yytext[0]; return T_const_char; }
 
-\"([^\'\"\\]|{Esc})*\" { return T_const_str; }
+\"([^\'\"\\]|{Esc})*\" { yylval.str = strdup(yytext); return T_const_str; }
 
 [\+\-\*\=\#\<\>] { return yytext[0]; }
 

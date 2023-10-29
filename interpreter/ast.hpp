@@ -20,6 +20,10 @@ extern std::map<std::string, int> globals;
 //     std::vector<Expr *> expr_list;
 // };
 
+class FuncDef;
+class LocalDef;
+class Local;
+
 class AST
 {
 public:
@@ -95,10 +99,7 @@ private:
 class ConstStr : public LValue
 {
 public:
-    ConstStr(std::string s)
-    {
-        var = s.c_str();
-    }
+    ConstStr(char *s) : var(s) {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "ConstStr(" << var << ")";
@@ -122,7 +123,7 @@ private:
 class Id : public LValue
 {
 public:
-    Id(std::string s) : var(s) {}
+    Id(char *s) : var(s) {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "Id(" << var << ")";
@@ -140,7 +141,7 @@ public:
     }
 
 private:
-    std::string var;
+    char *var;
 };
 
 class IdList : public AST
@@ -162,12 +163,13 @@ public:
     {
         out << "IdList(";
         bool first = true;
-        for (Id *id : idlist)
+        // for (Id *id : idlist)
+        for (auto id = idlist.rbegin(); id != idlist.rend(); ++id)
         {
             if (!first)
                 out << ", ";
             first = false;
-            out << id;
+            out << **id;
         }
         out << ")";
     }
@@ -191,7 +193,7 @@ public:
     {
         for (Const *num : dim)
         {
-            out << "[" << num << "]";
+            out << "[" << *num << "]";
         }
     }
     bool isEmpty()
@@ -249,12 +251,13 @@ public:
     {
         out << "ExprList(";
         bool first = true;
-        for (Expr *e : expr_list)
+        // for (Expr *e : expr_list)
+        for (auto e = expr_list.rbegin(); e != expr_list.rend(); ++e)
         {
             if (!first)
                 out << ",";
             first = false;
-            out << *e;
+            out << **e;
         }
         out << ")";
     }
@@ -279,12 +282,13 @@ public:
     {
         out << "StmtList(";
         bool first = true;
-        for (Stmt *s : stmt_list)
+        // for (Stmt *s : stmt_list)
+        for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
         {
             if (!first)
                 out << ",";
             first = false;
-            out << *s;
+            out << **s;
         }
         out << ")";
     }
@@ -307,12 +311,13 @@ public:
     {
         out << "Block(";
         bool first = true;
-        for (Stmt *s : stmt_list)
+        // for (Stmt *s : stmt_list)
+        for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
         {
             if (!first)
                 out << ",";
             first = false;
-            out << *s;
+            out << **s;
         }
         out << ")";
     }
@@ -333,14 +338,14 @@ private:
 class DataType : public AST
 {
 public:
-    DataType(std::string t) : type(t) {}
+    DataType(char *t) : type(t) {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "DataType(" << type;
+        out << "DataType(" << type << ")";
     }
 
 private:
-    std::string type;
+    char *type;
 };
 
 class Type : public AST
@@ -394,7 +399,7 @@ public:
         out << "FParType(";
         if (dimlen)
             out << "[ ]";
-        out << dim << ")";
+        out << *dim << ")";
     }
 
 private:
@@ -413,7 +418,7 @@ public:
         out << "FParam(";
         if (ref)
             out << "ref ";
-        out << *idlist << " : " << *fpartype;
+        out << *idlist << " : " << *fpartype << ")";
     }
 
 private:
@@ -435,13 +440,17 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        bool last = true;
-        for (FParam *param : params)
+        bool first = true;
+        out << "ParamList(";
+        // for (FParam *param : params)
+        for (auto param = params.rbegin(); param != params.rend(); ++param)
         {
-            out << param;
-            if (param != params.back())
-                out << " ; ";
+            if (!first)
+                out << "; ";
+            first = false;
+            out << **param;
         }
+        out << ")";
     }
     void append(FParam *param)
     {
@@ -463,7 +472,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Decl(var " << idlist << " : " << type << ")";
+        out << "Decl(var " << *idlist << " : " << *type << ")";
     }
 
 private:
@@ -482,9 +491,9 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Header(fun " << id << "(";
+        out << "Header(fun " << *id << "(";
         if (paramlist != nullptr)
-            out << paramlist;
+            out << *paramlist;
         out << ") :" << *type;
     }
 
@@ -508,66 +517,98 @@ private:
     Header *header;
 };
 
-class LocalDef;
+// class FuncDef;
 
-class FuncDef : public AST
-{
-public:
-    FuncDef(Header *h, LocalDef *ld, Stmt *s) : header(h), localdef(ld), stmt(s) {}
-    ~FuncDef()
-    {
-        delete header;
-        delete localdef;
-        delete stmt;
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "FuncDef(";
-        out << *header << localdef << *stmt;
-        out << ")";
-    }
+// class Local : public AST
+// {
+// public:
+//     Local(FuncDef *fdef = nullptr, FuncDecl *fdecl = nullptr, Decl *d = nullptr) : funcdef(fdef), funcdecl(fdecl), decl(d) {}
+//     ~Local()
+//     {
+//         delete funcdef;
+//         delete funcdecl;
+//         delete decl;
+//     }
+//     virtual void printOn(std::ostream &out) const override
+//     {
+//         out << "Local(";
+//         if (funcdef != nullptr)
+//         {
+//             out << funcdef;
+//         }
+//         else if (funcdecl != nullptr)
+//         {
+//             out << *funcdecl;
+//         }
+//         else if (decl != nullptr)
+//         {
+//             out << *decl;
+//         }
+//         out << ")";
+//     }
 
-private:
-    Header *header;
-    LocalDef *localdef;
-    // Block *block;
-    Stmt *stmt;
-};
+// private:
+//     FuncDef *funcdef;
+//     FuncDecl *funcdecl;
+//     Decl *decl;
+// };
 
-class LocalDef : public AST
-{
-public:
-    LocalDef() : locals() {}
-    ~LocalDef()
-    {
-        for (std::variant<FuncDef *, FuncDecl *, Decl *> &local : locals)
-        {
-            std::visit([](auto &&arg)
-                       { delete arg; },
-                       local);
-        }
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "LocalDef(";
-        for (const auto local : locals)
-        {
-            std::visit([&out](auto &&arg)
-                       { out << *arg; },
-                       local);
-            // out << *local;
-        }
-        out << ")";
-    }
-    template <typename T>
-    void append(T *object)
-    {
-        locals.push_back(object);
-    }
+// class LocalDef : public AST
+// {
+// public:
+//     LocalDef() : locals() {}
+//     ~LocalDef()
+//     {
+//         for (Local *l : locals)
+//         {
+//             delete l;
+//         }
+//     }
+//     virtual void printOn(std::ostream &out) const override
+//     {
+//         out << "LocalDef(";
+//         bool first = true;
+//         for (auto l = locals.rbegin(); l != locals.rend(); ++l)
+//         {
+//             if (!first)
+//                 out << ", ";
+//             out << *l;
+//             first = false;
+//         }
+//         out << ")";
+//     }
+//     void append(Local *l)
+//     {
+//         locals.push_back(l);
+//     }
 
-private:
-    std::vector<std::variant<FuncDef *, FuncDecl *, Decl *>> locals;
-};
+// private:
+//     std::vector<Local *> locals;
+// };
+
+// class FuncDef : public AST
+// {
+// public:
+//     FuncDef(Header *h, LocalDef *ld, Stmt *s) : header(h), localdef(ld), stmt(s) {}
+//     ~FuncDef()
+//     {
+//         delete header;
+//         delete localdef;
+//         delete stmt;
+//     }
+//     virtual void printOn(std::ostream &out) const override
+//     {
+//         out << "FuncDef(";
+//         out << *header << *localdef << *stmt;
+//         out << ")";
+//     }
+
+// private:
+//     Header *header;
+//     LocalDef *localdef;
+//     // Block *block;
+//     Stmt *stmt;
+// };
 
 class Assign : public Stmt
 {
@@ -584,7 +625,7 @@ public:
     }
     virtual void run() const override
     {
-        globals[l_value->getName()] = expr->eval();
+        // globals[l_value->getName()] = expr->eval();
     }
 
 private:
@@ -595,8 +636,6 @@ private:
 class CallExpr : public Expr
 {
 public:
-    // Call(std::string s) : id(s) {}
-    // Call(std::string s, ExprList *e_list) : id(s), expr_list(e_list) {}
     CallExpr(Id *id, ExprList *e_list = nullptr) : id(id), expr_list(e_list) {}
     ~CallExpr()
     {
@@ -605,8 +644,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        bool first = true;
-        out << "CallExpr( " << id << " ( " << expr_list << "))";
+        out << "CallExpr( " << *id << " ( " << *expr_list << "))";
     }
     // TODO: Implement how a function is run.
     virtual int eval() const override
@@ -614,17 +652,13 @@ public:
     }
 
 private:
-    // std::string id;
     Id *id;
-    // std::vector<Expr *> expr_list;
     ExprList *expr_list;
 };
 
 class CallStmt : public Stmt
 {
 public:
-    // Call(std::string s) : id(s) {}
-    // Call(std::string s, ExprList *e_list) : id(s), expr_list(e_list) {}
     CallStmt(Id *id, ExprList *e_list = nullptr) : id(id), expr_list(e_list) {}
     ~CallStmt()
     {
@@ -633,8 +667,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        bool first = true;
-        out << "CallStmt( " << id << " ( " << expr_list << "));";
+        out << "CallStmt( " << *id << " ( " << *expr_list << "));";
     }
     // TODO: Implement how a function is run.
     // virtual int eval() const override
@@ -645,16 +678,14 @@ public:
     }
 
 private:
-    // std::string id;
     Id *id;
-    // std::vector<Expr *> expr_list;
     ExprList *expr_list;
 };
 
 class UnOp : public Expr
 {
 public:
-    UnOp(std::string s, Expr *e) : op(s), right(e) {}
+    UnOp(char *s, Expr *e) : op(s), right(e) {}
     ~UnOp()
     {
         delete right;
@@ -676,14 +707,14 @@ public:
     }
 
 private:
+    char *op;
     Expr *right;
-    std::string op;
 };
 
 class BinOp : public Expr, public Cond
 {
 public:
-    BinOp(Expr *l, std::string s, Expr *r) : left(l), op(s), right(r) {}
+    BinOp(Expr *l, char *s, Expr *r) : left(l), op(s), right(r) {}
     ~BinOp()
     {
         delete left;
@@ -744,15 +775,16 @@ public:
     }
 
 private:
-    Expr *left, *right;
-    std::string op;
+    Expr *left;
+    char *op;
+    Expr *right;
 };
 
 class OpCond : public Cond
 {
 public:
-    OpCond(Cond *l, std::string s, Cond *r) : left(l), op(s), right(r) {}
-    OpCond(std::string s, Cond *r) : left(), op(s), right(r) {}
+    OpCond(Cond *l, char *s, Cond *r) : left(l), op(s), right(r) {}
+    OpCond(char *s, Cond *r) : left(), op(s), right(r) {}
     ~OpCond()
     {
         delete left;
@@ -783,8 +815,9 @@ public:
     }
 
 private:
-    Cond *left, *right;
-    std::string op;
+    Cond *left;
+    char *op;
+    Cond *right;
 };
 
 class Return : public Stmt
@@ -795,7 +828,7 @@ public:
     {
         out << "Return(";
         if (expr != nullptr)
-            out << expr;
+            out << *expr;
         out << ")";
     }
     virtual void run() const override
@@ -864,4 +897,4 @@ private:
     Stmt *stmt;
 };
 
-#endif __AST_HPP__
+#endif

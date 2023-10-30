@@ -33,13 +33,13 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 
 "and"       { return T_and; }
 "bool"      { return T_bool; }
-"char"      { return T_char; }
+"char"      { yylval.str = strdup(yytext); return T_char; }
 "div"       { return T_div; }
 "do"        { return T_do; }
 "else"      { return T_else; }
 "fun"       { return T_fun; }
 "if"        { return T_if; }
-"int"       { return T_int; }
+"int"       { yylval.str = strdup(yytext); return T_int; }
 "mod"       { return T_mod; }
 "not"       { return T_not; }
 "nothing"   { return T_nothing; }

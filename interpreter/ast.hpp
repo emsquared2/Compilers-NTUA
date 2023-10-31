@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include <cstring>
 
 extern std::map<std::string, int> globals;
 
@@ -99,7 +100,11 @@ private:
 class ConstStr : public LValue
 {
 public:
-    ConstStr(char *s) : var(s) {}
+    ConstStr(char *s) {
+        std::string Str(s);
+        std::string reversedStr(Str.rbegin(), Str.rend());
+        var = strdup(reversedStr.c_str());
+    }
     virtual void printOn(std::ostream &out) const override
     {
         out << "ConstStr(" << var << ")";

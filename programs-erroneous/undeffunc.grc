@@ -1,0 +1,28 @@
+$$
+  In this erroneous grace program a declared, but undefined function is called.
+
+  The function 'friendShowedUp' is declared, but the definition is missing and
+  (unfortunately) this is an error.
+$$
+
+fun main() : nothing
+  var airplaneLanded : int;
+  var travelerGuy, carGuy : char[10];
+
+  fun friendShowedUp(ref name : char[]) : int;
+
+  fun comePickMeUp(ref name : char[]) : nothing {
+    writeString(" - Hey, it\'s ");
+    writeString(name);
+    writeString(". I\'m at the airport and I\'m waiting for you!\n");
+  }
+
+{ $ main
+  strcpy(travelerGuy, "John");
+  strcpy(carGuy, "Kyle");
+
+  airplaneLanded <- 1;
+  comePickMeUp(travelerGuy);
+  if friendShowedUp(carGuy) = 1 then
+    writeString("\nEveryone went home that night.\n");
+} $ main

@@ -396,7 +396,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "FParType(";
+        out << "FParType(" << *type;
         if (dimlen)
             out << "[ ]";
         out << *dim << ")";

@@ -1,1 +1,4 @@
 .vscode
+
+/syntax-gen/proper
+/syntax-gen/*.beam

@@ -59,7 +59,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 
 {D}+ { yylval.num = std::stoi(yytext); return T_const; }
 
-\'([^\'\"\\]|{Esc})\' { yylval.c = yytext[0]; return T_const_char; }
+\'([^\'\"\\]|{Esc})\' { yylval.c = yytext[1]; return T_const_char; }
 
 \"([^\'\"\\]|{Esc})*\" { yylval.str = strdup(yytext); return T_const_str; }
 

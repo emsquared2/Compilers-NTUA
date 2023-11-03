@@ -14,6 +14,6 @@ FuncDef::~FuncDef()
 void FuncDef::printOn(std::ostream &out) const
 {
     out << "FuncDef(";
-    out << *header << *localdef << *stmt;
+    out << *header << " " << *localdef << " " << *stmt;
     out << ")";
 }

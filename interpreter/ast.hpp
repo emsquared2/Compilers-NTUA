@@ -255,7 +255,7 @@ public:
         for (auto e = expr_list.rbegin(); e != expr_list.rend(); ++e)
         {
             if (!first)
-                out << ",";
+                out << ", ";
             first = false;
             out << **e;
         }
@@ -286,7 +286,7 @@ public:
         for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
         {
             if (!first)
-                out << ",";
+                out << ", ";
             first = false;
             out << **s;
         }
@@ -315,7 +315,7 @@ public:
         for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
         {
             if (!first)
-                out << ",";
+                out << ", ";
             first = false;
             out << **s;
         }
@@ -494,7 +494,7 @@ public:
         out << "Header(fun " << *id << "(";
         if (paramlist != nullptr)
             out << *paramlist;
-        out << ") :" << *type;
+        out << ") : " << *type;
     }
 
 private:
@@ -644,7 +644,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "CallExpr( " << *id << " ( ";
+        out << "CallExpr(" << *id << "(";
         if (expr_list != nullptr)
             out << *expr_list;
         out << "))";
@@ -670,7 +670,7 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "CallStmt( " << *id << " ( ";
+        out << "CallStmt(" << *id << "(";
         if (expr_list != nullptr)
             out << *expr_list;
         out << "))";
@@ -863,7 +863,7 @@ public:
     {
         out << "If(" << *cond << ", " << *stmt1;
         if (stmt2 != nullptr)
-            out << ", " << *stmt2;
+            out << " Else " << *stmt2;
         out << ")";
     }
     virtual void run() const override

@@ -124,155 +124,155 @@ program:
 ;
 
 func-def:
-    header local-def block      { std::cout << "here"<< std::endl; $$ = new FuncDef($1, $2, $3); }
+    header local-def block      { $$ = new FuncDef($1, $2, $3); }
 ;
 
 header: 
-    "fun" id '(' fpar-def fpar-def-extended ')' ':' ret-type  { std::cout << "here2"<< std::endl; $5->append($4); $$ = new Header($2, $8, $5); }
-    | "fun" id '(' ')' ':' ret-type                           { std::cout << "here3"<< std::endl; $$ = new Header($2, $6); }
+    "fun" id '(' fpar-def fpar-def-extended ')' ':' ret-type  { $5->append($4); $$ = new Header($2, $8, $5); }
+    | "fun" id '(' ')' ':' ret-type                           { $$ = new Header($2, $6); }
 ;
 
 fpar-def-extended:
-    /* nothing */                       { std::cout << "here4"<< std::endl; $$ = new ParamList();}
-    | ';' fpar-def fpar-def-extended    { std::cout << "here5"<< std::endl; $3->append($2); $$ = $3;}
+    /* nothing */                       { $$ = new ParamList();}
+    | ';' fpar-def fpar-def-extended    { $3->append($2); $$ = $3;}
 ;
 
 fpar-def:
-    "ref" id id-extended ':' fpar-type { std::cout << "here6"<< std::endl; $3->append($2); $$ = new FParam($3, $5, true);}
-    | id id-extended ':' fpar-type     { std::cout << "here7"<< std::endl; $2->append($1); $$ = new FParam($2, $4);}
+    "ref" id id-extended ':' fpar-type { $3->append($2); $$ = new FParam($3, $5, true);}
+    | id id-extended ':' fpar-type     { $2->append($1); $$ = new FParam($2, $4);}
 ;
 
 id-extended:
-    /* nothing */               {std::cout << "here8"<< std::endl; $$ = new IdList(); }
-    | ',' id id-extended        {std::cout << "here9"<< std::endl; $3->append($2); $$ = $3; }
+    /* nothing */               { $$ = new IdList(); }
+    | ',' id id-extended        { $3->append($2); $$ = $3; }
 ;
 
 fpar-type: // use $2->isEmpty() to identify simple params (int / char) from arrays
-    data-type bracket-extended              { std::cout << "here10"<< std::endl; $$ = new FParType($1, $2); }
-    | data-type '[' ']' bracket-extended    { std::cout << "here11"<< std::endl; $$ = new FParType($1, $4, true); }
+    data-type bracket-extended              { $$ = new FParType($1, $2); }
+    | data-type '[' ']' bracket-extended    { $$ = new FParType($1, $4, true); }
 ;
 
 bracket-extended:
-    /* nothing */                                 {std::cout << "here12"<< std::endl; $$ = new ArrayDim(); } // use
-    | '[' /*T_const*/ const ']' bracket-extended  {std::cout << "here13"<< std::endl; $4->append($2); $$ = $4;}
+    /* nothing */                                 { $$ = new ArrayDim(); } // use
+    | '[' /*T_const*/ const ']' bracket-extended  { $4->append($2); $$ = $4;}
 ; 
 
 data-type:
-    "int"           /* { $$ = TYPE_INT;  } */ { std::cout << "here14"<< std::endl; $$ = new DataType($1);}
-    | "char"        /* { $$ = TYPE_BOOL; } */ { std::cout << "here15"<< std::endl; $$ = new DataType($1);}
+    "int"           /* { $$ = TYPE_INT;  } */ { $$ = new DataType($1);}
+    | "char"        /* { $$ = TYPE_BOOL; } */ { $$ = new DataType($1);}
 ;
 
 ret-type:
-    data-type       {std::cout << "here16"<< std::endl; $$ = new RetType($1); }
-    | "nothing"     {std::cout << "here17"<< std::endl; $$ = new RetType();   }
+    data-type       { $$ = new RetType($1); }
+    | "nothing"     { $$ = new RetType();   }
 ;
 
 local-def:
-    /* nothing*/                {std::cout << "here18"<< std::endl; $$ = new LocalDef(); }
-    | local local-def           {std::cout << "here19"<< std::endl; $2->append($1); $$ = $2; }
-    /* | func-def local-def        {std::cout << "here19"<< std::endl; $2->append($1); $$ = $2; }
-    | func-decl local-def       {std::cout << "here20"<< std::endl; $2->append($1); $$ = $2; }
-    | var-def local-def         {std::cout << "here21"<< std::endl; $2->append($1); $$ = $2; } */
+    /* nothing*/                { $$ = new LocalDef(); }
+    | local local-def           { $2->append($1); $$ = $2; }
+    /* | func-def local-def        { $2->append($1); $$ = $2; }
+    | func-decl local-def       { $2->append($1); $$ = $2; }
+    | var-def local-def         { $2->append($1); $$ = $2; } */
 ;
 
 local:
-    func-def                    {std::cout << "here20"<< std::endl; $$ = new Local($1); }
-    | func-decl                 {std::cout << "here21"<< std::endl; $$ = new Local($1); }
-    | var-def                   {std::cout << "here22"<< std::endl; $$ = new Local($1); }
+    func-def                    { $$ = new Local($1); }
+    | func-decl                 { $$ = new Local($1); }
+    | var-def                   { $$ = new Local($1); }
 ;
 
 func-decl:
-    header ';'  {std::cout << "here22"<< std::endl; $$ = new FuncDecl($1); }
+    header ';'  { $$ = new FuncDecl($1); }
 ;
 
 var-def:
-    "var" id id-extended ':' type ';'     {std::cout << "here23"<< std::endl; $3->append($2); $$ = new Decl($3, $5); }
+    "var" id id-extended ':' type ';'     { $3->append($2); $$ = new Decl($3, $5); }
 ;
 
 type:
-    data-type bracket-extended      { std::cout << "here24"<< std::endl; $$ = new Type($1, $2); }
+    data-type bracket-extended      { $$ = new Type($1, $2); }
 ;
 
 block:
-    '{' stmt-list '}'   { std::cout << "here25"<< std::endl; $$ = $2; }
+    '{' stmt-list '}'   { $$ = $2; }
 ;
 
 stmt-list: 
-    /* nothing */       { std::cout << "here26"<< std::endl; $$ = new Block(); }
-    | stmt stmt-list    { std::cout << "here27"<< std::endl; $2->append($1); $$ = $2;}
+    /* nothing */       { $$ = new Block(); }
+    | stmt stmt-list    { $2->append($1); $$ = $2;}
 ;
 
 stmt:
-    ';'                                     { std::cout << "here28"<< std::endl; $$ = nullptr; }
-    | l-value T_assign expr ';'             { std::cout << "here29"<< std::endl; $$ = new Assign($1, $3); }
-    | block                                 { std::cout << "here30"<< std::endl; $$ = $1; }
-    | func-call-stmt ';'                    { std::cout << "here31"<< std::endl; $$ = $1; }
-    | "if" cond "then" stmt                 { std::cout << "here32"<< std::endl; $$ = new If($2, $4); }
-    | "if" cond "then" stmt "else" stmt     { std::cout << "here33"<< std::endl; $$ = new If($2, $4, $6); }
-    | "while" cond "do" stmt                { std::cout << "here34"<< std::endl; $$ = new While($2, $4); }
-    | "return" ';'                          { std::cout << "here35"<< std::endl; $$ = new Return(); }
-    | "return" expr ';'                     { std::cout << "here36"<< std::endl; $$ = new Return($2); }    
+    ';'                                     { $$ = nullptr; }
+    | l-value T_assign expr ';'             { $$ = new Assign($1, $3); }
+    | block                                 { $$ = $1; }
+    | func-call-stmt ';'                    { $$ = $1; }
+    | "if" cond "then" stmt                 { $$ = new If($2, $4); }
+    | "if" cond "then" stmt "else" stmt     { $$ = new If($2, $4, $6); }
+    | "while" cond "do" stmt                { $$ = new While($2, $4); }
+    | "return" ';'                          { $$ = new Return(); }
+    | "return" expr ';'                     { $$ = new Return($2); }    
 ;
 
 l-value:                   
-    id/*T_id*/              { std::cout << "here37"<< std::endl; $$ = $1;}
-    | T_const_str           { std::cout << "here38"<< std::endl; $$ = new ConstStr($1);}
-    | l-value '[' expr ']'  { std::cout << "here39"<< std::endl; $$ = new ArrayElem($1, $3);} 
+    id/*T_id*/              { $$ = $1;}
+    | T_const_str           { $$ = new ConstStr($1);}
+    | l-value '[' expr ']'  { $$ = new ArrayElem($1, $3);} 
 ;
 
 id :
-    T_id                    { std::cout << "here40" << $1 << std::endl;  $$ = new Id($1);}
+    T_id                    { std::cout << "here40" << $1 << std::endl; $$ = new Id($1);}
 ;
 // changed all T_id to id to satisfy correct id
 
 expr:
     //T_const             { $$ = new Const($1); }
-    const               { std::cout << "here41"<< std::endl; $$ = $1; }
-    | T_const_char      { std::cout << "here42"<< std::endl; $$ = new ConstChar($1); }
-    | l-value           { std::cout << "here43"<< std::endl; $$ = $1; }
-    | '(' expr ')'      { std::cout << "here44"<< std::endl; $$ = $2; }
-    | func-call-expr    { std::cout << "here45"<< std::endl; $$ = $1; } // Check if run function needed.  
-    | '+' expr          { std::cout << "here46"<< std::endl; $$ = new UnOp("+", $2); }
-    | '-' expr          { std::cout << "here47"<< std::endl; $$ = new UnOp("-", $2); }
-    | expr '+' expr     { std::cout << "here48"<< std::endl; $$ = new BinOp($1, "+", $3);}
-    | expr '-' expr     { std::cout << "here49"<< std::endl; $$ = new BinOp($1, "-", $3);}
-    | expr '*' expr     { std::cout << "here50"<< std::endl; $$ = new BinOp($1, "*", $3);}
-    | expr "div"  expr  { std::cout << "here51"<< std::endl; $$ = new BinOp($1, "div", $3);}
-    | expr "mod"  expr  { std::cout << "here52"<< std::endl; $$ = new BinOp($1, "mod", $3);}
+    const               { $$ = $1; }
+    | T_const_char      { $$ = new ConstChar($1); }
+    | l-value           { $$ = $1; }
+    | '(' expr ')'      { $$ = $2; }
+    | func-call-expr    { $$ = $1; } // Check if run function needed.  
+    | '+' expr          { $$ = new UnOp("+", $2); }
+    | '-' expr          { $$ = new UnOp("-", $2); }
+    | expr '+' expr     { $$ = new BinOp($1, "+", $3);}
+    | expr '-' expr     { $$ = new BinOp($1, "-", $3);}
+    | expr '*' expr     { $$ = new BinOp($1, "*", $3);}
+    | expr "div"  expr  { $$ = new BinOp($1, "div", $3);}
+    | expr "mod"  expr  { $$ = new BinOp($1, "mod", $3);}
 ;
 
 const: 
-    T_const           { std::cout << "here43"<< std::endl; $$ = new Const($1); }
+    T_const           { $$ = new Const($1); }
 ;
 // changed impl just to have correct type (custom Const class instead of int)
 // Might need further examination ## 
 
 func-call-stmt: 
-    id '(' ')'                    { std::cout << "here53"<< std::endl; $$ = new CallStmt($1); }
-    | id '(' expr expr-list ')'   { std::cout << "here54"<< std::endl; $4->append($3); $$ = new CallStmt($1, $4); }
+    id '(' ')'                    { $$ = new CallStmt($1); }
+    | id '(' expr expr-list ')'   { $4->append($3); $$ = new CallStmt($1, $4); }
 ;
 
 func-call-expr: 
-    id '(' ')'                    {std::cout << "here55"<< std::endl; $$ = new CallExpr($1); }
-    | id '(' expr expr-list ')'   {std::cout << "here56"<< std::endl; $4->append($3); $$ = new CallExpr($1, $4); }
+    id '(' ')'                    { $$ = new CallExpr($1); }
+    | id '(' expr expr-list ')'   { $4->append($3); $$ = new CallExpr($1, $4); }
 ;
 
 expr-list:
-    /* nothing */           { std::cout << "here57"<< std::endl; $$ = new ExprList();}
-    | ',' expr expr-list    { std::cout << "here58"<< std::endl; $3->append($2); $$ = $3;}
+    /* nothing */           { $$ = new ExprList();}
+    | ',' expr expr-list    { $3->append($2); $$ = $3;}
 ;
 
 cond: 
-    '(' cond ')'        { std::cout << "here59"<< std::endl; $$ = $2; }
-    | "not" cond        { std::cout << "here61"<< std::endl; $$ = new OpCond("not", $2); }
-    | cond "and" cond   { std::cout << "here62"<< std::endl; $$ = new OpCond($1, "and", $3); }       
-    | cond "or" cond    { std::cout << "here63"<< std::endl; $$ = new OpCond($1, "or", $3); }    
-    | expr '=' expr     { std::cout << "here64"<< std::endl; $$ = new BinOp($1, "=", $3);}
-    | expr '#' expr     { std::cout << "here65"<< std::endl; $$ = new BinOp($1, "#", $3);}
-    | expr '<' expr     { std::cout << "here66"<< std::endl; $$ = new BinOp($1, "<", $3);}
-    | expr '>' expr     { std::cout << "here67"<< std::endl; $$ = new BinOp($1, ">", $3);}
-    | expr T_le expr    { std::cout << "here68"<< std::endl; $$ = new BinOp($1, "<=", $3);}
-    | expr T_ge expr    { std::cout << "here69"<< std::endl; $$ = new BinOp($1, ">=", $3);}
+    '(' cond ')'        { $$ = $2; }
+    | "not" cond        { $$ = new OpCond("not", $2); }
+    | cond "and" cond   { $$ = new OpCond($1, "and", $3); }       
+    | cond "or" cond    { $$ = new OpCond($1, "or", $3); }    
+    | expr '=' expr     { $$ = new BinOp($1, "=", $3);}
+    | expr '#' expr     { $$ = new BinOp($1, "#", $3);}
+    | expr '<' expr     { $$ = new BinOp($1, "<", $3);}
+    | expr '>' expr     { $$ = new BinOp($1, ">", $3);}
+    | expr T_le expr    { $$ = new BinOp($1, "<=", $3);}
+    | expr T_ge expr    { $$ = new BinOp($1, ">=", $3);}
 ;
 
 %%

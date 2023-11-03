@@ -59,7 +59,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 
 {D}+ { yylval.num = std::stoi(yytext); return T_const; }
 
-\'([^\'\"\\]|{Esc})\' { yylval.c = yytext[0]; return T_const_char; }
+\'([^\'\"\\]|{Esc})\' { yylval.c = Const_Char(yytext); return T_const_char; }
 
 \"([^\'\"\\]|{Esc})*\" { yylval.str = strdup(yytext); return T_const_str; }
 
@@ -83,6 +83,29 @@ $[^\$\n]*\n?         { lineno++; }
 .       { fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], lineno); exit(17); }
 
 %%
+
+char Const_Char(const char* seq) {
+    if (seq[1] != '\\') {
+        return seq[1];
+    } else if (seq[2] == 'x' && isxdigit(seq[3]) && isxdigit(seq[4])) {
+        char hexStr[3] = { seq[3], seq[4], '\0' };
+        int asciiCode = strtol(hexStr, nullptr, 16);
+        return static_cast<char>(asciiCode);
+    } else {
+        switch (seq[2]) {
+            case 'n': return '\n';
+            case 't': return '\t';
+            case 'r': return '\r';
+            case '0': return '\0';
+            case '\\': return '\\';
+            case '\'': return '\'';
+            case '\"': return '\"';
+            default:
+                yyerror("Unrecognized const char!");
+                return '\0'; // This will never be reached
+        }
+    }
+}
 
 void yyerror(const char *msg) {
     fprintf(stderr, "%s\n", msg);

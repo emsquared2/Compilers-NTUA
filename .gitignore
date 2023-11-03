@@ -1,9 +1,4 @@
 .vscode
-grace
-lexer.cpp
-parser.cpp
-parser.hpp
-*.o
-*.output
+
 /syntax-gen/proper
 /syntax-gen/*.beam

@@ -41,6 +41,9 @@ class Expr : public AST
 {
 public:
     virtual int eval() const = 0;
+
+protected:
+    Type *type;
 };
 
 class Cond : public AST
@@ -516,99 +519,6 @@ public:
 private:
     Header *header;
 };
-
-// class FuncDef;
-
-// class Local : public AST
-// {
-// public:
-//     Local(FuncDef *fdef = nullptr, FuncDecl *fdecl = nullptr, Decl *d = nullptr) : funcdef(fdef), funcdecl(fdecl), decl(d) {}
-//     ~Local()
-//     {
-//         delete funcdef;
-//         delete funcdecl;
-//         delete decl;
-//     }
-//     virtual void printOn(std::ostream &out) const override
-//     {
-//         out << "Local(";
-//         if (funcdef != nullptr)
-//         {
-//             out << funcdef;
-//         }
-//         else if (funcdecl != nullptr)
-//         {
-//             out << *funcdecl;
-//         }
-//         else if (decl != nullptr)
-//         {
-//             out << *decl;
-//         }
-//         out << ")";
-//     }
-
-// private:
-//     FuncDef *funcdef;
-//     FuncDecl *funcdecl;
-//     Decl *decl;
-// };
-
-// class LocalDef : public AST
-// {
-// public:
-//     LocalDef() : locals() {}
-//     ~LocalDef()
-//     {
-//         for (Local *l : locals)
-//         {
-//             delete l;
-//         }
-//     }
-//     virtual void printOn(std::ostream &out) const override
-//     {
-//         out << "LocalDef(";
-//         bool first = true;
-//         for (auto l = locals.rbegin(); l != locals.rend(); ++l)
-//         {
-//             if (!first)
-//                 out << ", ";
-//             out << *l;
-//             first = false;
-//         }
-//         out << ")";
-//     }
-//     void append(Local *l)
-//     {
-//         locals.push_back(l);
-//     }
-
-// private:
-//     std::vector<Local *> locals;
-// };
-
-// class FuncDef : public AST
-// {
-// public:
-//     FuncDef(Header *h, LocalDef *ld, Stmt *s) : header(h), localdef(ld), stmt(s) {}
-//     ~FuncDef()
-//     {
-//         delete header;
-//         delete localdef;
-//         delete stmt;
-//     }
-//     virtual void printOn(std::ostream &out) const override
-//     {
-//         out << "FuncDef(";
-//         out << *header << *localdef << *stmt;
-//         out << ")";
-//     }
-
-// private:
-//     Header *header;
-//     LocalDef *localdef;
-//     // Block *block;
-//     Stmt *stmt;
-// };
 
 class Assign : public Stmt
 {

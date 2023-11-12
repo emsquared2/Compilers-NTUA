@@ -16,7 +16,7 @@ public:
     Integer(int v) : val(v) {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Int(" << val << ")";
+        out << "int";
     }
 
 private:
@@ -29,18 +29,7 @@ public:
     Boolean(int b) : boolean(b) {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Boolean(";
-        switch (boolean)
-        {
-        case 0:
-            out << "false";
-            break;
-        case 1:
-            out << "true";
-            break;
-        default:
-        }
-        out << ")";
+        out << "bool";
     }
 
 private:
@@ -53,7 +42,7 @@ public:
     Character(char c) : chr(c) {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Char(" << chr << ")";
+        out << "char";
     }
 
 private:
@@ -66,7 +55,7 @@ public:
     Str(char *s) : str(s) {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "String(" << *str << ")";
+        out << "string";
     }
 
 private:
@@ -77,36 +66,25 @@ class Array : public Type
 {
 
 public:
-    Array(char cArray[])
-    {
-        charArray = cArray;
-        intArray = nullptr;
-    }
-    Array(int iArray[])
-    {
-        intArray = iArray;
-        charArray = nullptr;
+    Array(Integer *i) : integer(i), character(nullptr) {}
+    Array(Character *t) : integer(nullptr), character(t) {}
+    ~Array() {
+        delete integer;
+        delete character;
     }
     virtual void printOn(std::ostream &out) const override
     {
-        if (intArray != nullptr)
-        {
-            out << "IntArray(";
-            for (int i = 0; intArray[i] != '\0'; ++i)
-            {
-                out << intArray[i] << " ";
-            }
+        if(integer != nullptr) {
+            out << *integer;
         }
-        else if (charArray != nullptr)
-        {
-            out << "CharArray(" << charArray;
+        else {
+            out << *character;
         }
-        out << ")";
     }
 
 private:
-    char *charArray;
-    int *intArray;
+    Integer *integer;
+    Character *character;
 };
 
 #endif

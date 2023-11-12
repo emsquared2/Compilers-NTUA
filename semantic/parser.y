@@ -15,7 +15,7 @@
 
 %token T_and        "and"
 %token T_bool       "bool"
-%token<str> T_char    "char"
+%token<str> T_char  "char"
 %token T_div        "div"
 %token T_do         "do"
 %token T_else       "else"

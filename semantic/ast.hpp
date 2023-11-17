@@ -6,6 +6,19 @@
 #include <string>
 #include <vector>
 #include <variant>
+#include "types.hpp"
+
+inline std::ostream& operator<<(std::ostream &out, Types t) {
+  switch (t) {
+  case TYPE_INT: out << "int"; break;
+  case TYPE_BOOLEAN: out << "bool"; break;
+  case TYPE_CHARACTER: out << "char"; break;
+  case TYPE_STRING: out << "string"; break;
+  case TYPE_ARRAY: out << "array"; break;   
+  case TYPE_NOTHING: out << "nothing"; break; 
+  }
+  return out;
+}
 
 extern std::map<std::string, int> globals;
 
@@ -29,6 +42,7 @@ class AST
 public:
     virtual ~AST() {}
     virtual void printOn(std::ostream &out) const = 0;
+    virtual void sem() {}
 };
 
 inline std::ostream &operator<<(std::ostream &out, const AST &t)
@@ -41,6 +55,13 @@ class Expr : public AST
 {
 public:
     virtual int eval() const = 0;
+    void type_check(Type t) {
+        // sem();
+        // if(type != t) {
+        //     std::cerr << "Type mismatch" << std::endl;
+        //     exit(1);
+        // }
+    }
 
 protected:
     Type *type;
@@ -77,6 +98,7 @@ public:
     {
         return num;
     }
+    virtual void sem() override { type = new Integer(num); }
 
 private:
     int num;
@@ -94,6 +116,7 @@ public:
     {
         // return var;
     }
+    virtual void sem() override { type = new Character(var); }
 
 private:
     char var;
@@ -118,6 +141,7 @@ public:
     virtual int eval() const override
     {
     }
+    virtual void sem() override { type = new String(var); }
 
 private:
     const char *var;
@@ -142,9 +166,16 @@ public:
     virtual int eval() const override
     {
     }
+    virtual void sem() override
+    {
+        // SymbolEntry *e = st.lookup(var);
+        // type = e->type;
+        // offset = e->offset;
+    }
 
 private:
     char *var;
+    // int offset; 
 };
 
 class IdList : public AST
@@ -175,6 +206,10 @@ public:
             out << **id;
         }
         out << ")";
+    }
+    virtual void sem() override 
+    {
+        for(Id *i : idlist) i->sem();
     }
 
 private:
@@ -232,6 +267,10 @@ public:
     virtual int eval() const override
     {
     }
+    virtual void sem() override
+    {
+
+    }
 
 private:
     LValue *left;
@@ -264,6 +303,10 @@ public:
         }
         out << ")";
     }
+    vitual void sem() override
+    {
+        for (Expr *e : expr_list) e->sem();
+    }
 
 private:
     std::vector<Expr *> expr_list;
@@ -294,6 +337,10 @@ public:
             out << **s;
         }
         out << ")";
+    }
+    virtual void sem() override
+    {
+        for(Stmt *s : stmt_list) s->sem();
     }
 
 private:
@@ -333,6 +380,10 @@ public:
     {
         return stmt_list;
     }
+    virtual void sem() override
+    {
+        for(Stmt *s : stmt_list) s->sem();
+    }
 
 private:
     std::vector<Stmt *> stmt_list;
@@ -345,6 +396,10 @@ public:
     virtual void printOn(std::ostream &out) const override
     {
         out << "DataType(" << type << ")";
+    }
+    virtual void sem() override 
+    {
+
     }
 
 private:
@@ -688,6 +743,13 @@ public:
         }
 
         return 0;
+    }
+    virtual void sem() override
+    {
+        left->sem();
+        right->sem();
+
+
     }
 
 private:

@@ -3,86 +3,85 @@
 
 #include "ast.hpp"
 
-enum Types { TYPE_INTEGER, TYPE_BOOLEAN, TYPE_CHARACTER, TYPE_STRING, TYPE_ARRAY, TYPE_NOTHING };
+// enum Types
+// {
+//     TYPE_INTEGER,
+//     TYPE_BOOLEAN,
+//     TYPE_CHARACTER,
+//     TYPE_STRING,
+//     TYPE_ARRAY,
+//     TYPE_NOTHING
+// };
 
-class Type : public AST
+class Types : public AST
 {
 public:
-    virtual ~Type() {}
+    virtual ~Types() {}
     virtual void printOn(std::ostream &out) const = 0;
 
-protected:
-    Types *type;
+    // protected:
+    //     Types Types;
 };
 
-class Integer : public Type
+class Integer : public Types
 {
 public:
-    Integer(int v) : val(v), type(TYPE_INTEGER) {}
+    Integer() {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "int";
     }
-
-private:
-    int val;
 };
 
-class Boolean : public Type
+class Boolean : public Types
 {
 public:
-    Boolean(int b) : boolean(b), type(TYPE_BOOLEAN) {}
+    Boolean() {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "bool";
     }
-
-private:
-    int boolean;
 };
 
-class Character : public Type
+class Character : public Types
 {
 public:
-    Character(char c) : chr(c), type(TYPE_CHARACTER) {}
+    Character() {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "char";
     }
-
-private:
-    char chr;
 };
 
-class Str : public Type
+class Str : public Types
 {
 public:
-    Str(char *s) : str(s), type(TYPE_STRING) {}
+    Str() {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "string";
     }
-
-private:
-    char *str;
 };
 
-class Array : public Type
+class Array : public Types
 {
 
 public:
-    Array(Integer *i) : integer(i), character(nullptr), type(TYPE_ARRAY) {}
-    Array(Character *t) : integer(nullptr), character(t), type(TYPE_ARRAY) {}
-    ~Array() {
+    Array(Integer *i) : integer(i), character(nullptr) {}
+    Array(Character *t) : integer(nullptr), character(t) {}
+    ~Array()
+    {
         delete integer;
         delete character;
     }
     virtual void printOn(std::ostream &out) const override
     {
-        if(integer != nullptr) {
+        if (integer != nullptr)
+        {
             out << *integer;
         }
-        else {
+        else
+        {
             out << *character;
         }
         out << " array";
@@ -93,13 +92,14 @@ private:
     Character *character;
 };
 
-class Nothing : public Type
+class Nothing : public Types
 {
-    Nothing() : type(TYPE_NOTHING) {}
+public:
+    Nothing() {}
     virtual void printOn(std::ostream &out) const override
     {
         out << "nothing";
     }
-}
+};
 
 #endif

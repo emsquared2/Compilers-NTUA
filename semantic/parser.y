@@ -55,10 +55,10 @@
     FuncDef *funcdef;
     LocalDef *localdef;
     IdList *idlist;
-    ParamList *paramlist;
     ArrayDim *arraydim;
-    Type *type; // as we deal with more  types might change 
-    DataType *datatype;
+    ParamList *paramlist;
+    Types *types /**rettype, *fpartype*/; // as we deal with more  types might change 
+    // DataType *datatype;
     RetType *rettype;
     FParType *fpartype;
     Id *id;
@@ -106,8 +106,8 @@
 %type<idlist> id-extended
 %type<paramlist> fpar-def-extended
 %type<arraydim> bracket-extended
-%type<type> type;
-%type<datatype> data-type
+%type<types> type data-type //ret-type fpar-type
+/* %type<datatype> data-type */
 %type<rettype> ret-type
 %type<fpartype> fpar-type
 %type<cons> const
@@ -148,21 +148,29 @@ id-extended:
 ;
 
 fpar-type: // use $2->isEmpty() to identify simple params (int / char) from arrays
-    data-type bracket-extended              { $$ = new FParType($1, $2); }
-    | data-type '[' ']' bracket-extended    { $$ = new FParType($1, $4, true); }
-;
+    data-type bracket-extended
+    { 
+        if($2->isEmpty()) {
+            $$ = new FParType($1);
+        }
+        else {
+            $$ = new FParType(new Array($1, $2));
+        }
+    }
+    | data-type '[' ']' bracket-extended    { $4->specifyUnknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
+; // array 
 
-bracket-extended:
+bracket-extended: 
     /* nothing */                                 { $$ = new ArrayDim(); } // use
     | '[' /*T_const*/ const ']' bracket-extended  { $4->append($2); $$ = $4;}
 ; 
 
 data-type:
-    "int"           /* { $$ = TYPE_INT;  } */ { $$ = new DataType($1);}
-    | "char"        /* { $$ = TYPE_BOOL; } */ { $$ = new DataType($1);}
+    "int"           { $$ = new Integer(); } 
+    | "char"        { $$ = new Character();}
 ;
 
-ret-type:
+ret-type: 
     data-type       { $$ = new RetType($1); }
     | "nothing"     { $$ = new RetType();   }
 ;
@@ -190,7 +198,15 @@ var-def:
 ;
 
 type:
-    data-type bracket-extended      { $$ = new Type($1, $2); }
+    data-type bracket-extended      
+    { 
+        if($2->isEmpty()) {
+            $$ = $1;
+        }
+        else {
+            $$ = new Array($1, $2);
+        } 
+    }
 ;
 
 block:
@@ -221,7 +237,7 @@ l-value:
 ;
 
 id :
-    T_id                    { std::cout << "here40" << $1 << std::endl; $$ = new Id($1);}
+    T_id                    { $$ = new Id($1);}
 ;
 // changed all T_id to id to satisfy correct id
 

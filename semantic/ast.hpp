@@ -6,19 +6,13 @@
 #include <string>
 #include <vector>
 #include <variant>
-#include "types.hpp"
+// #include "types.hpp"
 
-inline std::ostream& operator<<(std::ostream &out, Types t) {
-  switch (t) {
-  case TYPE_INT: out << "int"; break;
-  case TYPE_BOOLEAN: out << "bool"; break;
-  case TYPE_CHARACTER: out << "char"; break;
-  case TYPE_STRING: out << "string"; break;
-  case TYPE_ARRAY: out << "array"; break;   
-  case TYPE_NOTHING: out << "nothing"; break; 
-  }
-  return out;
-}
+// inline std::ostream &operator<<(std::ostream &out, const Types &t)
+// {
+//     t.printOn(out);
+//     return out;
+// }
 
 extern std::map<std::string, int> globals;
 
@@ -36,6 +30,9 @@ extern std::map<std::string, int> globals;
 class FuncDef;
 class LocalDef;
 class Local;
+// class Types;
+// class Integer;
+// class Integer;
 
 class AST
 {
@@ -51,20 +48,81 @@ inline std::ostream &operator<<(std::ostream &out, const AST &t)
     return out;
 }
 
+// enum Types
+// {
+//     TYPE_INTEGER,
+//     TYPE_BOOLEAN,
+//     TYPE_CHARACTER,
+//     TYPE_STRING,
+//     TYPE_ARRAY,
+//     TYPE_NOTHING
+// };
+
+class Types : public AST
+{
+public:
+    virtual ~Types() {}
+    virtual void printOn(std::ostream &out) const = 0;
+
+    // protected:
+    //     Types Types;
+};
+
+class Integer : public Types
+{
+public:
+    Integer() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "int";
+    }
+};
+
+class Boolean : public Types
+{
+public:
+    Boolean() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "bool";
+    }
+};
+
+class Character : public Types
+{
+public:
+    Character() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "char";
+    }
+};
+
+class Str : public Types
+{
+public:
+    Str() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "string";
+    }
+};
+
 class Expr : public AST
 {
 public:
     virtual int eval() const = 0;
-    void type_check(Type t) {
-        // sem();
-        // if(type != t) {
-        //     std::cerr << "Type mismatch" << std::endl;
-        //     exit(1);
-        // }
-    }
+    // void type_check(Types t)
+    // {
+    //     sem();
+    //     if(type != t) {
+    //         std::cerr << "Type mismatch" << std::endl;
+    //         exit(1);
+    //     }
+    // }
 
 protected:
-    Type *type;
+    Types *types;
 };
 
 class Cond : public AST
@@ -89,7 +147,7 @@ public:
 class Const : public Expr
 {
 public:
-    Const(int n) : num(n) {}
+    Const(int n) : num(n) { types = new Integer(); }
     virtual void printOn(std::ostream &out) const override
     {
         out << "Const(" << num << ")";
@@ -98,7 +156,7 @@ public:
     {
         return num;
     }
-    virtual void sem() override { type = new Integer(num); }
+    virtual void sem() override {}
 
 private:
     int num;
@@ -107,7 +165,7 @@ private:
 class ConstChar : public Expr
 {
 public:
-    ConstChar(char v) : var(v) {}
+    ConstChar(char v) : var(v) { types = new Character(); }
     virtual void printOn(std::ostream &out) const override
     {
         out << "ConstChar(" << var << ")";
@@ -116,7 +174,7 @@ public:
     {
         // return var;
     }
-    virtual void sem() override { type = new Character(var); }
+    virtual void sem() override {}
 
 private:
     char var;
@@ -125,7 +183,7 @@ private:
 class ConstStr : public LValue
 {
 public:
-    ConstStr(char *s) : var(s) {}
+    ConstStr(char *s) : var(s) { types = new Str(); }
     virtual void printOn(std::ostream &out) const override
     {
         out << "ConstStr(" << var << ")";
@@ -141,10 +199,80 @@ public:
     virtual int eval() const override
     {
     }
-    virtual void sem() override { type = new String(var); }
+    virtual void sem() override {}
 
 private:
     const char *var;
+};
+
+class ArrayDim : public AST
+{
+public:
+    ArrayDim() : dim() {}
+    ~ArrayDim()
+    {
+        for (Const *num : dim)
+        {
+            delete num;
+        }
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        if (unknown)
+            out << "[ ]";
+        for (auto num = dim.rbegin(); num != dim.rend(); ++num)
+        {
+            out << "[" << **num << "]";
+        }
+    }
+    bool isEmpty()
+    {
+        return dim.empty();
+    }
+    void specifyUnknownFirstDim()
+    {
+        unknown = true;
+    }
+    void append(Const *num)
+    {
+        dim.push_back(num);
+    }
+    // TODO: for semantic action check each num that is of the correct type
+private:
+    std::vector<Const *> dim;
+    bool unknown = false;
+};
+
+class Array : public Types
+{
+
+public:
+    Array(Types *t, ArrayDim *d) : type(t), dim(d) {}
+    ~Array()
+    {
+        delete type;
+        delete dim;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << *type << " array" << *dim;
+    }
+
+private:
+    // Integer *integer;
+    // Character *character;
+    Types *type;
+    ArrayDim *dim;
+};
+
+class Nothing : public Types
+{
+public:
+    Nothing() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "nothing";
+    }
 };
 
 class Id : public LValue
@@ -175,7 +303,7 @@ public:
 
 private:
     char *var;
-    // int offset; 
+    // int offset;
 };
 
 class IdList : public AST
@@ -207,44 +335,14 @@ public:
         }
         out << ")";
     }
-    virtual void sem() override 
+    virtual void sem() override
     {
-        for(Id *i : idlist) i->sem();
+        for (Id *i : idlist)
+            i->sem();
     }
 
 private:
     std::vector<Id *> idlist;
-};
-
-class ArrayDim : public AST
-{
-public:
-    ArrayDim() : dim() {}
-    ~ArrayDim()
-    {
-        for (Const *num : dim)
-        {
-            delete num;
-        }
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        for (Const *num : dim)
-        {
-            out << "[" << *num << "]";
-        }
-    }
-    bool isEmpty()
-    {
-        return dim.empty();
-    }
-    void append(Const *num)
-    {
-        dim.push_back(num);
-    }
-
-private:
-    std::vector<Const *> dim;
 };
 
 class ArrayElem : public LValue
@@ -269,7 +367,6 @@ public:
     }
     virtual void sem() override
     {
-
     }
 
 private:
@@ -303,9 +400,10 @@ public:
         }
         out << ")";
     }
-    vitual void sem() override
+    virtual void sem() override
     {
-        for (Expr *e : expr_list) e->sem();
+        for (Expr *e : expr_list)
+            e->sem();
     }
 
 private:
@@ -340,7 +438,8 @@ public:
     }
     virtual void sem() override
     {
-        for(Stmt *s : stmt_list) s->sem();
+        for (Stmt *s : stmt_list)
+            s->sem();
     }
 
 private:
@@ -382,88 +481,86 @@ public:
     }
     virtual void sem() override
     {
-        for(Stmt *s : stmt_list) s->sem();
+        for (Stmt *s : stmt_list)
+            s->sem();
     }
 
 private:
     std::vector<Stmt *> stmt_list;
 };
 
-class DataType : public AST
+// class DataType : public AST
+// {
+// public:
+//     DataType(char *t) : type(t) {}
+//     virtual void printOn(std::ostream &out) const override
+//     {
+//         out << "DataType(" << type << ")";
+//     }
+//     virtual void sem() override
+//     {
+//     }
+
+// private:
+//     char *type;
+// };
+
+// class Type : public AST
+// {
+// public:
+//     Type(DataType *t, ArrayDim *d) : type(t), dim(d) {}
+//     ~Type()
+//     {
+//         delete type;
+//         delete dim;
+//     }
+//     virtual void printOn(std::ostream &out) const override
+//     {
+//         out << "Type(" << *type << *dim << ")";
+//     }
+
+// private:
+//     DataType *type;
+//     ArrayDim *dim;
+// };
+
+class RetType : public Types
 {
 public:
-    DataType(char *t) : type(t) {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "DataType(" << type << ")";
-    }
-    virtual void sem() override 
-    {
-
-    }
-
-private:
-    char *type;
-};
-
-class Type : public AST
-{
-public:
-    Type(DataType *t, ArrayDim *d) : type(t), dim(d) {}
-    ~Type()
-    {
-        delete type;
-        delete dim;
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "Type(" << *type << *dim << ")";
-    }
-
-private:
-    DataType *type;
-    ArrayDim *dim;
-};
-
-class RetType : public AST
-{
-public:
-    RetType(DataType *t = nullptr) : dtype(t) {}
+    RetType() { dtype = new Nothing(); }
+    RetType(Types *t) : dtype(t) {}
     ~RetType() { delete dtype; }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "RetType(";
-        if (dtype == nullptr)
-            out << "nothing)";
-        else
-            out << *dtype << ")";
+        out << "RetType(" << *dtype << ")";
     }
 
 private:
-    DataType *dtype;
+    Types *dtype;
 };
 
-class FParType : public AST
+class FParType : public Types
 {
 public:
-    FParType(DataType *t, ArrayDim *d, bool dl = false) : type(t), dim(d), dimlen(dl) {}
+    // FParType(Types *t, /*, ArrayDim *d, */ bool dl = false) : type(t)/*, dim(d),*/, dimlen(dl) {}
+    FParType(Types *t) : type(t) {}
     ~FParType()
     {
         delete type;
-        delete dim;
+        // delete dim;
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "FParType(" << *type;
-        if (dimlen)
-            out << "[ ]";
-        out << *dim << ")";
+        out << "FParType(" << *type << ")";
+        // if (dimlen)
+        //     out << "[ ]";
+        // out << *dim << ")";
     }
 
 private:
-    DataType *type;
-    ArrayDim *dim;
-    bool dimlen;
+    Types *type;
+    // ArrayDim *dim;
+    // bool dimlen;
 };
 
 class FParam : public AST
@@ -522,20 +619,20 @@ private:
 class Decl : public AST
 {
 public:
-    Decl(IdList *idl, Type *t) : idlist(idl), type(t) {}
+    Decl(IdList *idl, Types *t) : idlist(idl), types(t) {}
     ~Decl()
     {
         delete idlist;
-        delete type;
+        delete types;
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Decl(var " << *idlist << " : " << *type << ")";
+        out << "Decl(var " << *idlist << " : " << *types << ")";
     }
 
 private:
     IdList *idlist;
-    Type *type;
+    Types *types;
 };
 
 class Header : public AST
@@ -748,8 +845,6 @@ public:
     {
         left->sem();
         right->sem();
-
-
     }
 
 private:

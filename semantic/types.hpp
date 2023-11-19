@@ -2,7 +2,6 @@
 #define __TYPES_HPP__
 
 #include "ASTBase.hpp"
-#include "ast.hpp"
 
 class Type : public AST
 {

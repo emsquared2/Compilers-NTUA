@@ -1,61 +1,64 @@
 #ifndef __TYPES_HPP__
 #define __TYPES_HPP__
 
-#pragma once
+#include "ASTBase.hpp"
+#include "ast.hpp"
 
-class Types : public AST
+class Type : public AST
 {
 public:
-    virtual ~Types() {}
+    virtual ~Type() {}
     virtual void printOn(std::ostream &out) const = 0;
 };
 
-class Integer : public Types
+class Integer : public Type
 {
 public:
-    Integer();
-    virtual void printOn(std::ostream &out) const override;
+    Integer() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "int";
+    }
 };
 
-class Boolean : public Types
+class Boolean : public Type
 {
 public:
-    Boolean();
-    virtual void printOn(std::ostream &out) const override;
+    Boolean() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "bool";
+    }
 };
 
-class Character : public Types
+class Character : public Type
 {
 public:
-    Character();
-    virtual void printOn(std::ostream &out) const override;
+    Character() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "char";
+    }
 };
 
-class Str : public Types
+class Str : public Type
 {
 public:
-    Str();
-    virtual void printOn(std::ostream &out) const override;
+    Str() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "string";
+    }
 };
 
-class Array : public Types
-{
-
-public:
-    Array(Types *t, ArrayDim *d);
-    ~Array();
-    virtual void printOn(std::ostream &out) const override;
-
-private:
-    Types *type;
-    ArrayDim *dim;
-};
-
-class Nothing : public Types
+class Nothing : public Type
 {
 public:
-    Nothing();
-    virtual void printOn(std::ostream &out) const override;
+    Nothing() {}
+    virtual void printOn(std::ostream &out) const override
+    {
+        out << "nothing";
+    }
 };
 
 #endif

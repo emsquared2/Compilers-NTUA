@@ -57,7 +57,7 @@
     IdList *idlist;
     ArrayDim *arraydim;
     ParamList *paramlist;
-    Types *types /**rettype, *fpartype*/; // as we deal with more  types might change 
+    Type *type /**rettype, *fpartype*/; // as we deal with more types might change 
     // DataType *datatype;
     RetType *rettype;
     FParType *fpartype;
@@ -106,7 +106,7 @@
 %type<idlist> id-extended
 %type<paramlist> fpar-def-extended
 %type<arraydim> bracket-extended
-%type<types> type data-type //ret-type fpar-type
+%type<type> type data-type //ret-type fpar-type
 /* %type<datatype> data-type */
 %type<rettype> ret-type
 %type<fpartype> fpar-type

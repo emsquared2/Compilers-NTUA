@@ -1,105 +1,61 @@
 #ifndef __TYPES_HPP__
 #define __TYPES_HPP__
 
-#include "ast.hpp"
-
-// enum Types
-// {
-//     TYPE_INTEGER,
-//     TYPE_BOOLEAN,
-//     TYPE_CHARACTER,
-//     TYPE_STRING,
-//     TYPE_ARRAY,
-//     TYPE_NOTHING
-// };
+#pragma once
 
 class Types : public AST
 {
 public:
     virtual ~Types() {}
     virtual void printOn(std::ostream &out) const = 0;
-
-    // protected:
-    //     Types Types;
 };
 
 class Integer : public Types
 {
 public:
-    Integer() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "int";
-    }
+    Integer();
+    virtual void printOn(std::ostream &out) const override;
 };
 
 class Boolean : public Types
 {
 public:
-    Boolean() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "bool";
-    }
+    Boolean();
+    virtual void printOn(std::ostream &out) const override;
 };
 
 class Character : public Types
 {
 public:
-    Character() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "char";
-    }
+    Character();
+    virtual void printOn(std::ostream &out) const override;
 };
 
 class Str : public Types
 {
 public:
-    Str() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "string";
-    }
+    Str();
+    virtual void printOn(std::ostream &out) const override;
 };
 
 class Array : public Types
 {
 
 public:
-    Array(Integer *i) : integer(i), character(nullptr) {}
-    Array(Character *t) : integer(nullptr), character(t) {}
-    ~Array()
-    {
-        delete integer;
-        delete character;
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        if (integer != nullptr)
-        {
-            out << *integer;
-        }
-        else
-        {
-            out << *character;
-        }
-        out << " array";
-    }
+    Array(Types *t, ArrayDim *d);
+    ~Array();
+    virtual void printOn(std::ostream &out) const override;
 
 private:
-    Integer *integer;
-    Character *character;
+    Types *type;
+    ArrayDim *dim;
 };
 
 class Nothing : public Types
 {
 public:
-    Nothing() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "nothing";
-    }
+    Nothing();
+    virtual void printOn(std::ostream &out) const override;
 };
 
 #endif

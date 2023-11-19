@@ -1,6 +1,12 @@
 #include "ast.hpp"
 #include "types.hpp"
 
+inline std::ostream &operator<<(std::ostream &out, const Types &t)
+{
+    t.printOn(out);
+    return out;
+}
+
 Integer::Integer() {}
 void Integer::printOn(std::ostream &out) const
 {
@@ -25,25 +31,17 @@ void Str::printOn(std::ostream &out) const
     out << "str";
 }
 
-Array::Array(Integer *i) : integer(i), character(nullptr) {}
-Array::Array(Character *t) : integer(nullptr), character(t) {}
+Array:: Array(Types *t, ArrayDim *d) : type(t), dim(d) {}
 Array::~Array()
 {
-    delete integer;
-    delete character;
+    delete type;
+    delete dim;
 }
 void Array::printOn(std::ostream &out) const
 {
-    if (integer != nullptr)
-    {
-        out << *integer;
-    }
-    else
-    {
-        out << *character;
-    }
-    out << " array";
+    out << *type << " array" << *dim;
 }
+
 Nothing::Nothing() {}
 void Nothing::printOn(std::ostream &out) const
 {

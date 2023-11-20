@@ -118,7 +118,7 @@
 
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
-    | func-def  {  std::cout << "AST" << *$1 << std::endl;
+    | func-def  {  std::cout << "AST: " << *$1 << std::endl;
         //$$ = $1; 
     }
 ;

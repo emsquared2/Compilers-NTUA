@@ -22,10 +22,10 @@ local.o: local.cpp local.hpp funcdef.hpp ast.hpp
 parser.hpp parser.cpp: parser.y
 	bison -dv -o parser.cpp parser.y
 
-parser.o: parser.cpp lexer.hpp ast.hpp local.hpp funcdef.hpp localdef.hpp ASTBase.hpp types.hpp
+parser.o: parser.cpp lexer.hpp ast.hpp ASTabstracts.hpp types.hpp local.hpp funcdef.hpp localdef.hpp  
 	$(CXX) $(CXXFLAGS) -c parser.cpp
 
-grace: lexer.o parser.o funcdef.o localdef.o local.o ASTBase.hpp types.hpp
+grace: lexer.o parser.o funcdef.o localdef.o local.o 
 	$(CXX) $(CXXFLAGS) -o grace lexer.o parser.o funcdef.o localdef.o local.o
 
 clean: 

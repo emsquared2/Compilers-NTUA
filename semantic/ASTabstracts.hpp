@@ -22,14 +22,14 @@ class Expr : public AST
 {
 public:
     virtual int eval() const = 0;
-    // void type_check(Types t)
-    // {
-    //     sem();
-    //     if(type != t) {
-    //         std::cerr << "Type mismatch" << std::endl;
-    //         exit(1);
-    //     }
-    // }
+    void type_check(Type *t)
+    {
+        sem();
+        if(type != t) {
+            std::cerr << "Type mismatch" << std::endl;
+            exit(1);
+        }
+    }
 
 protected:
     Type *type;
@@ -39,6 +39,18 @@ class Cond : public AST
 {
 public:
     virtual int eval() const = 0;
+    // might not be needed 
+    void type_check(Type *t)
+    {
+        sem();
+        if (type != t)
+        {
+            std::cerr << "Type mismatch" << std::endl;
+            exit(1);
+        }
+    }
+protected:
+    Type *type;
 };
 
 class Stmt : public AST

@@ -230,15 +230,7 @@ stmt:
     | "return" expr ';'                     { $$ = new Return($2); }    
 ;
 
-//
-//l-value:                   
-//    id/*T_id*/              { $$ = $1;}
-//    | T_const_str           { $$ = new ConstStr($1);}
-//    | l-value '[' expr ']'  { $$ = new ArrayElem($1, $3);} 
-//; 
-
 l-value: 
-    //l-value-helper                          { $$ = $1;}
     l-value-helper array-elem-l-value     
     { 
         if($2->isEmpty()) {

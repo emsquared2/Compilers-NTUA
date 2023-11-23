@@ -91,9 +91,9 @@
 
 %type<block> stmt-list block program
 %type<funcdef> func-def /*program*/
-%type<exprlist> expr-list
+%type<exprlist> expr-list array-elem-l-value
 %type<expr> expr func-call-expr/*l-value*/ /*func-call*/
-%type<lvalue> l-value
+%type<lvalue> l-value l-value-helper
 %type<decl> var-def
 %type<cond> cond
 //%type<stmtlist> stmt-list
@@ -230,11 +230,33 @@ stmt:
     | "return" expr ';'                     { $$ = new Return($2); }    
 ;
 
-l-value:                   
-    id/*T_id*/              { $$ = $1;}
+//
+//l-value:                   
+//    id/*T_id*/              { $$ = $1;}
+//    | T_const_str           { $$ = new ConstStr($1);}
+//    | l-value '[' expr ']'  { $$ = new ArrayElem($1, $3);} 
+//; 
+
+l-value: 
+    //l-value-helper                          { $$ = $1;}
+    l-value-helper array-elem-l-value     
+    { 
+        if($2->isEmpty()) {
+            $$ = $1;
+        }
+        else {
+            $$ = new ArrayElem($1, $2);
+        }
+    }
+
+l-value-helper:
+    id                      { $$ = $1; }
     | T_const_str           { $$ = new ConstStr($1);}
-    | l-value '[' expr ']'  { $$ = new ArrayElem($1, $3);} 
-;
+
+array-elem-l-value:
+    /* nothing */                               { $$ = new ExprList(); }
+    | '[' expr ']' array-elem-l-value           { $4->append($2); $$ = $4; }
+
 
 id :
     T_id                    { $$ = new Id($1);}

@@ -84,35 +84,6 @@ private:
     std::vector<Id *> idlist;
 };
 
-class ArrayElem : public LValue
-{
-public:
-    ArrayElem(LValue *l, Expr *e) : left(l), expr(e) {}
-    ~ArrayElem()
-    {
-        delete left;
-        delete expr;
-    }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "ArrayElem(" << *left << "[" << *expr << "]";
-    }
-    virtual std::string getArrayElem()
-    {
-        return left->getName() + "[" + std::to_string(expr->eval()) + "]";
-    }
-    virtual int eval() const override
-    {
-    }
-    virtual void sem() override
-    {
-    }
-
-private:
-    LValue *left;
-    Expr *expr;
-};
-
 class ExprList : public AST
 {
 public:
@@ -138,6 +109,14 @@ public:
             out << **e;
         }
         out << ")";
+    }
+    std::vector<Expr *> getExprList()
+    {
+        return expr_list;
+    }
+    bool isEmpty()
+    {
+        return expr_list.empty();
     }
     virtual void sem() override
     {
@@ -226,6 +205,41 @@ public:
 
 private:
     std::vector<Stmt *> stmt_list;
+};
+
+class ArrayElem : public LValue
+{
+public:
+    ArrayElem(LValue *l, ExprList *e) : left(l), exprlist(e) {}
+    ~ArrayElem()
+    {
+        delete left;
+        delete exprlist;
+    }
+    virtual void printOn(std::ostream &out) const override
+    {
+        std::vector<Expr *> exprs = exprlist->getExprList();
+        out << "ArrayElem(" << *left;
+        for (auto e = exprs.rbegin(); e != exprs.rend(); ++e)
+        {
+            out << "[" << **e << "]";
+        }
+        out << ")";
+    }
+    virtual std::string getArrayElem()
+    {
+        //return left->getName() + "[" + std::to_string(expr->eval()) + "]";
+    }
+    virtual int eval() const override
+    {
+    }
+    virtual void sem() override
+    {
+    }
+
+private:
+    LValue *left;
+    ExprList *exprlist;
 };
 
 class FParam : public AST

@@ -7,3 +7,5 @@ parser.hpp
 *.output
 /syntax-gen/proper
 /syntax-gen/*.beam
+
+.DS_Store

@@ -32,6 +32,7 @@ public:
     }
     virtual int eval() const override
     {
+        // return rt_stack[offset]
     }
     virtual void sem() override
     {
@@ -452,6 +453,9 @@ public:
             return -right->eval();
         }
     }
+    virtual void sem() override {
+        right->type_check(new Integer());
+    }
 
 private:
     char *op;
@@ -522,8 +526,10 @@ public:
     }
     virtual void sem() override
     {
-        left->sem();
-        right->sem();
+        left->type_check(new Integer());
+        right->type_check(new Integer());
+        // left->sem();
+        // right->sem();
     }
 
 private:
@@ -566,6 +572,11 @@ public:
         return 0;
     }
 
+    virtual void sem() override {
+        if (left != nullptr) left->type_check(new Boolean());
+        right->type_check(new Boolean());
+    }
+
 private:
     Cond *left;
     char *op;
@@ -589,6 +600,11 @@ public:
     int ReturnValue()
     {
         return (expr != nullptr) ? expr->eval() : 0;
+    }
+
+    virtual void sem() override {
+        // Type expected_type = ???
+        // expr->sem();
     }
 
 private:
@@ -620,6 +636,12 @@ public:
             stmt2->run();
     }
 
+    virtual void sem() override {
+        cond->type_check(new Boolean());
+        stmt1->sem();
+        if (stmt2 != nullptr) stmt2->sem();
+    }
+
 private:
     Cond *cond;
     Stmt *stmt1, *stmt2;
@@ -642,6 +664,11 @@ public:
     {
         while (cond->eval())
             stmt->run();
+    }
+
+    virtual void sem() override {
+        cond->type_check(new Boolean());
+        stmt->sem();
     }
 
 private:

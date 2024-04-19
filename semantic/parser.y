@@ -8,6 +8,8 @@
     #include "funcdef.hpp"
     #include "local.hpp"
 
+    SymbolTable st;
+
     #define YYDEBUG 1
 
 %}
@@ -120,6 +122,7 @@ program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
     | func-def  {  std::cout << "AST: " << *$1 << std::endl;
         //$$ = $1; 
+        $1->sem();
     }
 ;
 

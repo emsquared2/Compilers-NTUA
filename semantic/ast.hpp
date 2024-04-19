@@ -7,8 +7,9 @@
 #include <variant>
 #include "ASTabstracts.hpp"
 #include "types.hpp"
+#include "symbol.hpp"
 
-extern std::map<std::string, int> globals;
+// extern std::map<std::string, int> globals;
 
 class FuncDef;
 class LocalDef;
@@ -36,14 +37,22 @@ public:
     }
     virtual void sem() override
     {
-        // SymbolEntry *e = st.lookup(var);
-        // type = e->type;
-        // offset = e->offset;
+        SymbolEntry *e = st.lookup(var);
+        if (e == nullptr)
+        {
+            std::cerr << "Undeclared variable " << var << std::endl;
+            throw std::runtime_error("Semantic error: Undeclared variable");
+        }
+        else
+        {
+            type = e->getType();
+            offset = e->getOffset();
+        }
     }
 
 private:
     char *var;
-    // int offset;
+    int offset;
 };
 
 class IdList : public AST
@@ -57,6 +66,9 @@ public:
             delete id;
         }
     }
+
+    const std::vector<Id *> get_idlist() { return idlist; }
+
     void append(Id *id)
     {
         idlist.push_back(id);
@@ -229,7 +241,7 @@ public:
     }
     virtual std::string getArrayElem()
     {
-        //return left->getName() + "[" + std::to_string(expr->eval()) + "]";
+        // return left->getName() + "[" + std::to_string(expr->eval()) + "]";
     }
     virtual int eval() const override
     {
@@ -310,6 +322,15 @@ public:
         out << "Decl(var " << *idlist << " : " << *type << ")";
     }
 
+    virtual void sem() override
+    {
+        for (Id *id : idlist->get_idlist())
+        {
+            st.lookup(id->getId());
+            st.insert(id->getId(), type);
+        }
+    }
+
 private:
     IdList *idlist;
     Type *type;
@@ -332,6 +353,18 @@ public:
         out << ") : " << *type;
     }
 
+    virtual void sem() override
+    {
+        /* Check if id exists in symbol table. If it exists, throw error.
+         * If not:
+         *  1) add it to the symbol table
+         *  2) open a new scope
+         *  3) store the return type
+         *  4) paramlit->sem()
+         *  5) close the scope?
+         */
+    }
+
 private:
     Id *id;
     RetType *type;
@@ -346,6 +379,12 @@ public:
     virtual void printOn(std::ostream &out) const override
     {
         out << "FuncDecl(" << *header << ")";
+    }
+
+    virtual void sem() override
+    {
+        // Add funcdecl to symbol entry
+        header->sem();
     }
 
 private:
@@ -368,6 +407,12 @@ public:
     virtual void run() const override
     {
         // globals[l_value->getName()] = expr->eval();
+    }
+    virtual void sem() override
+    {
+        // lookup for lvalue?
+        // st.lookup(l_value->getName());
+        // l_value->type_check(expr->getType());
     }
 
 private:
@@ -394,6 +439,11 @@ public:
     // TODO: Implement how a function is run.
     virtual int eval() const override
     {
+    }
+    virtual void sem() override
+    {
+        id->sem();
+        expr_list->sem();
     }
 
 private:
@@ -424,6 +474,11 @@ public:
     virtual void run() const override
     {
     }
+    virtual void sem() override
+    {
+        id->sem();
+        expr_list->sem();
+    }
 
 private:
     Id *id;
@@ -453,7 +508,8 @@ public:
             return -right->eval();
         }
     }
-    virtual void sem() override {
+    virtual void sem() override
+    {
         right->type_check(new Integer());
     }
 
@@ -528,8 +584,6 @@ public:
     {
         left->type_check(new Integer());
         right->type_check(new Integer());
-        // left->sem();
-        // right->sem();
     }
 
 private:
@@ -572,8 +626,10 @@ public:
         return 0;
     }
 
-    virtual void sem() override {
-        if (left != nullptr) left->type_check(new Boolean());
+    virtual void sem() override
+    {
+        if (left != nullptr)
+            left->type_check(new Boolean());
         right->type_check(new Boolean());
     }
 
@@ -602,7 +658,10 @@ public:
         return (expr != nullptr) ? expr->eval() : 0;
     }
 
-    virtual void sem() override {
+    virtual void sem() override
+    {
+        // Should lookup for the function's type and type_check...
+        // function Scope
         // Type expected_type = ???
         // expr->sem();
     }
@@ -636,10 +695,12 @@ public:
             stmt2->run();
     }
 
-    virtual void sem() override {
+    virtual void sem() override
+    {
         cond->type_check(new Boolean());
         stmt1->sem();
-        if (stmt2 != nullptr) stmt2->sem();
+        if (stmt2 != nullptr)
+            stmt2->sem();
     }
 
 private:
@@ -666,7 +727,8 @@ public:
             stmt->run();
     }
 
-    virtual void sem() override {
+    virtual void sem() override
+    {
         cond->type_check(new Boolean());
         stmt->sem();
     }

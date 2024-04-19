@@ -25,11 +25,13 @@ public:
     void type_check(Type *t)
     {
         sem();
-        if(type != t) {
+        if (type != t)
+        {
             std::cerr << "Type mismatch" << std::endl;
             exit(1);
         }
     }
+    Type *getType() { return type; }
 
 protected:
     Type *type;
@@ -39,7 +41,7 @@ class Cond : public AST
 {
 public:
     virtual int eval() const = 0;
-    // might not be needed 
+    // might not be needed
     void type_check(Type *t)
     {
         sem();
@@ -49,6 +51,7 @@ public:
             exit(1);
         }
     }
+
 protected:
     Type *type;
 };

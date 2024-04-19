@@ -8,7 +8,7 @@ default: grace
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp 
+lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp symbol.hpp
 
 funcdef.o: funcdef.cpp funcdef.hpp ast.hpp localdef.hpp local.hpp
 	$(CXX) $(CXXFLAGS) -c funcdef.cpp
@@ -22,7 +22,7 @@ local.o: local.cpp local.hpp funcdef.hpp ast.hpp
 parser.hpp parser.cpp: parser.y
 	bison -dv -o parser.cpp parser.y
 
-parser.o: parser.cpp lexer.hpp ast.hpp ASTabstracts.hpp types.hpp local.hpp funcdef.hpp localdef.hpp  
+parser.o: parser.cpp lexer.hpp ast.hpp ASTabstracts.hpp types.hpp local.hpp funcdef.hpp localdef.hpp symbol.hpp
 	$(CXX) $(CXXFLAGS) -c parser.cpp
 
 grace: lexer.o parser.o funcdef.o localdef.o local.o 

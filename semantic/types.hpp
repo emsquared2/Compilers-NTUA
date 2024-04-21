@@ -2,143 +2,21 @@
 #define __TYPES_HPP__
 
 #include "ASTabstracts.hpp"
+#include "expressions.hpp"
 
-/*
-############################
-        BASE TYPES
-############################
-*/
-class Integer : public Type
-{
-public:
-    Integer() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "int";
-    }
-};
+/* ---------------------------------------------------------------------
+   ------------------------- Array Dimensions --------------------------
+   --------------------------------------------------------------------- */
 
-class Boolean : public Type
-{
-public:
-    Boolean() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "bool";
-    }
-};
+class Const;
 
-class Character : public Type
-{
-public:
-    Character() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "char";
-    }
-};
-
-class Str : public Type
-{
-public:
-    Str() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "string";
-    }
-};
-
-class Nothing : public Type
-{
-public:
-    Nothing() {}
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "nothing";
-    }
-};
-
-/*
-############################
-        CONST TYPES
-############################
-*/
-
-class Const : public Expr
-{
-public:
-    Const(int n) : num(n) { type = new Integer(); }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "Const(" << num << ")";
-    }
-    virtual int eval() const override
-    {
-        return num;
-    }
-    virtual void sem() override {}
-
-private:
-    int num;
-};
-
-class ConstChar : public Expr
-{
-public:
-    ConstChar(char v) : var(v) { type = new Character(); }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "ConstChar(" << var << ")";
-    }
-    virtual int eval() const override
-    {
-        // return var;
-    }
-    virtual void sem() override {}
-
-private:
-    char var;
-};
-
-class ConstStr : public LValue
-{
-public:
-    ConstStr(char *s) : var(s) { type = new Str(); }
-    virtual void printOn(std::ostream &out) const override
-    {
-        out << "ConstStr(" << var << ")";
-    }
-    virtual const char *getStr()
-    {
-        return var;
-    }
-    virtual std::string getName() const override
-    {
-        return std::string(var);
-    }
-    virtual int eval() const override
-    {
-    }
-    virtual void sem() override {}
-
-private:
-    const char *var;
-};
-
-/*
-############################
-        ARRAY TYPE
-############################
-*/
-
-/// @brief helper function for array dimension
 class ArrayDim : public AST
 {
 public:
-    ArrayDim() : dim() {}
+    ArrayDim() : dims() {}
     ~ArrayDim()
     {
-        for (Const *num : dim)
+        for (Const *num : dims)
         {
             delete num;
         }
@@ -147,82 +25,192 @@ public:
     {
         if (unknown)
             out << "[ ]";
-        for (auto num = dim.rbegin(); num != dim.rend(); ++num)
+        for (auto num = dims.rbegin(); num != dims.rend(); ++num)
         {
-            out << "[" << **num << "]";
+            out << "[" << *num << "]";
         }
     }
     bool isEmpty()
     {
-        return dim.empty();
+        return dims.empty();
     }
-    void specifyUnknownFirstDim()
+    void setUknownFirstDim()
     {
         unknown = true;
     }
     void append(Const *num)
     {
-        dim.push_back(num);
+        dims.push_back(num);
     }
-    // TODO: for semantic action check each num that is of the correct type
+    bool getUknown() { return unknown; }
+
 private:
-    std::vector<Const *> dim;
+    std::vector<Const *> dims;
     bool unknown = false;
 };
 
-class Array : public Type
+
+/* #####################################################################
+   #####                        CUSTOM TYPES                       #####
+   ##################################################################### */
+
+/* ---------------------------------------------------------------------
+   ------------------------------- Array -------------------------------
+   --------------------------------------------------------------------- */
+
+class Array : public CustomType
 {
 
 public:
-    Array(Type *t, ArrayDim *d) : type(t), dim(d) {}
+    Array(DataType t, ArrayDim *d) : data_type(t), dims(d) {
+        uknown = dims->getUknown();
+    }
     ~Array()
     {
-        delete type;
-        delete dim;
+        delete dims;
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << *type << " array" << *dim;
+        out << "Array of ";
+        switch (data_type)
+        {
+            case TYPE_INTEGER:
+            {
+                out << "ints";
+                break;
+            }
+            case TYPE_CHAR: 
+            {
+                out << "chars";
+                break;
+            }
+            default:
+            {
+                out << "Not valid data_type in Array"; // This should never be reached.
+                exit(1) ;
+            }
+        }
+        out << "( Dimensions --> ";
+        dims->printOn(out);
+
+        out << ") )";
     }
+    virtual Type ConvertToType(CustomType *t) const override
+    {
+        
+    }
+    bool getUknown() { return uknown; }
 
 private:
-    Type *type;
-    ArrayDim *dim;
+    DataType data_type;
+    ArrayDim *dims;
+    bool uknown = false;
 };
 
+/* ---------------------------------------------------------------------
+   ------------------------------ RetType ------------------------------
+   --------------------------------------------------------------------- */
 
-/// @brief return type of function
-class RetType : public Type
+class RetType : public CustomType
 {
 public:
-    RetType() { dtype = new Nothing(); }
-    RetType(Type *t) : dtype(t) {}
-    ~RetType() { delete dtype; }
+    RetType(DataType dt) : data_type(dt) {}
+    ~RetType() {}
     virtual void printOn(std::ostream &out) const override
     {
-        out << "RetType(" << *dtype << ")";
+        out << "RetType(";
+        switch (data_type)
+        {
+            case TYPE_INTEGER:
+            {
+                out << "int";
+                break;
+            }
+            case TYPE_CHAR: 
+            {
+                out << "char";
+                break;
+            }
+            case TYPE_VOID:
+            {
+                out << "void";
+                break;
+            }
+            default:
+            {
+                out << "Not valid data_type"; // This should never be reached.
+                exit(1) ;
+            }
+        }
+        out << ")";
+    }
+    virtual Type ConvertToType(CustomType *t) const override
+    {
+
     }
 
 private:
-    Type *dtype;
+    DataType data_type;
 };
 
-/// @brief function parameter type
-class FParType : public Type
+/* ---------------------------------------------------------------------
+   ----------------------------- FParType ------------------------------
+   --------------------------------------------------------------------- */
+
+class FParType : public CustomType
 {
 public:
-    FParType(Type *t) : type(t) {}
-    ~FParType()
-    {
-        delete type;
+    FParType(DataType t) : data_type(t) { array = nullptr; }
+    FParType(Array *arr) : array(arr) {
+        data_type = (array->getUknown()) ? TYPE_IARRAY : TYPE_ARRAY;
     }
+    ~FParType() { if(array != nullptr) delete array; }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "FParType(" << *type << ")";
+        out << "FParType(";
+        switch (data_type)
+        {
+            case TYPE_INTEGER:
+            {
+                out << "int";
+                break;
+            }
+            case TYPE_CHAR: 
+            {
+                out << "char";
+                break;
+            }
+            case TYPE_VOID:
+            {
+                out << "void";
+                break;
+            }
+            case TYPE_ARRAY:
+            {
+                out << "array of known size --> ";
+                array->printOn(out);
+            }
+            case TYPE_IARRAY:
+            {
+                out <<"array of uknown size --> ";
+                array->printOn(out);
+            }
+            default:
+            {
+                out << "Not valid data_type in Array"; // This should never be reached.
+                exit(1) ;
+            }
+        }
+        out << ")";
+    }
+    virtual Type ConvertToType(CustomType *t) const override
+    {
+
     }
 
 private:
-    Type *type;
+    DataType data_type;
+    Array *array;
 };
 
 #endif

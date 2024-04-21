@@ -1,30 +1,33 @@
+class FuncDef;
+
 #include "ast.hpp"
-#include "local.hpp"
+#include "funcdef.hpp"
 #include "localdef.hpp"
 
-LocalDef::LocalDef() : locals() {}
+LocalDef::LocalDef(FuncDef *fdef) : funcdef(fdef), funcdecl(nullptr), decl(nullptr) {}
+LocalDef::LocalDef(FuncDecl *fdecl) : funcdef(nullptr), funcdecl(fdecl), decl(nullptr) {}
+LocalDef::LocalDef(Decl *decl) : funcdef(nullptr), funcdecl(nullptr), decl(decl) {}
+
 LocalDef::~LocalDef()
 {
-    for (Local *l : locals)
-    {
-        delete l;
-    }
+    delete funcdef;
+    delete funcdecl;
+    delete decl;
 }
 void LocalDef::printOn(std::ostream &out) const
 {
     out << "LocalDef(";
-    bool first = true;
-    for (auto l = locals.rbegin(); l != locals.rend(); ++l)
+    if (funcdef != nullptr)
     {
-        if (!first)
-            out << ", ";
-        out << **l;
-        first = false;
+        out << *funcdef;
+    }
+    else if (funcdecl != nullptr)
+    {
+        out << *funcdecl;
+    }
+    else if (decl != nullptr)
+    {
+        out << *decl;
     }
     out << ")";
-}
-
-void LocalDef::append(Local *l)
-{
-    locals.push_back(l);
 }

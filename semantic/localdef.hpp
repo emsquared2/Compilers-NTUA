@@ -2,18 +2,20 @@
 #define __LOCALDEF_HPP__
 
 #pragma once
-#include <vector>
 
 class LocalDef : public AST
 {
 public:
-    LocalDef();
+    LocalDef(FuncDef *fdef);
+    LocalDef(FuncDecl *fdecl);
+    LocalDef(Decl *decl);
     ~LocalDef();
     virtual void printOn(std::ostream &out) const override;
-    void append(Local *l);
 
 private:
-    std::vector<Local *> locals;
+    FuncDef *funcdef;
+    FuncDecl *funcdecl;
+    Decl *decl;
 };
 
 #endif

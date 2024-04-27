@@ -54,7 +54,7 @@ enum DataType { TYPE_INTEGER, TYPE_CHAR, TYPE_VOID, TYPE_ARRAY, TYPE_IARRAY };
 class AST
 {
 public:
-    AST();
+    AST() {}
     virtual ~AST() {}
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem() {}

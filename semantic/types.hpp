@@ -27,7 +27,7 @@ public:
             out << "[ ]";
         for (auto num = dims.rbegin(); num != dims.rend(); ++num)
         {
-            out << "[" << *num << "]";
+            out << "[" << **num << "]";
         }
     }
     bool isEmpty()
@@ -71,17 +71,17 @@ public:
     }
     virtual void printOn(std::ostream &out) const override
     {
-        out << "Array of ";
+        out << "Array_";
         switch (data_type)
         {
             case TYPE_INTEGER:
             {
-                out << "ints";
+                out << "int";
                 break;
             }
             case TYPE_CHAR: 
             {
-                out << "chars";
+                out << "char";
                 break;
             }
             default:
@@ -90,10 +90,10 @@ public:
                 exit(1) ;
             }
         }
-        out << "( Dimensions --> ";
+        // out << "( Dimensions --> ";
         dims->printOn(out);
 
-        out << ") )";
+        // out << ") )";
     }
     virtual Type ConvertToType(CustomType *t) const override
     {
@@ -189,11 +189,13 @@ public:
             {
                 out << "array of known size --> ";
                 array->printOn(out);
+                break;
             }
             case TYPE_IARRAY:
             {
                 out <<"array of uknown size --> ";
                 array->printOn(out);
+                break;
             }
             default:
             {

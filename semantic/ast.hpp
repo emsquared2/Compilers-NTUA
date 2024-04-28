@@ -7,7 +7,7 @@
 #include <variant>
 #include "ASTabstracts.hpp"
 #include "types.hpp"
-#include "symbol.hpp"
+#include "symbol.h"
 
 // extern std::map<std::string, int> globals;
 
@@ -299,11 +299,18 @@ public:
         }
         out << ")";
     }
+
+    /*
+
+    Check class Header for information about this sem() method.
+
+    virtual void sem() override {}
+    */
+
     void append(FParam *param)
     {
         params.push_back(param);
     }
-
 private:
     std::vector<FParam *> params;
 };
@@ -326,8 +333,9 @@ public:
     {
         for (Id *id : idlist->get_idlist())
         {
-            st.lookup(id->getId());
-            st.insert(id->getId(), type);
+            lookupEntry(id->getName(), LOOKUP_CURRENT_SCOPE, true);            
+            newVariable(id->getName(), type);
+
         }
     }
 
@@ -363,12 +371,45 @@ public:
          *  4) paramlit->sem()
          *  5) close the scope?
          */
+        SymbolEntry *function = newFunction(id->getName());
+        // add case when parser identifies forward declaration
+        if (forward_declaration)
+            forwardFunction(function);
+
+        /*
+        Here we have to add all the parameters to the symbol entry.
+        The SymbolEntry of the function (look *function above) is also needed when creating a new function parameter. 
+        We have 2 options:
+        Option 1: Pass the function SymbolEntry to the ParamList and handle the sem() function inside the ParamList class
+        Option 2: Add a method to the ParamList class that returns the private vector of Parameters. Then handle each Param in this sem() function.
+
+        Option 1 might be easier to implement but having a field of SymbolEntry on a Class might seem a little be counterintuitive.
+
+        Option 2 on the other hand might be a cleaner option as the SymbolEntry is abstracted from the classes.
+        */
+        paramlist->sem();
+        /*
+        for (FParam *fp : paramlist):
+            for (Id *id : fp->getIdlist()):
+                SymbolEntry *fun_param = newParameter(id->getName(), ..., ..., function)
+
+                // newParameter (const char * name, Type type, PassMode mode, SymbolEntry * f)
+
+        */
+
+        endFunctionHeader(function, type);
+    }
+
+    void set_forward_declaration()
+    {
+        forward_declaration = true;
     }
 
 private:
     Id *id;
     RetType *type;
     ParamList *paramlist;
+    bool forward_declaration = false;
 };
 
 class FuncDecl : public AST
@@ -383,7 +424,10 @@ public:
 
     virtual void sem() override
     {
-        // Add funcdecl to symbol entry
+        // FuncDecl is for forward declaring function.
+        // Header class is for both forward and non forward functions.
+        // Set forward_declaration to true to specify a header that represents a forward declared function.
+        header->set_forward_declaration();
         header->sem();
     }
 
@@ -410,9 +454,8 @@ public:
     }
     virtual void sem() override
     {
-        // lookup for lvalue?
-        // st.lookup(l_value->getName());
-        // l_value->type_check(expr->getType());
+        lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
+        // check expr type with l_value type
     }
 
 private:
@@ -442,8 +485,10 @@ public:
     }
     virtual void sem() override
     {
-        id->sem();
-        expr_list->sem();
+        // Check if the function exists
+        SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
+
+
     }
 
 private:
@@ -476,8 +521,7 @@ public:
     }
     virtual void sem() override
     {
-        id->sem();
-        expr_list->sem();
+        lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
     }
 
 private:

@@ -343,6 +343,7 @@ SymbolEntry * newFunction (const char * name)
 {
     SymbolEntry * e = lookupEntry(name, LOOKUP_CURRENT_SCOPE, false);
 
+    // For function definitions
     if (e == NULL) {
         e = newEntry(name);
         if (e != NULL) {
@@ -354,6 +355,7 @@ SymbolEntry * newFunction (const char * name)
         }
         return e;
     }
+    // For function that have been forward declared
     else if (e->entryType == ENTRY_FUNCTION && e->u.eFunction.isForward) {
         e->u.eFunction.isForward = false;
         e->u.eFunction.pardef = PARDEF_CHECK;

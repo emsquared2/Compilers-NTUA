@@ -25,6 +25,12 @@ parser.hpp parser.cpp: parser.y
 parser.o: parser.cpp lexer.hpp ast.hpp ASTabstracts.hpp types.hpp local.hpp funcdef.hpp localdef.hpp symbol.hpp
 	$(CXX) $(CXXFLAGS) -c parser.cpp
 
+general.o  : general.c general.h error.h
+
+error.o    : error.c general.h error.h
+
+symbol.o   : symbol.c symbol.h general.h error.h
+
 grace: lexer.o parser.o funcdef.o localdef.o local.o 
 	$(CXX) $(CXXFLAGS) -o grace lexer.o parser.o funcdef.o localdef.o local.o
 

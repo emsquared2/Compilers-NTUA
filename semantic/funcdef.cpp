@@ -21,7 +21,9 @@ void FuncDef::printOn(std::ostream &out) const
 }
 void FuncDef::sem()
 {
-    header->sem();
+    // might need to open scope (scope should end after the end of the block)
+
+    header->sem(); // not forward declared
     localdef->sem();
     // stmt->sem();
     block->sem();

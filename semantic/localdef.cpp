@@ -6,10 +6,9 @@ LocalDef::LocalDef() : locals() {}
 LocalDef::~LocalDef()
 {
     for (Local *l : locals)
-    {
         delete l;
-    }
 }
+
 void LocalDef::printOn(std::ostream &out) const
 {
     out << "LocalDef(";
@@ -22,6 +21,12 @@ void LocalDef::printOn(std::ostream &out) const
         first = false;
     }
     out << ")";
+}
+
+void LocalDef::sem()
+{
+    for (Local *l : locals)
+        l->sem();
 }
 
 void LocalDef::append(Local *l)

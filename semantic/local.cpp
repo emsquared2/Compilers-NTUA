@@ -31,3 +31,10 @@ void Local::printOn(std::ostream &out) const
     }
     out << ")";
 }
+
+void Local::sem() {
+    // They can never be more than one not nullptr
+    if(funcdef != nullptr) funcdef->sem();
+    if(funcdecl != nullptr) funcdecl->sem();
+    if(decl != nullptr) funcdecl->sem();
+}

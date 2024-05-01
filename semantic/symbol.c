@@ -547,6 +547,25 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     return NULL;
 }
 
+SymbolEntry *lookupLastFunction()
+{
+    SymbolEntry *lastFunction = NULL;
+
+    // Iterate through all entries in the current scope
+    for (SymbolEntry *e = currentScope->entries; e != NULL; e = e->nextInScope)
+    {
+        // Check if the entry is a function
+        if (e->entryType == ENTRY_FUNCTION)
+        {
+            // Update lastFunction to the most recent function entry
+            lastFunction = e;
+        }
+    }
+
+    // Return the last function found, or NULL if no function was found in the current scope
+    return lastFunction;
+}
+
 Type typeArray (RepInteger size, Type refType)
 {
     Type n = (Type) new(sizeof(struct Type_tag));

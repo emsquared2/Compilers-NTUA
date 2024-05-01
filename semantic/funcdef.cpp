@@ -19,7 +19,10 @@ void FuncDef::printOn(std::ostream &out) const
 }
 void FuncDef::sem()
 {
+    std::cout << "here" << std::endl;
     header->sem();
     local_def_list->sem();
     block->sem();
+
+    closeScope();
 }

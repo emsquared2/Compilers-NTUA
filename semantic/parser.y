@@ -100,8 +100,8 @@
 %left<op> '*' T_div T_mod
 
 
-%type<block> block stmt_list program
-%type<funcdef> func_def                         /* program */
+%type<block> block stmt_list /* program */
+%type<funcdef> func_def program
 %type<exprlist> expr_list array_elem_l_value
 
 %type<expr> expr func_call_expr                 /* l_value*/ /* func_call */
@@ -134,9 +134,9 @@
 // Maybe implement class Program
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
-    | func_def      { std::cout << "AST: " << *$1 << std::endl;
+    | func_def      { std::cout << "AST: " << *$1 << std::endl; 
         // $$ = $1; 
-        // $1->sem();
+        $1->sem();
     }
 ;
 
@@ -314,7 +314,7 @@ cond:
     | "not" cond        { $$ = new OpCond("not", $2); }
     | cond "and" cond   { $$ = new OpCond($1, "and", $3); }       
     | cond "or" cond    { $$ = new OpCond($1, "or", $3); }    
-    | expr '=' expr     { $$ = new CompCond($1, "=", $3);}
+    | expr '=' expr     { $$ = new CompCond($1, "=", $3);}  
     | expr '#' expr     { $$ = new CompCond($1, "#", $3);}
     | expr '<' expr     { $$ = new CompCond($1, "<", $3);}
     | expr '>' expr     { $$ = new CompCond($1, ">", $3);}
@@ -325,11 +325,25 @@ cond:
 %%
 
 int main() {
-    // #ifdef YYDEBUG
-    //     int yydebug = 1;
-    // #endif
+
+    // Initialize the symbol table with hash table of size 1024
+    initSymbolTable(1024);
+
+    // Open program's scope
+    openScope();
+
+    #ifdef YYDEBUG
+        int yydebug = 1;
+    #endif
 
     int result = yyparse();
     if (result == 0) printf("Success.\n");
     return result;
+
+    // Close program's scope
+    closeScope();
+
+    // Destroy the symbol table.
+    destroySymbolTable();
+
 }

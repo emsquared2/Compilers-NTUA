@@ -31,7 +31,10 @@ std::vector<Stmt *> Block::getList() { return stmt_list; }
 
 void Block::sem()
 {
-    
+    for (Stmt *s : stmt_list) {
+        std::cout << "sem_block: " << *s << std::endl;
+        s->sem();
+    }
 }
 
 /* ---------------------------------------------------------------------
@@ -58,7 +61,11 @@ void Assign::run() const
 
 void Assign::sem()
 {
+    std::cout << "l_value_name:" << l_value->getName() << std::endl;
+    lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
 
+    // check that types match
+    l_value->type_check(expr->getType());
 }
 
 
@@ -93,7 +100,10 @@ void If::run() const
 
 void If::sem() 
 {
+    std::cout << "stmt1: " << *stmt1 << std::endl;
+    std::cout << "cond: " << *cond << std::endl;
     cond->type_check(typeBoolean);
+    std::cout << "after type_check" << std::endl;
     stmt1->sem();
     if (stmt2 != nullptr)
         stmt2->sem();
@@ -152,8 +162,13 @@ int Return::ReturnValue()
 }
 
 void Return::sem() {
+    if (expr != nullptr) {
+        expr->sem();
+        // expr->type_check();
+    }
 
 }
+
 
 /* ---------------------------------------------------------------------
    ------------------------------ EMPTY STMT----------------------------
@@ -189,6 +204,7 @@ void CallStmt::run() const
 }
 void CallStmt::sem()
 {
-    id->sem();
-    expr_list->sem();
+    // Check if the function exists
+    SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
+    // TODO: Check if function is called properly (number and type of arguments)
 }

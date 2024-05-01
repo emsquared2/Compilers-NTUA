@@ -10,6 +10,7 @@ public:
     LocalDefList();
     ~LocalDefList();
     virtual void printOn(std::ostream &out) const override;
+    virtual void sem() override;
     void append(LocalDef *l);
 
 private:

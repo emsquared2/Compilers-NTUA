@@ -2,50 +2,57 @@
 #define __ASTABSTRACTS_HPP__
 
 #include <iostream>
+#include "lexer.hpp"
 
 /* Link C with C++ */
-extern "C" {
-    #include "symbol.h"
+extern "C"
+{
+#include "symbol.h"
 
-    extern void          initSymbolTable    (unsigned int size);
-    extern void          destroySymbolTable (void);
+    extern void initSymbolTable(unsigned int size);
+    extern void destroySymbolTable(void);
 
-    extern void          openScope          (void);
-    extern void          closeScope         (void);
+    extern void openScope(void);
+    extern void closeScope(void);
 
-    extern SymbolEntry * newVariable        (const char * name, Type type);
-    extern SymbolEntry * newConstant        (const char * name, Type type, ...);
-    extern SymbolEntry * newFunction        (const char * name);
-    extern SymbolEntry * newParameter       (const char * name, Type type,
-                                     PassMode mode, SymbolEntry * f);
-    extern SymbolEntry * newTemporary       (Type type);
+    extern SymbolEntry *newVariable(const char *name, Type type);
+    extern SymbolEntry *newConstant(const char *name, Type type, ...);
+    extern SymbolEntry *newFunction(const char *name);
+    extern SymbolEntry *newParameter(const char *name, Type type,
+                                     PassMode mode, SymbolEntry *f);
+    extern SymbolEntry *newTemporary(Type type);
 
-    extern void          forwardFunction    (SymbolEntry * f);
-    extern void          endFunctionHeader  (SymbolEntry * f, Type type);
-    extern void          destroyEntry       (SymbolEntry * e);
-    extern SymbolEntry * lookupEntry        (const char * name, LookupType type,
-                                     bool err);
+    extern void forwardFunction(SymbolEntry *f);
+    extern void endFunctionHeader(SymbolEntry *f, Type type);
+    extern void destroyEntry(SymbolEntry *e);
+    extern SymbolEntry *lookupEntry(const char *name, LookupType type, bool err);
 
-    extern Type          typeArray          (RepInteger size, Type refType);
-    extern Type          typeIArray         (Type refType);
-    extern Type          typePointer        (Type refType);
-    extern void          destroyType        (Type type);
-    extern unsigned int  sizeOfType         (Type type);
-    extern bool          equalType          (Type type1, Type type2);
-    extern void          printType          (Type type);
-    extern void          printMode          (PassMode mode);
+    extern Type typeArray(RepInteger size, Type refType);
+    extern Type typeIArray(Type refType);
+    extern Type typePointer(Type refType);
+    extern void destroyType(Type type);
+    extern unsigned int sizeOfType(Type type);
+    extern bool equalType(Type type1, Type type2);
+    extern void printType(Type type);
+    extern void printMode(PassMode mode);
 
-    extern void          destroyType        (Type type);
+    extern void destroyType(Type type);
 }
 
+extern int yylineno;
 
 /* ---------------------------------------------------------------------
    ------------------------------ DataType -----------------------------
    --------------------------------------------------------------------- */
 
-
-enum DataType { TYPE_INTEGER, TYPE_CHAR, TYPE_VOID, TYPE_ARRAY, TYPE_IARRAY };
-
+enum DataType
+{
+    TYPE_INTEGER,
+    TYPE_CHAR,
+    TYPE_VOID,
+    TYPE_ARRAY,
+    TYPE_IARRAY
+};
 
 /* ---------------------------------------------------------------------
    -------------------------------- AST --------------------------------
@@ -54,16 +61,21 @@ enum DataType { TYPE_INTEGER, TYPE_CHAR, TYPE_VOID, TYPE_ARRAY, TYPE_IARRAY };
 class AST
 {
 public:
-    AST() {}
+    AST() : lineno(yylineno){};
     virtual ~AST() {}
     virtual void printOn(std::ostream &out) const = 0;
-    virtual void sem() {}
+    virtual void sem(){};
 
     // TODO add int lineno as protected field and print it when detecting a semantic error.
-    void SemanticError(const char *msg) {
-        fprintf(stderr, "%s\n", msg);
+    void SemanticError(const char *msg)
+    {
+        fprintf(stderr, "Error: %s at line %d\n", msg, lineno);
+        // fprintf(stderr, "%s\n", msg);
         exit(1);
     }
+
+protected:
+    int lineno;
 };
 
 /* ---------------------------------------------------------------------
@@ -80,8 +92,11 @@ public:
     {
         sem();
 
+        std::cout << "After calling sem in expr" << std::endl;
+
         if (!equalType(type, t))
         {
+            std::cout << "After calling equalType in expr" << std::endl;
             SemanticError("Type mismatch");
         }
     }
@@ -102,9 +117,12 @@ public:
 
     void type_check(Type t)
     {
+        std::cout << "entered" << std::endl;
         sem();
+        std::cout << "After calling sem in cond" << std::endl;
         if (!equalType(type, t))
         {
+            std::cout << "After calling equalType in cond" << std::endl;
             SemanticError("Type mismatch");
         }
     }
@@ -112,7 +130,6 @@ public:
 protected:
     Type type;
 };
-
 
 /* ---------------------------------------------------------------------
    ------------------------------- Stmt --------------------------------
@@ -124,7 +141,6 @@ public:
     virtual void run() const = 0;
 };
 
-
 /* ---------------------------------------------------------------------
    ------------------------------- LValue ------------------------------
    --------------------------------------------------------------------- */
@@ -133,7 +149,7 @@ class LValue : public Expr
 {
 public:
     virtual int eval() const = 0;
-    virtual const char * getName() const {};
+    virtual const char *getName() const {};
 };
 
 /* ---------------------------------------------------------------------

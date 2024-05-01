@@ -28,3 +28,10 @@ void LocalDefList::append(LocalDef *l)
 {
     locals.push_back(l);
 }
+
+void LocalDefList::sem() {
+    for (LocalDef *l : locals)
+    {
+        l->sem();
+    }
+}

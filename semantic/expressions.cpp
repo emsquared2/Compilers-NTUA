@@ -63,8 +63,8 @@ void Const::printOn(std::ostream &out) const
     out << "Const(" << val << ")";
 }
 
-void Const::sem() 
-{ 
+void Const::sem()
+{
     type = typeInteger;
 }
 
@@ -79,11 +79,11 @@ void ConstChar::printOn(std::ostream &out) const
 {
     out << "ConstChar(" << var << ")";
 }
-    // virtual int eval() const override
-    // {
-    //     // return var;
-    // }
-void ConstChar::sem()  
+// virtual int eval() const override
+// {
+//     // return var;
+// }
+void ConstChar::sem()
 {
     type = typeChar;
 }
@@ -122,7 +122,7 @@ void CallExpr::printOn(std::ostream &out) const
 }
 void CallExpr::sem()
 {
-    id->sem();
-    expr_list->sem();
-    // Also do smth with type (inherited from class Expr)
+    // Check if the function exists
+    SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
+    // TODO: Check if function is called properly (number and type of arguments)
 }

@@ -6,11 +6,14 @@
 
 OpCond::OpCond(Cond *l, char *s, Cond *r) : left(l), op(s), right(r) {}
 
-OpCond::OpCond(char *s, Cond *r) :left(), op(s), right(r) {}
+OpCond::OpCond(char *s, Cond *r) : left(), op(s), right(r) {}
 
 OpCond::~OpCond()
 {
-    if (left != nullptr) { delete left; }
+    if (left != nullptr)
+    {
+        delete left;
+    }
     delete right;
 }
 
@@ -51,5 +54,6 @@ void CompCond::sem()
 {
     left->type_check(typeInteger);
     right->type_check(typeInteger);
+
     type = typeBoolean;
 }

@@ -20,10 +20,10 @@ lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp statements.hpp
 ast.o: ast.cpp ast.hpp ASTabstracts.hpp types.hpp
 	$(CXX) $(CXXFLAGS) -c ast.cpp
 
-statements.o: statements.cpp statements.hpp ASTabstracts.hpp ast.hpp
+statements.o: statements.cpp statements.hpp ast.hpp
 	$(CXX) $(CXXFLAGS) -c statements.cpp
 
-expressions.o: expressions.cpp expressions.hpp ASTabstracts.hpp ast.hpp
+expressions.o: expressions.cpp expressions.hpp ast.hpp
 	$(CXX) $(CXXFLAGS) -c expressions.cpp
 
 conditions.o: conditions.cpp conditions.hpp ASTabstracts.hpp
@@ -41,7 +41,7 @@ localdef.o: localdef.cpp localdef.hpp funcdef.hpp ast.hpp
 parser.hpp parser.cpp: parser.y
 	bison -dv -o parser.cpp parser.y
 
-parser.o: parser.cpp lexer.hpp ast.hpp ASTabstracts.hpp types.hpp localdef.hpp funcdef.hpp localdeflist.hpp statements.hpp expressions.hpp conditions.hpp
+parser.o: parser.cpp lexer.hpp ast.hpp localdef.hpp funcdef.hpp localdeflist.hpp statements.hpp expressions.hpp conditions.hpp
 	$(CXX) $(CXXFLAGS) -c parser.cpp
 
 general.o  : general.c general.h error.h

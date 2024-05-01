@@ -4,33 +4,31 @@
    ----------------------------- ConstStr ------------------------------
    --------------------------------------------------------------------- */
 
-
 ConstStr::ConstStr(std::string s) : str(s) {}
 void ConstStr::printOn(std::ostream &out) const
 {
     out << "ConstStr(" << str << ")";
 }
-const char * ConstStr::getStr()
+const char *ConstStr::getStr()
 {
     return str.c_str();
 }
-const char * ConstStr::getName() const 
+const char *ConstStr::getName() const
 {
     return str.c_str();
 }
-int ConstStr::eval() const 
+int ConstStr::eval() const
 {
 }
-void ConstStr::sem()  {
+void ConstStr::sem()
+{
     RepInteger len = str.length() + 1;
     type = typeArray(len, typeChar);
 }
 
-
 /* ---------------------------------------------------------------------
    -------------------------------- Id ---------------------------------
    --------------------------------------------------------------------- */
-
 
 Id::Id(std::string s) : name(s) {}
 void Id::printOn(std::ostream &out) const
@@ -41,7 +39,7 @@ std::string Id::getId()
 {
     return name.c_str();
 }
-const char * Id::getName() const
+const char *Id::getName() const
 {
     return name.c_str();
 }
@@ -63,7 +61,6 @@ void Id::sem()
     //     offset = e->getOffset();
     // }
 }
-
 
 /* ---------------------------------------------------------------------
    ------------------------------ IdList -------------------------------
@@ -108,7 +105,6 @@ void IdList::sem()
    ----------------------------- ExprList ------------------------------
    --------------------------------------------------------------------- */
 
-
 ExprList::ExprList() : expr_list() {}
 ExprList::~ExprList()
 {
@@ -146,11 +142,9 @@ void ExprList::sem()
         e->sem();
 }
 
-
 /* ---------------------------------------------------------------------
    ----------------------------- StmtList ------------------------------
    --------------------------------------------------------------------- */
-
 
 StmtList::StmtList() : stmt_list() {}
 StmtList::~StmtList()
@@ -180,20 +174,23 @@ void StmtList::sem()
         s->sem();
 }
 
-
 /* ---------------------------------------------------------------------
    ------------------------------ FParam -------------------------------
    --------------------------------------------------------------------- */
 
-
-FParam::FParam(IdList *idl, FParType *t, bool ref = false) : idlist(idl), fpartype(t), ref(ref) {
+FParam::FParam(IdList *idl, FParType *t, bool ref = false) : idlist(idl), fpartype(t), ref(ref)
+{
     pass_mode = ref ? PASS_BY_REFERENCE : PASS_BY_VALUE;
     type = fpartype->ConvertToType(fpartype);
 }
-FParam::~FParam() { 
+FParam::~FParam()
+{
     delete idlist;
     delete fpartype;
-    if (fpartype) { destroyType(type); }
+    if (fpartype)
+    {
+        destroyType(type);
+    }
 }
 void FParam::printOn(std::ostream &out) const
 {
@@ -204,6 +201,17 @@ void FParam::printOn(std::ostream &out) const
     out << *fpartype;
     // if (fpartype) printType(fpartype);
     out << ")";
+}
+
+void FParam::sem()
+{
+    for (Id *id : idlist->get_idlist())
+        SymbolEntry *fun_param = newParameter(id->getName(), type, pass_mode, function);
+}
+
+void FParam::setSymbolEntry(SymbolEntry *f)
+{
+    function = f;
 }
 
 /* ---------------------------------------------------------------------
@@ -231,22 +239,42 @@ void FParamList::printOn(std::ostream &out) const
     }
     out << ")";
 }
+
+// Check class Header for information about this sem() method.
+
+void FParamList::sem()
+{
+    for (FParam *param : params)
+    {
+        param->setSymbolEntry(function);
+        param->sem();
+    }
+}
+
 void FParamList::append(FParam *param)
 {
     params.push_back(param);
 }
 
+void FParamList::setSymbolEntry(SymbolEntry *f)
+{
+    function = f;
+}
+
+
 /* ---------------------------------------------------------------------
    ------------------------------- Decl --------------------------------
    --------------------------------------------------------------------- */
-
 
 Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt) { type = parser_type->ConvertToType(parser_type); }
 Decl::~Decl()
 {
     delete idlist;
     delete parser_type;
-    if (type) { destroyType(type); }
+    if (type)
+    {
+        destroyType(type);
+    }
 }
 void Decl::printOn(std::ostream &out) const
 {
@@ -256,11 +284,11 @@ void Decl::printOn(std::ostream &out) const
 }
 void Decl::sem()
 {
-    // for (Id *id : idlist->get_idlist())
-    // {
-    //     st.lookup(id->getId());
-    //     st.insert(id->getId(), type);
-    // }
+    for (Id *id : idlist->get_idlist())
+    {
+        // lookupEntry(id->getName(), LOOKUP_CURRENT_SCOPE, true);
+        newVariable(id->getName(), type);
+    }
 }
 
 /* ---------------------------------------------------------------------
@@ -271,16 +299,22 @@ Header::Header(Id *id, RetType *t, FParamList *fpl = nullptr) : id(id), ret_type
 Header::~Header()
 {
     delete id;
-    if (fparamlist != nullptr) { delete fparamlist; }
+    if (fparamlist != nullptr)
+    {
+        delete fparamlist;
+    }
     delete ret_type;
-    if (type) { destroyType(type); }
+    if (type)
+    {
+        destroyType(type);
+    }
 }
 void Header::printOn(std::ostream &out) const
 {
     out << "Header(fun " << *id << "(";
     if (fparamlist != nullptr)
         out << *fparamlist;
-    out << ") : " ;
+    out << ") : ";
     out << *ret_type;
     // if(type) printType(type);
     out << ")";
@@ -288,13 +322,45 @@ void Header::printOn(std::ostream &out) const
 void Header::sem()
 {
     /* Check if id exists in symbol table. If it exists, throw error.
-        * If not:
-        *  1) add it to the symbol table
-        *  2) open a new scope
-        *  3) store the return type
-        *  4) paramlit->sem()
-        *  5) close the scope?
-        */
+     * If not:
+     *  1) add it to the symbol table
+     *  2) open a new scope
+     *  3) store the return type
+     *  4) paramlit->sem()
+     *  5) close the scope?
+     */
+    std::cout << id->getName() << std::endl;
+
+    SymbolEntry *function = newFunction(id->getName());
+
+    // add case when parser identifies forward declaration
+    if (forward_declaration)
+        forwardFunction(function);
+
+    openScope();
+    /*
+    Here we have to add all the parameters to the symbol entry.
+    The SymbolEntry of the function (look *function above) is also needed when creating a new function parameter.
+    We have 2 options:
+    Option 1: Pass the function SymbolEntry to the ParamList and handle the sem() function inside the ParamList class
+    Option 2: Add a method to the ParamList class that returns the private vector of Parameters. Then handle each Param in this sem() function.
+
+    Option 1 might be easier to implement but having a field of SymbolEntry on a Class might seem a little be counterintuitive.
+
+    Option 2 on the other hand might be a cleaner option as the SymbolEntry is abstracted from the classes.
+    */
+    if (fparamlist != nullptr) {
+        fparamlist->setSymbolEntry(function);
+        fparamlist->sem();
+
+    }
+
+    endFunctionHeader(function, type);
+}
+
+void Header::set_forward_declaration()
+{
+    forward_declaration = true;
 }
 
 /* ---------------------------------------------------------------------
@@ -309,8 +375,14 @@ void FuncDecl::printOn(std::ostream &out) const
 }
 void FuncDecl::sem()
 {
-    // Add funcdecl to symbol entry
+    // FuncDecl is for forward declaring function.
+    // Header class is for both forward and non forward functions.
+    // Set forward_declaration to true to specify a header that represents a forward declared function.
+    header->set_forward_declaration();
     header->sem();
+
+    // close scope ?
+    closeScope();
 }
 
 /* ---------------------------------------------------------------------

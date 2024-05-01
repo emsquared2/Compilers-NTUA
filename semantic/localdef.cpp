@@ -31,3 +31,14 @@ void LocalDef::printOn(std::ostream &out) const
     }
     out << ")";
 }
+
+void LocalDef::sem()
+{
+    // They can never be more than one not nullptr
+    if (funcdef != nullptr)
+        funcdef->sem();
+    if (funcdecl != nullptr)
+        funcdecl->sem();
+    if (decl != nullptr)
+        decl->sem();
+}

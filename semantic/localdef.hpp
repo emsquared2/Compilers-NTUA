@@ -11,6 +11,7 @@ public:
     LocalDef(Decl *decl);
     ~LocalDef();
     virtual void printOn(std::ostream &out) const override;
+    virtual void sem() override;
 
 private:
     FuncDef *funcdef;

@@ -1,9 +1,9 @@
 %{
     #include <cstdio>
-    #include <stdio.h>
-    #include <vector>
-    
+    #include <cstdlib>
+
     #include "lexer.hpp"
+
     #include "ast.hpp"
     #include "statements.hpp"
     #include "expressions.hpp"
@@ -15,28 +15,6 @@
     #define YYDEBUG 1
 
 %}
-
-
-%token T_and        "and"
-%token T_bool       "bool"
-%token<str> T_char  "char"
-%token T_div        "div"
-%token T_do         "do"
-%token T_else       "else"
-%token T_fun        "fun"
-%token T_if         "if"
-%token<str> T_int   "int"
-%token T_mod        "mod"
-%token T_not        "not"
-%token T_nothing    "nothing"
-%token T_or         "or"
-%token T_ref        "ref"
-%token T_return     "return"
-%token T_then       "then"
-%token T_var        "var"
-%token T_while      "while"
-
-         
 
 %expect 1
 %define parse.error /*detailed*/ verbose
@@ -73,12 +51,34 @@
     ConstChar *constchar;
     ConstStr *conststr;
     char *op, c, *str;
-    //std::string str;
     int num; 
 
     // CallStmt *callstmt;
     // CallExpr *callexpr;
 }
+
+%token T_and        "and"
+%token T_bool       "bool"
+%token<str> T_char  "char"
+%token T_div        "div"
+%token T_do         "do"
+%token T_else       "else"
+%token T_fun        "fun"
+%token T_if         "if"
+%token<str> T_int   "int"
+%token T_mod        "mod"
+%token T_not        "not"
+%token T_nothing    "nothing"
+%token T_or         "or"
+%token T_ref        "ref"
+%token T_return     "return"
+%token T_then       "then"
+%token T_var        "var"
+%token T_while      "while"
+
+%token T_ge         ">="     
+%token T_le         "<="
+%token<op> T_assign "<-"
 
 //%token<id> T_id
 %token<str> T_id
@@ -88,9 +88,7 @@
 %token<str> T_const_str 
 /* %token<constchar> T_const_char 
 %token<conststr> T_const_str   */
-%token T_ge         ">="     
-%token T_le         "<="
-%token<op> T_assign     "<-"
+
 
 %left<op> T_or
 %left<op> T_and
@@ -100,7 +98,7 @@
 %left<op> '*' T_div T_mod
 
 
-%type<block> block stmt_list /* program */
+%type<block> block stmt_list
 %type<funcdef> func_def program
 %type<exprlist> expr_list array_elem_l_value
 
@@ -135,8 +133,9 @@
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
     | func_def      { std::cout << "AST: " << *$1 << std::endl; 
-        // $$ = $1; 
+        $$ = $1; 
         $1->sem();
+        delete $$;
     }
 ;
 

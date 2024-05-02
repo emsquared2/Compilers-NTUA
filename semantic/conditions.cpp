@@ -27,6 +27,7 @@ void OpCond::printOn(std::ostream &out) const
 
 void OpCond::sem()
 {
+    std::cout << "OpCond Sem..." << std::endl;
     if (left != nullptr)
         left->type_check(typeBoolean);
     right->type_check(typeBoolean);
@@ -52,8 +53,24 @@ void CompCond::printOn(std::ostream &out) const
 
 void CompCond::sem()
 {
-    left->type_check(typeInteger);
-    right->type_check(typeInteger);
 
+    std::cout << "CopmCond Sem..." << std::endl;
+    Type left_type = left->getType();
+    Type right_type = right->getType();
+
+    std::cout << "CompCond b4 equaltype..." << std::endl;
+    // Check operands' type (typeInteher or typeChar)
+    if(!equalType(left_type, typeInteger) && !equalType(left_type, typeChar))
+        SemanticError("CompCond: Left operand should be typeInteger or typeChar");
+
+    std::cout << "CompCond after 1st equaltype..." << std::endl;
+
+    if(!equalType(right_type, typeInteger) && !equalType(right_type, typeChar))
+        SemanticError("CompCond: Right operand should be typeInteger or typeChar");
+
+    // Check if right and left operand have the same type
+    if(!equalType(left_type, right_type))
+        SemanticError("CompCond: Operands should have the same type.");
+    
     type = typeBoolean;
 }

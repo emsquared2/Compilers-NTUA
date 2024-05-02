@@ -22,6 +22,7 @@ int ConstStr::eval() const
 }
 void ConstStr::sem()
 {
+    std::cout << "ConstStr Sem..." << std::endl;
     RepInteger len = str.length() + 1;
     type = typeArray(len, typeChar);
 }
@@ -49,17 +50,30 @@ int Id::eval() const
 }
 void Id::sem()
 {
-    // SymbolEntry *e = st.lookup(name);
-    // if (e == nullptr)
-    // {
-    //     std::cerr << "Undeclared variable " << name << std::endl;
-    //     throw std::runtime_error("Semantic error: Undeclared variable");
-    // }
-    // else
-    // {
-    //     type = e->getType();
-    //     offset = e->getOffset();
-    // }
+    std::cout << "Id Sem..." << std::endl;
+    SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
+
+    switch (e->entryType)
+    {
+        case ENTRY_VARIABLE:
+            type = e->u.eVariable.type;
+            break;
+        case ENTRY_CONSTANT:
+            SemanticError("Id cannot be a constant.");
+            break;
+        case ENTRY_FUNCTION:
+            SemanticError("Id cannot be a function.");
+            break;    
+        case ENTRY_PARAMETER:
+            type = e->u.eParameter.type;
+            break;
+        case ENTRY_TEMPORARY:
+            type = e->u.eTemporary.type;
+            break;
+        default:
+            SemanticError("Invalid entry for identifier. This should never be reached");
+            break;
+    }
 }
 
 /* ---------------------------------------------------------------------
@@ -97,6 +111,7 @@ void IdList::printOn(std::ostream &out) const
 }
 void IdList::sem()
 {
+    std::cout << "IdList Sem..." << std::endl;
     for (Id *i : idlist)
         i->sem();
 }
@@ -138,6 +153,7 @@ bool ExprList::isEmpty()
 }
 void ExprList::sem()
 {
+    std::cout << "ExprList Sem..." << std::endl;
     for (Expr *e : expr_list)
         e->sem();
 }
@@ -170,6 +186,7 @@ void StmtList::printOn(std::ostream &out) const
 }
 void StmtList::sem()
 {
+    std::cout << "StmtList Sem..." << std::endl;
     for (Stmt *s : stmt_list)
         s->sem();
 }
@@ -205,6 +222,7 @@ void FParam::printOn(std::ostream &out) const
 
 void FParam::sem()
 {
+    std::cout << "FParam Sem..." << std::endl;
     for (Id *id : idlist->get_idlist())
         SymbolEntry *fun_param = newParameter(id->getName(), type, pass_mode, function);
 }
@@ -244,6 +262,7 @@ void FParamList::printOn(std::ostream &out) const
 
 void FParamList::sem()
 {
+    std::cout << "FParamList Sem..." << std::endl;
     for (FParam *param : params)
     {
         param->setSymbolEntry(function);
@@ -284,6 +303,7 @@ void Decl::printOn(std::ostream &out) const
 }
 void Decl::sem()
 {
+    std::cout << "Decl Sem..." << std::endl;
     for (Id *id : idlist->get_idlist())
     {
         // lookupEntry(id->getName(), LOOKUP_CURRENT_SCOPE, true);
@@ -329,7 +349,8 @@ void Header::sem()
      *  4) paramlit->sem()
      *  5) close the scope?
      */
-    std::cout << id->getName() << std::endl;
+
+    std::cout << "Header Sem..." << std::endl;
 
     SymbolEntry *function = newFunction(id->getName());
 
@@ -375,13 +396,13 @@ void FuncDecl::printOn(std::ostream &out) const
 }
 void FuncDecl::sem()
 {
+    std::cout << "FuncDecl Sem..." << std::endl;
     // FuncDecl is for forward declaring function.
     // Header class is for both forward and non forward functions.
     // Set forward_declaration to true to specify a header that represents a forward declared function.
     header->set_forward_declaration();
     header->sem();
 
-    // close scope ?
     closeScope();
 }
 
@@ -414,4 +435,16 @@ int ArrayElem::eval() const
 }
 void ArrayElem::sem()
 {
+    std::cout << "ArrayElem Sem..." << std::endl;  
+    std::vector<Expr *> expr_list = exprlist->getExprList();
+
+    left->sem();
+
+    for(Expr *e : expr_list) {
+        e->type_check(typeInteger);
+        e->sem();
+    }
+
+    // What else?
+    
 }

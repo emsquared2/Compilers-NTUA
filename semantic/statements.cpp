@@ -31,8 +31,8 @@ std::vector<Stmt *> Block::getList() { return stmt_list; }
 
 void Block::sem()
 {
+    std::cout << "Block Sem..." << std::endl;
     for (Stmt *s : stmt_list) {
-        std::cout << "sem_block: " << *s << std::endl;
         s->sem();
     }
 }
@@ -61,11 +61,23 @@ void Assign::run() const
 
 void Assign::sem()
 {
-    std::cout << "l_value_name:" << l_value->getName() << std::endl;
+    std::cout << "Assign Sem..." << std::endl;
     lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
 
-    // check that types match
-    l_value->type_check(expr->getType());
+    Type l_value_type = l_value->getType();
+    Type expr_type = expr->getType();
+
+    // Check that types match
+    if(!equalType(l_value_type, expr_type))
+        SemanticError("Assign: L_value and Expr type mismatch.");
+    
+    // Check that their type is typeInteger or typeChar
+    if(!equalType(l_value_type, typeInteger) && !equalType(l_value_type, typeChar))
+        SemanticError("Assign: L_value's type should be typeInteger or typeChar");
+
+    if(!equalType(expr_type, typeInteger) && !equalType(expr_type, typeChar))
+    SemanticError("Assign: Expr's type should be typeInteger or typeChar");
+
 }
 
 
@@ -100,10 +112,8 @@ void If::run() const
 
 void If::sem() 
 {
-    std::cout << "stmt1: " << *stmt1 << std::endl;
-    std::cout << "cond: " << *cond << std::endl;
+    std::cout << "If Sem..." << std::endl;
     cond->type_check(typeBoolean);
-    std::cout << "after type_check" << std::endl;
     stmt1->sem();
     if (stmt2 != nullptr)
         stmt2->sem();
@@ -133,6 +143,7 @@ void While::run() const
 }
 
 void While::sem() {
+    std::cout << "While Sem..." << std::endl;
     cond->type_check(typeBoolean);
     stmt->sem();
 }
@@ -162,6 +173,7 @@ int Return::ReturnValue()
 }
 
 void Return::sem() {
+    std::cout << "Return Sem..." << std::endl;
     if (expr != nullptr) {
         expr->sem();
         // expr->type_check();
@@ -204,6 +216,7 @@ void CallStmt::run() const
 }
 void CallStmt::sem()
 {
+    std::cout << "CallStmt Sem..." << std::endl;
     // Check if the function exists
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
     // TODO: Check if function is called properly (number and type of arguments)

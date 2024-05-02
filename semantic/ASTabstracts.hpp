@@ -92,11 +92,8 @@ public:
     {
         sem();
 
-        std::cout << "After calling sem in expr" << std::endl;
-
         if (!equalType(type, t))
         {
-            std::cout << "After calling equalType in expr" << std::endl;
             SemanticError("Type mismatch");
         }
     }
@@ -117,12 +114,9 @@ public:
 
     void type_check(Type t)
     {
-        std::cout << "entered" << std::endl;
         sem();
-        std::cout << "After calling sem in cond" << std::endl;
         if (!equalType(type, t))
         {
-            std::cout << "After calling equalType in cond" << std::endl;
             SemanticError("Type mismatch");
         }
     }

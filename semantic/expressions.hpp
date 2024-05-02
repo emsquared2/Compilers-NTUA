@@ -130,6 +130,9 @@ public:
     // {
     //     return val;
     // }
+    int getVal() {
+        return val;
+    }
 
 private:
     const int val;

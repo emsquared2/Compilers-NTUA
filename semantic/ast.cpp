@@ -449,7 +449,6 @@ void ArrayElem::sem()
     for (Expr *e : expr_list)
     {
         e->type_check(typeInteger);
-        e->sem();
     }
 
     // What else?

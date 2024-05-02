@@ -62,7 +62,8 @@ class Array : public CustomType
 {
 
 public:
-    Array(DataType t, ArrayDim *d) : data_type(t), dims(d) {
+    Array(DataType t, ArrayDim *d) : data_type(t), dims(d)
+    {
         uknown = dims->getUknown();
     }
     ~Array()
@@ -79,7 +80,7 @@ public:
                 out << "int";
                 break;
             }
-            case TYPE_CHAR: 
+            case TYPE_CHAR:
             {
                 out << "char";
                 break;
@@ -87,7 +88,7 @@ public:
             default:
             {
                 out << "Not valid data_type in Array"; // This should never be reached.
-                exit(1) ;
+                exit(1);
             }
         }
         // out << "( Dimensions --> ";
@@ -95,9 +96,8 @@ public:
 
         // out << ") )";
     }
-    virtual Type ConvertToType(CustomType *t) const override
+    virtual Type ConvertToType() const override
     {
-        
     }
     bool getUknown() { return uknown; }
 
@@ -126,7 +126,7 @@ public:
                 out << "int";
                 break;
             }
-            case TYPE_CHAR: 
+            case TYPE_CHAR:
             {
                 out << "char";
                 break;
@@ -139,14 +139,46 @@ public:
             default:
             {
                 out << "Not valid data_type"; // This should never be reached.
-                exit(1) ;
+                exit(1);
             }
         }
         out << ")";
     }
-    virtual Type ConvertToType(CustomType *t) const override
+    virtual Type ConvertToType() const override
     {
-
+        switch (data_type)
+        {
+            case TYPE_INTEGER:
+            {
+                return typeInteger;
+                break;
+            }
+            case TYPE_CHAR:
+            {
+                return typeChar;
+                break;
+            }
+            case TYPE_VOID:
+            {
+                return typeVoid;
+                break;
+            }
+            // case TYPE_ARRAY:
+            // {
+            //     return typeArray;
+            //     break;
+            // }
+            // case TYPE_IARRAY:
+            // {
+            //     return typeIArray;
+            //     break;
+            // }
+            default:
+            {
+                return typeInteger;
+                // exit(1);
+            }
+        }
     }
 
 private:
@@ -161,10 +193,15 @@ class FParType : public CustomType
 {
 public:
     FParType(DataType t) : data_type(t) { array = nullptr; }
-    FParType(Array *arr) : array(arr) {
+    FParType(Array *arr) : array(arr)
+    {
         data_type = (array->getUknown()) ? TYPE_IARRAY : TYPE_ARRAY;
     }
-    ~FParType() { if(array != nullptr) delete array; }
+    ~FParType()
+    {
+        if (array != nullptr)
+            delete array;
+    }
     virtual void printOn(std::ostream &out) const override
     {
         out << "FParType(";
@@ -175,7 +212,7 @@ public:
                 out << "int";
                 break;
             }
-            case TYPE_CHAR: 
+            case TYPE_CHAR:
             {
                 out << "char";
                 break;
@@ -193,21 +230,53 @@ public:
             }
             case TYPE_IARRAY:
             {
-                out <<"array of uknown size --> ";
+                out << "array of uknown size --> ";
                 array->printOn(out);
                 break;
             }
             default:
             {
                 out << "Not valid data_type in Array"; // This should never be reached.
-                exit(1) ;
+                exit(1);
             }
         }
         out << ")";
     }
-    virtual Type ConvertToType(CustomType *t) const override
+    virtual Type ConvertToType() const override
     {
-
+        switch (data_type)
+        {
+            case TYPE_INTEGER:
+            {
+                return typeInteger;
+                break;
+            }
+            case TYPE_CHAR:
+            {
+                return typeChar;
+                break;
+            }
+            case TYPE_VOID:
+            {
+                return typeVoid;
+                break;
+            }
+            // case TYPE_ARRAY:
+            // {
+            //     return typeArray;
+            //     break;
+            // }
+            // case TYPE_IARRAY:
+            // {
+            //     return typeIArray;
+            //     break;
+            // }
+            default:
+            {
+                return typeInteger;
+                // exit(1);
+            }
+        }
     }
 
 private:

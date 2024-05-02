@@ -30,8 +30,8 @@ void LocalDefList::append(LocalDef *l)
 }
 
 void LocalDefList::sem() {
-    for (LocalDef *l : locals)
+    for (auto l = locals.rbegin(); l != locals.rend(); ++l)
     {
-        l->sem();
+        (*l)->sem();
     }
 }

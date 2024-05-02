@@ -5,7 +5,8 @@
    --------------------------------------------------------------------- */
 
 Block::Block() : stmt_list() {}
-Block::~Block() {
+Block::~Block()
+{
     for (Stmt *s : stmt_list)
         delete s;
 }
@@ -22,18 +23,18 @@ void Block::printOn(std::ostream &out) const
         out << **s;
     }
     out << ")";
-} 
+}
 void Block::run() const
 {
-
 }
 std::vector<Stmt *> Block::getList() { return stmt_list; }
 
 void Block::sem()
 {
     std::cout << "Block Sem..." << std::endl;
-    for (Stmt *s : stmt_list) {
-        s->sem();
+    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+    {
+        (*s)->sem();
     }
 }
 
@@ -56,45 +57,47 @@ void Assign::printOn(std::ostream &out) const
 
 void Assign::run() const
 {
-   
 }
 
 void Assign::sem()
 {
     std::cout << "Assign Sem..." << std::endl;
-    lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
+
+    l_value->sem();
+    expr->sem();
+
+    // this probably will existin in l_value sem so it will not be needed here
+    // lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
 
     Type l_value_type = l_value->getType();
     Type expr_type = expr->getType();
 
     // Check that types match
-    if(!equalType(l_value_type, expr_type))
+    if (!equalType(l_value_type, expr_type))
         SemanticError("Assign: L_value and Expr type mismatch.");
-    
+
     // Check that their type is typeInteger or typeChar
-    if(!equalType(l_value_type, typeInteger) && !equalType(l_value_type, typeChar))
+    if (!equalType(l_value_type, typeInteger) && !equalType(l_value_type, typeChar))
         SemanticError("Assign: L_value's type should be typeInteger or typeChar");
 
-    if(!equalType(expr_type, typeInteger) && !equalType(expr_type, typeChar))
-    SemanticError("Assign: Expr's type should be typeInteger or typeChar");
-
+    if (!equalType(expr_type, typeInteger) && !equalType(expr_type, typeChar))
+        SemanticError("Assign: Expr's type should be typeInteger or typeChar");
 }
-
 
 /* ---------------------------------------------------------------------
    --------------------------------- IF --------------------------------
    --------------------------------------------------------------------- */
 
-If::If(Cond *c, Stmt *s1, Stmt *s2=nullptr) : cond(c), stmt1(s1), stmt2(s2) {}
+If::If(Cond *c, Stmt *s1, Stmt *s2 = nullptr) : cond(c), stmt1(s1), stmt2(s2) {}
 
-If::~If() 
+If::~If()
 {
     delete cond;
     delete stmt1;
     delete stmt2;
 }
 
-void If::printOn(std::ostream &out) const 
+void If::printOn(std::ostream &out) const
 {
     out << "If(" << *cond << ", " << *stmt1;
     if (stmt2 != nullptr)
@@ -102,7 +105,7 @@ void If::printOn(std::ostream &out) const
     out << ")";
 }
 
-void If::run() const 
+void If::run() const
 {
     // if (cond->eval())
     //     stmt1->run();
@@ -110,7 +113,7 @@ void If::run() const
     //     stmt2->run();
 }
 
-void If::sem() 
+void If::sem()
 {
     std::cout << "If Sem..." << std::endl;
     cond->type_check(typeBoolean);
@@ -125,24 +128,25 @@ void If::sem()
 
 While::While(Cond *c, Stmt *s) : cond(c), stmt(s) {}
 
-While::~While() 
+While::~While()
 {
     delete cond;
     delete stmt;
 }
 
-void While::printOn(std::ostream &out) const 
+void While::printOn(std::ostream &out) const
 {
     out << "While(" << *cond << ", " << *stmt << ")";
 }
 
-void While::run() const 
+void While::run() const
 {
     // while (cond->eval())
     //     stmt->run();
 }
 
-void While::sem() {
+void While::sem()
+{
     std::cout << "While Sem..." << std::endl;
     cond->type_check(typeBoolean);
     stmt->sem();
@@ -154,7 +158,7 @@ void While::sem() {
 
 Return::Return(Expr *e) : expr(e) {}
 
-void Return::printOn(std::ostream &out) const 
+void Return::printOn(std::ostream &out) const
 {
     out << "Return(";
     if (expr != nullptr)
@@ -162,34 +166,33 @@ void Return::printOn(std::ostream &out) const
     out << ")";
 }
 
-void Return::run() const 
+void Return::run() const
 {
-
 }
 
-int Return::ReturnValue() 
+int Return::ReturnValue()
 {
     // return (expr != nullptr) ? expr->eval() : 0;
 }
 
-void Return::sem() {
+void Return::sem()
+{
     std::cout << "Return Sem..." << std::endl;
-    if (expr != nullptr) {
+    if (expr != nullptr)
+    {
         expr->sem();
         // expr->type_check();
     }
-
 }
-
 
 /* ---------------------------------------------------------------------
    ------------------------------ EMPTY STMT----------------------------
    --------------------------------------------------------------------- */
 
-
 EmptyStmt::EmptyStmt() {}
 
-void EmptyStmt::printOn(std::ostream &out) const {
+void EmptyStmt::printOn(std::ostream &out) const
+{
     out << "Empty Statement()";
 }
 
@@ -212,7 +215,6 @@ void CallStmt::printOn(std::ostream &out) const
 }
 void CallStmt::run() const
 {
-
 }
 void CallStmt::sem()
 {

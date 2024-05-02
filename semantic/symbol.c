@@ -690,6 +690,9 @@ void printType (Type type)
             printf("^");
             printType(type->refType);
             break;
+        // add unexpected non null behavior debug message
+        default:
+            printf("wrong type");
     }
 }
 

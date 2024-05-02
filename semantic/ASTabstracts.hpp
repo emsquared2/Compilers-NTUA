@@ -154,7 +154,7 @@ class CustomType : public AST
 {
 public:
     virtual void printOn(std::ostream &out) const = 0;
-    virtual Type ConvertToType(CustomType *t) const = 0;
+    virtual Type ConvertToType() const = 0;
 };
 
 inline std::ostream &operator<<(std::ostream &out, const AST &t)

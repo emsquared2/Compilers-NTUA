@@ -53,17 +53,21 @@ void Id::sem()
     std::cout << "Id Sem..." << std::endl;
     SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
 
-    switch (e->entryType)
+    if (e != NULL)
     {
+        std::cout << "Entry Type" << e->entryType << std::endl;
+        switch (e->entryType)
+        {
         case ENTRY_VARIABLE:
             type = e->u.eVariable.type;
             break;
         case ENTRY_CONSTANT:
             SemanticError("Id cannot be a constant.");
             break;
+        // check this when implementing CallExpr
         case ENTRY_FUNCTION:
             SemanticError("Id cannot be a function.");
-            break;    
+            break;
         case ENTRY_PARAMETER:
             type = e->u.eParameter.type;
             break;
@@ -73,6 +77,8 @@ void Id::sem()
         default:
             SemanticError("Invalid entry for identifier. This should never be reached");
             break;
+        }
+        printType(type);
     }
 }
 
@@ -198,7 +204,7 @@ void StmtList::sem()
 FParam::FParam(IdList *idl, FParType *t, bool ref = false) : idlist(idl), fpartype(t), ref(ref)
 {
     pass_mode = ref ? PASS_BY_REFERENCE : PASS_BY_VALUE;
-    type = fpartype->ConvertToType(fpartype);
+    type = fpartype->ConvertToType();
 }
 FParam::~FParam()
 {
@@ -223,6 +229,7 @@ void FParam::printOn(std::ostream &out) const
 void FParam::sem()
 {
     std::cout << "FParam Sem..." << std::endl;
+    printType(type);
     for (Id *id : idlist->get_idlist())
         SymbolEntry *fun_param = newParameter(id->getName(), type, pass_mode, function);
 }
@@ -280,12 +287,11 @@ void FParamList::setSymbolEntry(SymbolEntry *f)
     function = f;
 }
 
-
 /* ---------------------------------------------------------------------
    ------------------------------- Decl --------------------------------
    --------------------------------------------------------------------- */
 
-Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt) { type = parser_type->ConvertToType(parser_type); }
+Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt) { type = parser_type->ConvertToType(); }
 Decl::~Decl()
 {
     delete idlist;
@@ -315,7 +321,7 @@ void Decl::sem()
    ------------------------------ Header -------------------------------
    --------------------------------------------------------------------- */
 
-Header::Header(Id *id, RetType *t, FParamList *fpl = nullptr) : id(id), ret_type(t), fparamlist(fpl) { type = ret_type->ConvertToType(ret_type); }
+Header::Header(Id *id, RetType *t, FParamList *fpl = nullptr) : id(id), ret_type(t), fparamlist(fpl) { type = ret_type->ConvertToType(); }
 Header::~Header()
 {
     delete id;
@@ -370,10 +376,10 @@ void Header::sem()
 
     Option 2 on the other hand might be a cleaner option as the SymbolEntry is abstracted from the classes.
     */
-    if (fparamlist != nullptr) {
+    if (fparamlist != nullptr)
+    {
         fparamlist->setSymbolEntry(function);
         fparamlist->sem();
-
     }
 
     endFunctionHeader(function, type);
@@ -435,16 +441,16 @@ int ArrayElem::eval() const
 }
 void ArrayElem::sem()
 {
-    std::cout << "ArrayElem Sem..." << std::endl;  
+    std::cout << "ArrayElem Sem..." << std::endl;
     std::vector<Expr *> expr_list = exprlist->getExprList();
 
     left->sem();
 
-    for(Expr *e : expr_list) {
+    for (Expr *e : expr_list)
+    {
         e->type_check(typeInteger);
         e->sem();
     }
 
     // What else?
-    
 }

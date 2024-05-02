@@ -48,7 +48,6 @@ void BinOp::sem()
     type = typeInteger;
 }
 
-
 /* #####################################################################
    #####                        CONST TYPES                       #####
    ##################################################################### */
@@ -56,7 +55,6 @@ void BinOp::sem()
 /* ---------------------------------------------------------------------
    ------------------------------- Const -------------------------------
    --------------------------------------------------------------------- */
-
 
 Const::Const(int v) : val(v) {}
 Const::~Const() {}
@@ -70,7 +68,6 @@ void Const::sem()
     std::cout << "Const Sem..." << std::endl;
     type = typeInteger;
 }
-
 
 /* ---------------------------------------------------------------------
    ----------------------------- ConstChar -----------------------------
@@ -131,31 +128,49 @@ void CallExpr::sem()
     // Check if the function exists
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
 
-    if(function->entryType != ENTRY_FUNCTION)
-        SemanticError("This identifier does not correspond to a function.");
+    if (function->entryType != ENTRY_FUNCTION)
+        SemanticError("Could not find function name.");
+
+    std::cout << "Result Type -> ";
+    printType(function->u.eFunction.resultType);
+    std::cout << std::endl;
 
     // Check if function is called with correct number and type of arguments
     SymbolEntry *argument = function->u.eFunction.firstArgument;
 
-    std::vector<Expr *> e_list = expr_list->getExprList();
+    std::vector<Expr *> e_list;
+    
+    if (expr_list != nullptr)
+        e_list = expr_list->getExprList();        
 
     int counter = 0;
 
-    for(Expr *e : e_list)
+    for (Expr *e : e_list)
     {
-      if(argument == NULL) {
-        std::string msg = "Expected " + std::to_string(counter) + " arguments, but got " + std::to_string(e_list.size()) + ".";
-        SemanticError(msg.c_str());
-      }
+        // More parameters than expected
+        if (argument == NULL)
+        {
+            std::string msg = "Expected " + std::to_string(counter) + " arguments, but got " + std::to_string(e_list.size()) + ".";
+            SemanticError(msg.c_str());
+        }
 
-      e->type_check(argument->u.eParameter.type);
-      argument = argument->u.eParameter.next;
+        e->type_check(argument->u.eParameter.type);
+        argument = argument->u.eParameter.next;
 
-      counter++;
+        counter++;
     }
 
-    if(argument != NULL)
-      SemanticError("Fewer parameters than expected in function call.");
-    
+    // Fewer parameters than expected
+    if (argument != NULL)
+    {
+        // Find true number of arguments
+        while(argument != NULL) {
+            argument = argument->u.eParameter.next;
+            counter++;
+        }
+        
+        std::string msg = "Expected " + std::to_string(counter) + " arguments, but got " + std::to_string(e_list.size()) + ".";
+        SemanticError(msg.c_str());
+    }
     type = function->u.eFunction.resultType;
 }

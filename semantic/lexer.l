@@ -5,9 +5,6 @@
 %{
 #include <cstdio>
 #include <cstdlib>
-#include "ast.hpp"
-#include "statements.hpp"
-#include "lexer.hpp"
 #include "parser.hpp"
 
 int lineno = 1;

@@ -1,7 +1,7 @@
 #ifndef __LOCALDEFLIST_HPP__
 #define __LOCALDEFLIST_HPP__
 
-#pragma once
+#include "localdef.hpp"
 #include <vector>
 
 class LocalDefList : public AST

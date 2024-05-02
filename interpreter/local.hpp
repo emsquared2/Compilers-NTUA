@@ -1,8 +1,6 @@
 #ifndef __LOCAL_HPP__
 #define __LOCAL_HPP__
 
-#pragma once
-
 class Local : public AST
 {
 public:

@@ -1,8 +1,6 @@
 #ifndef __FUNCDEF_HPP__
 #define __FUNCDEF_HPP__
 
-#pragma once
-
 class FuncDef : public AST
 {
 public:

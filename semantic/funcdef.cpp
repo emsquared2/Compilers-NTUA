@@ -1,7 +1,3 @@
-class LocalDefList;
-
-#include "ast.hpp"
-#include "localdeflist.hpp"
 #include "funcdef.hpp"
 
 FuncDef::FuncDef(Header *h, LocalDefList *ldl, Block *b) : header(h), local_def_list(ldl), block(b) {}

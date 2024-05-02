@@ -3,15 +3,47 @@
     #include <cstdlib>
 
     #include "lexer.hpp"
-
-    #include "ast.hpp"
-    #include "statements.hpp"
-    #include "expressions.hpp"
-    #include "conditions.hpp"
-    #include "localdeflist.hpp"
-    #include "funcdef.hpp"
-    #include "localdef.hpp"
     
+    #include "ast.hpp"
+
+    #include "array.hpp"
+    #include "arraydim.hpp"
+    #include "arrayelem.hpp"
+    #include "assign.hpp"
+    #include "binop.hpp"
+    #include "block.hpp"
+    #include "callexpr.hpp"
+    #include "callstmt.hpp"
+    #include "compcond.hpp"
+    #include "cond.hpp"
+    #include "const.hpp"
+    #include "constchar.hpp"
+    #include "conststr.hpp"
+    #include "customtype.hpp"
+    #include "decl.hpp"
+    #include "expr.hpp"
+    #include "exprlist.hpp"
+    #include "fparam.hpp"
+    #include "fparamlist.hpp"
+    #include "fpartype.hpp"
+    #include "funcdecl.hpp"
+    #include "funcdef.hpp"
+    #include "header.hpp"
+    #include "id.hpp"
+    #include "idlist.hpp"
+    #include "if.hpp"
+    #include "localdef.hpp"
+    #include "localdeflist.hpp"
+    #include "lvalue.hpp"
+    #include "nothing.hpp"
+    #include "opcond.hpp"
+    #include "rettype.hpp"
+    #include "return.hpp"
+    #include "stmt.hpp"
+    #include "stmtlist.hpp"
+    #include "unop.hpp"
+    #include "while.hpp"
+
     #define YYDEBUG 1
 
 %}
@@ -197,9 +229,9 @@ local_def_list:
 ;
 
 local_def:
-    func_def                    { $$ = new LocalDef($1); }
-    | func_decl                 { $$ = new LocalDef($1); }
-    | var_def                   { $$ = new LocalDef($1); }
+    func_def                    { $$ = $1; }
+    | func_decl                 { $$ = $1; }
+    | var_def                   { $$ = $1; }
 ;
 
 func_decl:

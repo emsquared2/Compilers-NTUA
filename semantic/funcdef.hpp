@@ -1,10 +1,13 @@
 #ifndef __FUNCDEF_HPP__
 #define __FUNCDEF_HPP__
 
-#include "statements.hpp"
-#pragma once
+#include "localdef.hpp"
+#include "header.hpp"
+#include "block.hpp"
+#include "localdeflist.hpp"
 
-class FuncDef : public AST
+
+class FuncDef : public LocalDef
 {
 public:
     FuncDef(Header *h, LocalDefList *ldl, Block *b);

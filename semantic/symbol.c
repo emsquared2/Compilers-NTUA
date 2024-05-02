@@ -547,24 +547,30 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     return NULL;
 }
 
-SymbolEntry *lookupLastFunction()
-{
-    SymbolEntry *lastFunction = NULL;
+SymbolEntry *lookupLastFunction() {
+    Scope *scope = currentScope;
 
-    // Iterate through all entries in the current scope
-    for (SymbolEntry *e = currentScope->entries; e != NULL; e = e->nextInScope)
-    {
-        // Check if the entry is a function
-        if (e->entryType == ENTRY_FUNCTION)
-        {
-            // Update lastFunction to the most recent function entry
-            lastFunction = e;
+    // Traverse scopes from the current scope upwards
+    while (scope != NULL) {
+        SymbolEntry *entry = scope->entries;
+
+        // Traverse all entries in the current scope
+        while (entry != NULL) {
+            if (entry->entryType == ENTRY_FUNCTION) {
+                // Return the first function entry found
+                return entry;
+            }
+            entry = entry->nextInScope;
         }
+
+        // Move to the parent scope
+        scope = scope->parent;
     }
 
-    // Return the last function found, or NULL if no function was found in the current scope
-    return lastFunction;
+    // Return NULL if no function was found in any of the scopes
+    return NULL;
 }
+
 
 Type typeArray (RepInteger size, Type refType)
 {

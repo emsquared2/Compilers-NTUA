@@ -2,6 +2,11 @@
 
 CPP_FILES := $(wildcard *.cpp)
 
+# Exclude ast.cpp from the list
+# CPP_FILES := $(filter-out ast.cpp, $(CPP_FILES))
+
+HPP_FILES := $(wildcard *.hpp)
+
 OBJECT_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
 
 CXX=c++
@@ -12,12 +17,13 @@ default: grace
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
+lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp
+
 parser.hpp parser.cpp: parser.y
 	bison -dv -o parser.cpp parser.y
 
-lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp
-
-parser.o: parser.cpp lexer.hpp ast.hpp
+parser.o: parser.cpp $(HPP_FILES)
+	$(CXX) $(CXXFLAGS) -c parser.cpp
 
 general.o  : general.c general.h error.h
 

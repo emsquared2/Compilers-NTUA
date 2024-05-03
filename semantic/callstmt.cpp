@@ -48,6 +48,12 @@ void CallStmt::sem()
         printType(argument->u.eParameter.type);        
         std::cout << std::endl;
         e->type_check(argument->u.eParameter.type);
+
+        /* Check if Expr e is a LValue */
+        LValue * lvalue_ptr = dynamic_cast<LValue *>(e);
+        if (argument->u.eParameter.mode == PASS_BY_REFERENCE && !lvalue_ptr)
+            SemanticError("Parameter defined as pass-by-reference must be an lvalue.");
+
         argument = argument->u.eParameter.next;
 
         counter++;

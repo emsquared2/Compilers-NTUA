@@ -1,11 +1,15 @@
 #include "arraydim.hpp"
 
-ArrayDim::ArrayDim() : dims() {}
+ArrayDim::ArrayDim() : dims(), unknown(false) {}
+
 ArrayDim::~ArrayDim()
 {
-    for (Const *num :dims)
+    for (Const *num : dims)
+    {
         delete num;
+    }
 }
+
 void ArrayDim::printOn(std::ostream &out) const
 {
     if (unknown)
@@ -16,12 +20,12 @@ void ArrayDim::printOn(std::ostream &out) const
     }
 }
 
-bool ArrayDim::isEmpty()
+bool ArrayDim::isEmpty() const
 {
     return dims.empty();
 }
 
-void ArrayDim::setUknownFirstDim()
+void ArrayDim::setUnknownFirstDim()
 {
     unknown = true;
 }
@@ -31,7 +35,12 @@ void ArrayDim::append(Const *num)
     dims.push_back(num);
 }
 
-bool ArrayDim::getUknown() 
-{ 
-    return unknown; 
+std::vector<Const *> ArrayDim::getDims() const
+{
+    return dims;
+}
+
+bool ArrayDim::getUnknown() const
+{
+    return unknown;
 }

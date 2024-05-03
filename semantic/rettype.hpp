@@ -7,7 +7,7 @@ class RetType : public CustomType
 {
 public:
     RetType(DataType dt);
-    ~RetType() = default;
+    ~RetType();
     virtual void printOn(std::ostream &out) const override;
     virtual Type ConvertToType() const override;
 

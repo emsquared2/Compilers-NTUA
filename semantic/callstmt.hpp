@@ -15,7 +15,7 @@ public:
 
 private:
     Id *id;
-    ExprList *expr_list;
+    ExprList *expr_list = nullptr;
 };
 
 #endif

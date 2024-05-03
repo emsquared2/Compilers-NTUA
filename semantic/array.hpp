@@ -12,12 +12,12 @@ public:
     ~Array();
     virtual void printOn(std::ostream &out) const override;
     virtual Type ConvertToType() const;
-    bool getUknown();
+    bool getUnknown();
 
 private:
     DataType data_type;
     ArrayDim *dims;
-    bool uknown = false;
+    bool unknown = false;
 };
 
 #endif

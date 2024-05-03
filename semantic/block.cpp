@@ -24,7 +24,8 @@ std::vector<Stmt *> Block::getList() { return stmt_list; }
 void Block::sem()
 {
     std::cout << "Block Sem..." << std::endl;
-    for (Stmt *s : stmt_list) {
-        s->sem();
+    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+    {
+        (*s)->sem();
     }
 }

@@ -13,5 +13,10 @@ void ConstStr::sem()
 {
     std::cout << "ConstStr Sem..." << std::endl;
     RepInteger len = str.length() + 1;
-    type = typeArray(len, typeChar);
+    // type = typeArray(len, typeChar);
+    type = typeIArray(typeChar);
+
+    std::cout << "Actual Parameter type ";
+    printType(type);
+    std::cout << std::endl;
 }

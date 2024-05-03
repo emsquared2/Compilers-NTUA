@@ -205,7 +205,7 @@ fpar_type:
             $$ = new FParType(new Array($1, $2));
         }
     }
-    | data_type '[' ']' bracket_extended    { $4->setunknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
+    | data_type '[' ']' bracket_extended    { $4->setUnknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
 ; // array 
 
 bracket_extended: 
@@ -369,7 +369,6 @@ int main() {
 
     int result = yyparse();
     if (result == 0) printf("Success.\n");
-    return result;
 
     // Close program's scope
     closeScope();
@@ -377,4 +376,5 @@ int main() {
     // Destroy the symbol table.
     destroySymbolTable();
 
+    return result;
 }

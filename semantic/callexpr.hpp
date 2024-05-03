@@ -11,15 +11,11 @@ public:
     CallExpr(Id *id, ExprList *e_list);
     ~CallExpr();
     virtual void printOn(std::ostream &out) const override;
-    // TODO: Implement how a function is run.
-    // virtual int eval() const override
-    // {
-    // }
     virtual void sem() override;
 
 private:
     Id *id;
-    ExprList *expr_list;
+    ExprList *expr_list = nullptr;
 };
 
 

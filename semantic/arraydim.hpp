@@ -10,10 +10,11 @@ public:
     ArrayDim();
     ~ArrayDim();
     virtual void printOn(std::ostream &out) const override;
-    bool isEmpty();
-    void setUknownFirstDim();
+    bool isEmpty() const;
+    void setUnknownFirstDim();
     void append(Const *num);
-    bool getUknown();
+    std::vector<Const *> getDims() const;
+    bool getUnknown() const;
 
 private:
     std::vector<Const *> dims;

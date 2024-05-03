@@ -10,24 +10,6 @@ public:
     OpCond(char *s, Cond *r);
     ~OpCond();
     virtual void printOn(std::ostream &out) const override;
-
-    // virtual int eval() const override
-    // {
-    //     if (op == "not")
-    //     {
-    //         return !right->eval();
-    //     }
-    //     else if (op == "and")
-    //     {
-    //         return left->eval() && right->eval();
-    //     }
-    //     else if (op == "or")
-    //     {
-    //         return left->eval() || right->eval();
-    //     }
-    //     return 0;
-    // }
-
     virtual void sem() override;
 
 private:

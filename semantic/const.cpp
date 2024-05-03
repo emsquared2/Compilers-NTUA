@@ -6,7 +6,6 @@ void Const::printOn(std::ostream &out) const
 {
     out << "Const(" << val << ")";
 }
-
 int Const::getVal() 
 {
     return val;

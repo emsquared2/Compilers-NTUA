@@ -21,3 +21,19 @@ void FuncDef::sem()
 
     closeScope();
 }
+
+void FuncDef::ProgramSem()
+{
+    /* Program should:
+        *      1) NOT take parameters
+        *     2) Return nothing, i.e. have type typeVoid
+        */ 
+
+    if(header->getFParamList() != nullptr)
+        SemanticError("Program cannot take parameters.");
+
+    if(!equalType(header->getReturnType(), typeVoid))
+        SemanticError("Program should have type void.");
+
+    sem();
+}

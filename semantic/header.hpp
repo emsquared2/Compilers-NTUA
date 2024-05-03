@@ -13,6 +13,8 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
     void set_forward_declaration();
+    FParamList * getFParamList();
+    Type getReturnType();
 
 private:
     Id *id;

@@ -14,6 +14,7 @@ public:
     ~FuncDef();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
+    void ProgramSem();
 
 private:
     Header *header;

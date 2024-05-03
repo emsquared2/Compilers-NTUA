@@ -1,0 +1,27 @@
+addchar             --> CORRECT:    c = c + 1 where c is char
+arraybyvalue        --> WRONG:      segfault
+charindex           --> CORRECT:    array[j] where j is char
+doublevar           --> WRONG:      a r-value is passed as param by ref (double(a+b))
+errorcode           --> CORRECT:    the main function must have void return type
+evennumber          --> CORRECT:    undefined variable (it prints "unknown identifier" but it also gets segfault)
+funcassign          --> CORRECT:    function <- id
+ifaelseb            --> CORRECT:    return different type
+inputfunc           --> CORRECT
+issorted            --> CORRECT:    the main function cannot take arguments
+negativechar        --> CORRECT
+notanarray          --> WRONG:      segfault
+notwhatiwanted      --> CORRECT:    wrong return type
+ordermatters        --> CORRECT:    params in wrong order
+paramtypehavoc      --> CORRECT:    function defined with different type of arguments than declared (fix: better msg)
+redefine            --> CORRECT:    Redefinition of a function (should exit instead of just printing the error?)
+returntypehaveoc    --> NOT TESTED
+stringassign        --> CORRECT:    char array <- string
+toolessparam        --> CORRECT:    call function with less arguments
+toomuchparam        --> CORRECT:    call function with more arguments
+undeclfunc          --> CORRECT:    undeclared function call
+undeffunc           --> NOT TESTED
+zerosizearrays      --> NOT TESTED
+
+Array related:  2, 12, 23
+Fixable:        4
+Adjust:         6, 15

@@ -166,7 +166,7 @@ program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
     | func_def      { std::cout << "AST: " << *$1 << std::endl; 
         $$ = $1; 
-        $1->sem();
+        $1->ProgramSem();
         delete $$;
     }
 ;

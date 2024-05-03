@@ -34,6 +34,15 @@ void Header::set_forward_declaration()
     forward_declaration = true;
 }
 
+FParamList * Header::getFParamList()
+{
+    return fparamlist;
+}
+
+Type Header::getReturnType()
+{
+    return type;
+}
 void Header::sem()
 {
     /* Check if id exists in symbol table. If it exists, throw error.

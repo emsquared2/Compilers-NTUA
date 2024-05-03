@@ -1,5 +1,3 @@
-#include "ast.hpp"
-#include "localdef.hpp"
 #include "localdeflist.hpp"
 
 LocalDefList::LocalDefList() : locals() {}

@@ -1,7 +1,7 @@
 addchar             --> CORRECT:    c = c + 1 where c is char
 arraybyvalue        --> WRONG:      segfault
 charindex           --> CORRECT:    array[j] where j is char
-doublevar           --> WRONG:      a r-value is passed as param by ref (double(a+b))
+doublevar           --> CORRECT:    a r-value is passed as param by ref (double(a+b))
 errorcode           --> CORRECT:    the main function must have void return type
 evennumber          --> CORRECT:    undefined variable (it prints "unknown identifier" but it also gets segfault)
 funcassign          --> CORRECT:    function <- id
@@ -23,5 +23,4 @@ undeffunc           --> NOT TESTED
 zerosizearrays      --> NOT TESTED
 
 Array related:  2, 12, 23
-Fixable:        4
 Adjust:         6, 15

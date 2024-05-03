@@ -173,7 +173,7 @@ fpar_type:
             $$ = new FParType(new Array($1, $2));
         }
     }
-    | data_type '[' ']' bracket_extended    { $4->setUknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
+    | data_type '[' ']' bracket_extended    { $4->setunknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
 ; // array 
 
 bracket_extended: 

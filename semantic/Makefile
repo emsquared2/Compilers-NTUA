@@ -20,6 +20,9 @@ lexer.o: lexer.cpp lexer.hpp parser.hpp ast.hpp statements.hpp
 ast.o: ast.cpp ast.hpp ASTabstracts.hpp types.hpp
 	$(CXX) $(CXXFLAGS) -c ast.cpp
 
+types.o: types.cpp types.hpp ast.hpp expressions.hpp
+	$(CXX) $(CXXFLAGS) -c types.cpp
+
 statements.o: statements.cpp statements.hpp ast.hpp
 	$(CXX) $(CXXFLAGS) -c statements.cpp
 

@@ -36,9 +36,9 @@ void FParamList::setSymbolEntry(SymbolEntry *f)
 void FParamList::sem()
 {
     std::cout << "FParamList Sem..." << std::endl;
-    for (FParam *param : params)
+    for (auto param = params.rbegin(); param != params.rend(); ++param)
     {
-        param->setSymbolEntry(function);
-        param->sem();
+        (*param)->setSymbolEntry(function);
+        (*param)->sem();
     }
 }

@@ -18,5 +18,4 @@ private:
     ExprList *expr_list = nullptr;
 };
 
-
 #endif

@@ -24,3 +24,13 @@ zerosizearrays      --> NOT TESTED
 
 Array related:  2, 12, 23
 Adjust:         6, 15
+
+Notes:
+
+1) If a function has returned then we shouldn't keep doing semantic analysis, gen code etc.
+2) ConstStr->sem(): type should be Array and not IArray
+3) Ensure that a non void function will include return statement.
+4) ArrayElem --> assign type... in sem ()
+
+Assign,  Block, CallStmt(?), Return, If
+3 applies to funcdef

@@ -32,6 +32,13 @@ void FParam::setSymbolEntry(SymbolEntry *f)
 
 void FParam::sem()
 {
+    /* Arrays passed as function parameters can only be passed by reference */
+    bool isArrayType = !equalType(type, typeInteger) && !equalType(type, typeChar);
+    if(isArrayType && pass_mode != PASS_BY_REFERENCE)
+    {
+        SemanticError("Arrays can only be passed by reference.");
+    }
+
     std::cout << "FParam Sem..." << std::endl;
     for (Id *id : idlist->get_idlist())
         newParameter(id->getName(), type, pass_mode, function);

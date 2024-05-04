@@ -23,10 +23,6 @@ void CallExpr::sem()
     if (function->entryType != ENTRY_FUNCTION)
         SemanticError("Could not find function name.");
 
-    std::cout << "Result Type -> ";
-    printType(function->u.eFunction.resultType);
-    std::cout << std::endl;
-
     // Check if function is called with correct number and type of arguments
     SymbolEntry *argument = function->u.eFunction.firstArgument;
 

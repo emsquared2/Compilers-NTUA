@@ -664,7 +664,9 @@ bool equalType (Type type1, Type type2)
     printType(type2);
     printf("\n");
     if (type1->kind != type2->kind) {
-        if((type1->kind != TYPE_ARRAY || type1->kind != TYPE_IARRAY) && (type2->kind != TYPE_ARRAY || type2->kind != TYPE_IARRAY)) {
+        if ((type1->kind != TYPE_ARRAY && type1->kind != TYPE_IARRAY) ||
+            (type2->kind != TYPE_ARRAY && type2->kind != TYPE_IARRAY))
+        {
             return false;
         }
     }

@@ -33,7 +33,7 @@ void CallExpr::sem()
 
     int counter = 0;
 
-    for (Expr *e : e_list)
+    for (auto e = e_list.rbegin(); e != e_list.rend(); ++e)
     {
         // More parameters than expected
         if (argument == NULL)
@@ -50,10 +50,10 @@ void CallExpr::sem()
         printType(argument->u.eParameter.type);
         std::cout << std::endl;
 
-        e->type_check(argument->u.eParameter.type);
+        (*e)->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */
-        LValue * lvalue_ptr = dynamic_cast<LValue *>(e);
+        LValue *lvalue_ptr = dynamic_cast<LValue *>((*e));
         if (argument->u.eParameter.mode == PASS_BY_REFERENCE && !lvalue_ptr)
             SemanticError("Parameter defined as pass-by-reference must be an lvalue.");
 

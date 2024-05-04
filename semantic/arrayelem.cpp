@@ -31,4 +31,17 @@ void ArrayElem::sem()
         e->type_check(typeInteger);
         e->sem();
     }
+
+    Type t = left->getType();
+    if(t->refType == nullptr) {
+        std::string name = left->getName();
+        std::string msg = "Variable " + name + "is not of type Array";
+        SemanticError(msg.c_str());
+    }
+    
+    type = findArrayType(t);
+
+    std::cout << "Array Elem type ";
+    printType(type);
+    std::cout << std::endl;
 }

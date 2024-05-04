@@ -234,5 +234,7 @@ void          printMode          (PassMode mode);
 
 void          destroyType        (Type type);
 
+Type          findArrayType      (Type type);
+
 
 #endif

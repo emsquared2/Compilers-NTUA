@@ -571,6 +571,14 @@ SymbolEntry *lookupLastFunction() {
     return NULL;
 }
 
+Type findArrayType(Type t)
+{
+    while(t->kind == TYPE_ARRAY || t->kind == TYPE_IARRAY) {
+        t = t->refType;
+    }
+    return t;
+}
+
 
 Type typeArray (RepInteger size, Type refType)
 {
@@ -671,7 +679,6 @@ bool equalType (Type type1, Type type2)
             }
         case TYPE_IARRAY:
         case TYPE_POINTER:
-            printf("Entered here\n");
             return equalType(type1->refType, type2->refType);
     }
     return true;        

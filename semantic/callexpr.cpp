@@ -42,6 +42,14 @@ void CallExpr::sem()
             SemanticError(msg.c_str());
         }
 
+        // std::cout << "Actual Type -> ";
+        // printType(e->getType());
+        // std::cout << std::endl;
+
+        std::cout << "Expected Type -> ";
+        printType(argument->u.eParameter.type);
+        std::cout << std::endl;
+
         e->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */

@@ -39,4 +39,7 @@ void Id::sem()
             SemanticError("Invalid entry for identifier. This should never be reached");
             break;
     }
+    std::cout << "Actual Type -> ";
+    printType(type);
+    std::cout << std::endl;
 }

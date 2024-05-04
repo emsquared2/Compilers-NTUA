@@ -648,14 +648,30 @@ unsigned int sizeOfType (Type type)
 
 bool equalType (Type type1, Type type2)
 {
-    if (type1->kind != type2->kind)
-        return false;
+    printf("Type 1 in equalType ");
+    printType(type1);
+    printf("\n");
+
+    printf("Type 2 in equalType ");
+    printType(type2);
+    printf("\n");
+    if (type1->kind != type2->kind) {
+        if((type1->kind != TYPE_ARRAY || type1->kind != TYPE_IARRAY) && (type2->kind != TYPE_ARRAY || type2->kind != TYPE_IARRAY)) {
+            return false;
+        }
+    }
     switch (type1->kind) {
         case TYPE_ARRAY:
-            if (type1->size != type2->size)
+             if ((type2->kind == TYPE_IARRAY) && (type1->refType->kind == type2->refType->kind))
+            {
+                return true;
+            }
+            if (type1->size != type2->size) {
                 return false;
+            }
         case TYPE_IARRAY:
         case TYPE_POINTER:
+            printf("Entered here\n");
             return equalType(type1->refType, type2->refType);
     }
     return true;        

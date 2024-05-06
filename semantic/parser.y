@@ -360,7 +360,13 @@ int main() {
     // Initialize the symbol table with hash table of size 1024
     initSymbolTable(1024);
 
-    // Open program's scope
+    // Open scope for library functions
+    openScope();
+
+    // Add library
+    addLibrary();
+
+    // Open program scope
     openScope();
 
     #ifdef YYDEBUG
@@ -370,11 +376,14 @@ int main() {
     int result = yyparse();
     if (result == 0) printf("Success.\n");
 
-    // Close program's scope
+    // Close scope for library functions
+    closeScope();
+
+    // Close program scope
     closeScope();
 
     // Destroy the symbol table.
     destroySymbolTable();
-
+    
     return result;
 }

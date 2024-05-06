@@ -2,6 +2,7 @@
 #define __AST_HPP__
 
 #include <iostream>
+#include <vector>
 
 /* Link C with C++ */
 extern "C"
@@ -38,6 +39,31 @@ extern "C"
 
     extern void destroyType(Type type);
 }
+
+
+/* ---------------------------------------------------------------------
+   ----------------------------- Parameter -----------------------------
+   --------------------------------------------------------------------- */
+
+// This class represents a function parameter and is used in addLibrary and addLibraryFunction.
+class Parameter {
+public:
+    Parameter(const char* n, Type t, PassMode pm) : name(n), type(t), pass_mode(pm) {}
+    const char* getName() const { return name; }
+    Type getType() const { return type; }
+    PassMode getPassMode() const { return pass_mode; }
+
+private:
+    const char* name;
+    Type type;
+    PassMode pass_mode;
+};
+
+/* ---------------------------------------------------------------------
+   ----------------------- Add Library Functions -----------------------
+   --------------------------------------------------------------------- */
+
+void addLibrary();
 
 /* ---------------------------------------------------------------------
    ------------------------------ DataType -----------------------------

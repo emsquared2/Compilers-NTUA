@@ -20,10 +20,8 @@ toolessparam        --> CORRECT:    call function with less arguments line 18
 toomuchparam        --> CORRECT:    call function with more arguments line 15
 undeclfunc          --> CORRECT:    undeclared function call
 undeffunc           --> CORRECT:    undefined function           
-zerosizearrays      --> WRONG
+zerosizearrays      --> WRONG:      To be fixed in llv - compile() method
 
-Array related:  23
-Adjust:         6, 15
 
 Notes:
 
@@ -31,10 +29,16 @@ Notes:
 2) ConstStr->sem(): type should be Array and not IArray
 3) Ensure that a non void function will include return statement.
 
+
+Fixes:
+1) add check of 0 sized array --> This will be fixed later in llvm. We will check that every expr in expr_list will evaluate to a positive integer. 
+
+
+Minor issues:
+- 13, 14) sem error appears as type mismatch - maybe improve message clarity? (13 - return, 14 - fparams) --> it's okay
+
 # Updated 4/05/2024
-13, 14) sem error appears as type mismatch - maybe improve message clarity? (13 - return, 14 - fparams)
-15, 16, 17, 21) Probably error not attributed to a SemanticError 
-23) add check of 0 sized array
+- 15, 16, 17, 21) Probably error not attributed to a SemanticError --> it's okay
 
 
 Assign,  Block, CallStmt(?), Return, If

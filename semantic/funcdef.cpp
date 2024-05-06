@@ -15,11 +15,14 @@ void FuncDef::printOn(std::ostream &out) const
 }
 void FuncDef::sem()
 {
+    std::cout << "FuncDef Sem..." << std::endl;
     header->sem();
     local_def_list->sem();
     block->sem();
 
+    std::cout << "before close scope" << std::endl;
     closeScope();
+    std::cout << "after close scope" << std::endl;
 }
 
 void FuncDef::ProgramSem()

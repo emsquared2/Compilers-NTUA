@@ -32,6 +32,7 @@ extern "C"
     extern void destroyType(Type type);
     extern unsigned int sizeOfType(Type type);
     extern bool equalType(Type type1, Type type2);
+    void NewFunction(Type type1, Type type2);
     extern void printType(Type type);
     extern void printMode(PassMode mode);
 

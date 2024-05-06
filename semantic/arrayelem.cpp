@@ -35,7 +35,7 @@ void ArrayElem::sem()
     Type t = left->getType();
     if(t->refType == nullptr) {
         std::string name = left->getName();
-        std::string msg = "Variable " + name + "is not of type Array";
+        std::string msg = "Variable " + name + " is not of type Array";
         SemanticError(msg.c_str());
     }
     

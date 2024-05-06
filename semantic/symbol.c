@@ -167,6 +167,7 @@ void destroySymbolTable ()
 
 void openScope ()
 {
+    printf("Opened scope!\n");
     Scope * newScope = (Scope *) new(sizeof(Scope));
 
     newScope->negOffset = START_NEGATIVE_OFFSET;
@@ -183,6 +184,7 @@ void openScope ()
 
 void closeScope ()
 {
+    printf("Closed scope!\n");
     SymbolEntry * e = currentScope->entries;
     Scope       * t = currentScope;
     
@@ -193,7 +195,6 @@ void closeScope ()
         destroyEntry(e);
         e = next;
     }
-    
     currentScope = currentScope->parent;
     delete(t);
 }
@@ -548,14 +549,21 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
 }
 
 SymbolEntry *lookupLastFunction() {
-    Scope *scope = currentScope;
+    /*
+    Scope is opened AFTER the function is entered in the symbol table. 
+    So we expect to find the function in the parent scope and not the current scope. 
+    This fixes the issue of nested functions return statements.
+    */
+    Scope *scope = currentScope->parent;
 
     // Traverse scopes from the current scope upwards
     while (scope != NULL) {
+        printf("Nesting level: %d\n", scope->nestingLevel);
         SymbolEntry *entry = scope->entries;
 
         // Traverse all entries in the current scope
         while (entry != NULL) {
+            printf("Entry: %s\n", entry->id);
             if (entry->entryType == ENTRY_FUNCTION) {
                 // Return the first function entry found
                 return entry;
@@ -656,13 +664,13 @@ unsigned int sizeOfType (Type type)
 
 bool equalType (Type type1, Type type2)
 {
-    printf("Type 1 in equalType ");
-    printType(type1);
-    printf("\n");
+    // printf("Type 1 in equalType ");
+    // printType(type1);
+    // printf("\n");
 
-    printf("Type 2 in equalType ");
-    printType(type2);
-    printf("\n");
+    // printf("Type 2 in equalType ");
+    // printType(type2);
+    // printf("\n");
     if (type1->kind != type2->kind) {
         if ((type1->kind != TYPE_ARRAY && type1->kind != TYPE_IARRAY) ||
             (type2->kind != TYPE_ARRAY && type2->kind != TYPE_IARRAY))

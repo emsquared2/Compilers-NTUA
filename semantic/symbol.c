@@ -184,12 +184,17 @@ void openScope ()
 
 void closeScope ()
 {
-    printf("Closed scope!\n");
     SymbolEntry * e = currentScope->entries;
     Scope       * t = currentScope;
     
     while (e != NULL) {
         SymbolEntry * next = e->nextInScope;
+
+        /* Check that every forward-declared function has been defined (implemented). */
+        if(e->entryType == ENTRY_FUNCTION && e->u.eFunction.isForward)
+        {
+            error("Function %s declared but not defined", e->id);
+        }
         
         hashTable[e->hashValue] = e->nextHash;
         destroyEntry(e);
@@ -197,6 +202,7 @@ void closeScope ()
     }
     currentScope = currentScope->parent;
     delete(t);
+    printf("Closed scope!\n");
 }
 
 static void insertEntry (SymbolEntry * e)

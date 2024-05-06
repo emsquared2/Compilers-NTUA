@@ -79,6 +79,9 @@ void error (const char * fmt, ...)
    vfprintf(stderr, fmt, ap);
    fprintf(stderr, "\n");
    va_end(ap);
+
+   /* If an error occurs we need to terminate compilation. */
+   exit(1);
 }
 
 void warning (const char * fmt, ...)

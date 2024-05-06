@@ -1,9 +1,9 @@
-readdchar             --> CORRECT:    c = c + 1 where c is char line 18
+readdchar           --> CORRECT:    c = c + 1 where c is char line 18
 arraybyvalue        --> CORRECT:    segfault - Error: Arrays can only be passed by reference. at line 12
 charindex           --> CORRECT:    array[j] where j is char line 18
 doublevar           --> CORRECT:    a r-value is passed as param by ref (double(a+b)) line 17
 errorcode           --> CORRECT:    the main function must have void return type line 30
-evennumber          --> CORRECT:    undefined variable (it prints "unknown identifier" but it also gets segfault)
+evennumber          --> CORRECT:    undefined variable (it prints "unknown identifier")
 funcassign          --> CORRECT:    function <- id line 17
 ifaelseb            --> CORRECT:    return different type line 17
 inputfunc           --> CORRECT     Error: Assign: L_value and Expr type mismatch. at line 18 (x expects int func returns void)
@@ -19,10 +19,10 @@ stringassign        --> CORRECT:    char array <- string line 12
 toolessparam        --> CORRECT:    call function with less arguments line 18
 toomuchparam        --> CORRECT:    call function with more arguments line 15
 undeclfunc          --> CORRECT:    undeclared function call
-undeffunc           --> WRONG           
+undeffunc           --> CORRECT:    undefined function           
 zerosizearrays      --> WRONG
 
-Array related:  12, 23
+Array related:  23
 Adjust:         6, 15
 
 Notes:
@@ -30,13 +30,10 @@ Notes:
 1) If a function has returned then we shouldn't keep doing semantic analysis, gen code etc. - what ?
 2) ConstStr->sem(): type should be Array and not IArray
 3) Ensure that a non void function will include return statement.
-4) ArrayElem --> assign type... in sem () - DONE
 
 # Updated 4/05/2024
-5) Check number 6 why it segfaults
 13, 14) sem error appears as type mismatch - maybe improve message clarity? (13 - return, 14 - fparams)
 15, 16, 17, 21) Probably error not attributed to a SemanticError 
-22) when an undefined function is called it should throw an error
 23) add check of 0 sized array
 
 

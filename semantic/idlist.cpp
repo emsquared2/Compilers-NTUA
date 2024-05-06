@@ -33,7 +33,6 @@ void IdList::printOn(std::ostream &out) const
 }
 void IdList::sem()
 {
-    std::cout << "IdList Sem..." << std::endl;
     for (Id *i : idlist)
         i->sem();
 }

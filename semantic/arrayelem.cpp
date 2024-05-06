@@ -22,7 +22,6 @@ std::string ArrayElem::getArrayElem()
 }
 void ArrayElem::sem()
 {
-    std::cout << "ArrayElem Sem..." << std::endl;  
     std::vector<Expr *> expr_list = exprlist->getExprList();
 
     left->sem();
@@ -40,8 +39,4 @@ void ArrayElem::sem()
     }
     
     type = findArrayType(t);
-
-    std::cout << "Array Elem type ";
-    printType(type);
-    std::cout << std::endl;
 }

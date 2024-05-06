@@ -14,7 +14,6 @@ void While::printOn(std::ostream &out) const
 }
 
 void While::sem() {
-    std::cout << "While Sem..." << std::endl;
     cond->type_check(typeBoolean);
     stmt->sem();
 }

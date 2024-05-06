@@ -32,7 +32,6 @@ void FParam::setSymbolEntry(SymbolEntry *f)
 
 void FParam::sem()
 {
-    std::cout << "FParam Sem..." << std::endl;
     /* Arrays passed as function parameters can only be passed by reference */
     bool isArrayType = !equalType(type, typeInteger) && !equalType(type, typeChar);
     if(isArrayType && pass_mode != PASS_BY_REFERENCE)

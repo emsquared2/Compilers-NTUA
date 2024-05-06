@@ -11,9 +11,7 @@ const char *Id::getName() const
 }
 
 void Id::sem()
-{
-    std::cout << "Id Sem..." << std::endl;
-    
+{   
     // Check if the identifier exists. 
     SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
 
@@ -39,7 +37,4 @@ void Id::sem()
             SemanticError("Invalid entry for identifier. This should never be reached");
             break;
     }
-    std::cout << "Actual Type -> ";
-    printType(type);
-    std::cout << std::endl;
 }

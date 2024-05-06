@@ -19,7 +19,6 @@ void If::printOn(std::ostream &out) const
 
 void If::sem() 
 {
-    std::cout << "If Sem..." << std::endl;
     cond->type_check(typeBoolean);
     stmt1->sem();
     if (stmt2 != nullptr)

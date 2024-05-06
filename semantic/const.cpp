@@ -12,6 +12,5 @@ int Const::getVal()
 }
 void Const::sem()
 {
-    std::cout << "Const Sem..." << std::endl;
     type = typeInteger;
 }

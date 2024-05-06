@@ -15,8 +15,6 @@ void Assign::printOn(std::ostream &out) const
 
 void Assign::sem()
 {
-    std::cout << "Assign Sem..." << std::endl;
-
     l_value->sem();
     expr->sem();
 

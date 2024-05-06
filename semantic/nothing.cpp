@@ -8,6 +8,5 @@ void Nothing::printOn(std::ostream &out) const
 }
 void Nothing::sem()
 {
-    std::cout << "Nothing Sem..." << std::endl;
     type = typeVoid;
 }

@@ -8,6 +8,5 @@ void ConstChar::printOn(std::ostream &out) const
 }
 void ConstChar::sem()
 {
-    std::cout << "ConstChar Sem..." << std::endl;
     type = typeChar;
 }

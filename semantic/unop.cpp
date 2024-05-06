@@ -14,7 +14,6 @@ void UnOp::printOn(std::ostream &out) const
 
 void UnOp::sem()
 {
-    std::cout << "Unop Sem..." << std::endl;    
     right->type_check(typeInteger);
     type = typeInteger;
 }

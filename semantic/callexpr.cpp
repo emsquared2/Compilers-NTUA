@@ -15,8 +15,6 @@ void CallExpr::printOn(std::ostream &out) const
 }
 void CallExpr::sem()
 {
-    std::cout << "CallExpr Sem..." << std::endl;
-
     // Check if the function exists
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
 
@@ -45,10 +43,6 @@ void CallExpr::sem()
         // std::cout << "Actual Type -> ";
         // printType(e->getType());
         // std::cout << std::endl;
-
-        std::cout << "Expected Type -> ";
-        printType(argument->u.eParameter.type);
-        std::cout << std::endl;
 
         (*e)->type_check(argument->u.eParameter.type);
 

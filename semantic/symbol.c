@@ -167,7 +167,6 @@ void destroySymbolTable ()
 
 void openScope ()
 {
-    printf("Opened scope!\n");
     Scope * newScope = (Scope *) new(sizeof(Scope));
 
     newScope->negOffset = START_NEGATIVE_OFFSET;
@@ -202,7 +201,6 @@ void closeScope ()
     }
     currentScope = currentScope->parent;
     delete(t);
-    printf("Closed scope!\n");
 }
 
 static void insertEntry (SymbolEntry * e)
@@ -564,12 +562,12 @@ SymbolEntry *lookupLastFunction() {
 
     // Traverse scopes from the current scope upwards
     while (scope != NULL) {
-        printf("Nesting level: %d\n", scope->nestingLevel);
+        // printf("Nesting level: %d\n", scope->nestingLevel);
         SymbolEntry *entry = scope->entries;
 
         // Traverse all entries in the current scope
         while (entry != NULL) {
-            printf("Entry: %s\n", entry->id);
+            // printf("Entry: %s\n", entry->id);
             if (entry->entryType == ENTRY_FUNCTION) {
                 // Return the first function entry found
                 return entry;

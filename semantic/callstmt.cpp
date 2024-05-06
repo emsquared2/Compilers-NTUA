@@ -17,8 +17,6 @@ void CallStmt::printOn(std::ostream &out) const
 
 void CallStmt::sem()
 {
-    std::cout << "CallStmt Sem..." << std::endl;
-
     // Check if the function exists
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
 
@@ -44,9 +42,6 @@ void CallStmt::sem()
             SemanticError(msg.c_str());
         }
 
-        std::cout << "Expected Parameter type ";
-        printType(argument->u.eParameter.type);        
-        std::cout << std::endl;
         (*e)->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */

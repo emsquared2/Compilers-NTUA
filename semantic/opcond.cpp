@@ -23,7 +23,6 @@ void OpCond::printOn(std::ostream &out) const
 
 void OpCond::sem()
 {
-    std::cout << "OpCond Sem..." << std::endl;
     if (left != nullptr)
         left->type_check(typeBoolean);
     right->type_check(typeBoolean);

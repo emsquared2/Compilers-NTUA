@@ -17,8 +17,6 @@ int Return::ReturnValue()
 
 void Return::sem()
 {
-    std::cout << "Return Sem..." << std::endl;
-
     /* TODO: Get return type.
      * There are 2 options:
      *      a) Use a stack that keeps the return types (function decls are nested so you only need to check the last element).

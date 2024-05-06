@@ -15,8 +15,6 @@ void CompCond::printOn(std::ostream &out) const
 
 void CompCond::sem()
 {
-    std::cout << "CopmCond Sem..." << std::endl;
-
     left->sem();
     right->sem();
 

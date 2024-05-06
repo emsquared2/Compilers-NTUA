@@ -33,7 +33,6 @@ bool ExprList::isEmpty()
 }
 void ExprList::sem()
 {
-    std::cout << "ExprList Sem..." << std::endl;
     for (Expr *e : expr_list)
         e->sem();
 }

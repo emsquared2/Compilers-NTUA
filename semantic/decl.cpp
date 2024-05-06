@@ -24,7 +24,6 @@ void Decl::printOn(std::ostream &out) const
 
 void Decl::sem()
 {
-    std::cout << "Decl Sem..." << std::endl;
     for (Id *id : idlist->get_idlist())
     {
         newVariable(id->getName(), type);

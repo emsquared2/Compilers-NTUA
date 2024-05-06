@@ -54,8 +54,6 @@ void Header::sem()
      *  5) close the scope?
      */
 
-    std::cout << "Header Sem..." << std::endl;
-
     SymbolEntry *function = newFunction(id->getName());
 
     // add case when parser identifies forward declaration

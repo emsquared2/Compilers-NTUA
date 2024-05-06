@@ -25,7 +25,6 @@ void StmtList::printOn(std::ostream &out) const
 }
 void StmtList::sem()
 {
-    std::cout << "StmtList Sem..." << std::endl;
     for (Stmt *s : stmt_list)
         s->sem();
 }

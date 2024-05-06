@@ -43,6 +43,10 @@ Type Header::getReturnType()
 {
     return type;
 }
+Id * Header::getId()
+{
+    return id;
+}
 void Header::sem()
 {
     /* Check if id exists in symbol table. If it exists, throw error.
@@ -61,6 +65,7 @@ void Header::sem()
         forwardFunction(function);
 
     openScope();
+    returnedFunction.push_back(false);
     /*
     Here we have to add all the parameters to the symbol entry.
     The SymbolEntry of the function (look *function above) is also needed when creating a new function parameter.

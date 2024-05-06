@@ -19,6 +19,15 @@ void FuncDef::sem()
     local_def_list->sem();
     block->sem();
 
+    SymbolEntry * function = lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
+
+    if(!equalType(header->getReturnType(), typeVoid) && !returnedFunction.back()) {
+        std::string func_name = header->getId()->getName();
+        std::string msg = "Non-void function " + func_name + " has no return statement.";
+        SemanticError(msg.c_str());
+    }
+
+    returnedFunction.pop_back();
     closeScope();
 }
 

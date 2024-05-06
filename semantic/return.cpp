@@ -46,4 +46,7 @@ void Return::sem()
     {
         SemanticError("Return type should be int, char or void");
     }
+
+    // Declare that function has return statement
+    returnedFunction.back() = true;
 }

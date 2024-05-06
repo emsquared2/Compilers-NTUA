@@ -14,5 +14,6 @@ void FuncDecl::sem()
     header->set_forward_declaration();
     header->sem();
 
+    returnedFunction.pop_back();
     closeScope();
 }

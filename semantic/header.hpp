@@ -15,6 +15,7 @@ public:
     void set_forward_declaration();
     FParamList * getFParamList();
     Type getReturnType();
+    Id * getId();
 
 private:
     Id *id;

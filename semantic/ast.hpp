@@ -95,6 +95,9 @@ protected:
     int lineno;
 };
 
+
+inline std::vector<bool> returnedFunction;
+ 
 inline std::ostream &operator<<(std::ostream &out, const AST &t)
 {
     t.printOn(out);

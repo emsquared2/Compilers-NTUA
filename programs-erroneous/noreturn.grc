@@ -1,0 +1,37 @@
+$$
+  In this erroneous grace program a non-void function does not have return statement.
+  Every non-void function should have a return statement.
+
+  The even function has return type int but does not include a return statement.
+$$
+
+fun main(): nothing
+
+  fun even(n: int): int;
+
+  fun odd(n: int): int
+  { $ odd
+  $$
+    if n = 0 then
+      return 0;
+    else
+      return even(n-1);
+      $$
+  } $ odd
+
+  fun even(n: int): int
+  { $ even
+    if n = 0 then
+      writeString("0\n");
+    else
+      writeInteger(odd(n-1));
+  } $ even
+
+{ $ main
+  writeString("Please, give an integer: ");
+  
+  if odd(readInteger()) = 1 then
+    writeString("odd\n");
+  else
+    writeString("even\n");
+} $ main

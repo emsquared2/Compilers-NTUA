@@ -188,12 +188,17 @@ void closeScope ()
     
     while (e != NULL) {
         SymbolEntry * next = e->nextInScope;
+
+        /* Check that every forward-declared function has been defined (implemented). */
+        if(e->entryType == ENTRY_FUNCTION && e->u.eFunction.isForward)
+        {
+            error("Function %s declared but not defined", e->id);
+        }
         
         hashTable[e->hashValue] = e->nextHash;
         destroyEntry(e);
         e = next;
     }
-    
     currentScope = currentScope->parent;
     delete(t);
 }
@@ -547,6 +552,46 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     return NULL;
 }
 
+SymbolEntry *lookupLastFunction() {
+    /*
+    Scope is opened AFTER the function is entered in the symbol table. 
+    So we expect to find the function in the parent scope and not the current scope. 
+    This fixes the issue of nested functions return statements.
+    */
+    Scope *scope = currentScope->parent;
+
+    // Traverse scopes from the current scope upwards
+    while (scope != NULL) {
+        // printf("Nesting level: %d\n", scope->nestingLevel);
+        SymbolEntry *entry = scope->entries;
+
+        // Traverse all entries in the current scope
+        while (entry != NULL) {
+            // printf("Entry: %s\n", entry->id);
+            if (entry->entryType == ENTRY_FUNCTION) {
+                // Return the first function entry found
+                return entry;
+            }
+            entry = entry->nextInScope;
+        }
+
+        // Move to the parent scope
+        scope = scope->parent;
+    }
+
+    // Return NULL if no function was found in any of the scopes
+    return NULL;
+}
+
+Type findArrayType(Type t)
+{
+    while(t->kind == TYPE_ARRAY || t->kind == TYPE_IARRAY) {
+        t = t->refType;
+    }
+    return t;
+}
+
+
 Type typeArray (RepInteger size, Type refType)
 {
     Type n = (Type) new(sizeof(struct Type_tag));
@@ -623,12 +668,29 @@ unsigned int sizeOfType (Type type)
 
 bool equalType (Type type1, Type type2)
 {
-    if (type1->kind != type2->kind)
-        return false;
+    // printf("Type 1 in equalType ");
+    // printType(type1);
+    // printf("\n");
+
+    // printf("Type 2 in equalType ");
+    // printType(type2);
+    // printf("\n");
+    if (type1->kind != type2->kind) {
+        if ((type1->kind != TYPE_ARRAY && type1->kind != TYPE_IARRAY) ||
+            (type2->kind != TYPE_ARRAY && type2->kind != TYPE_IARRAY))
+        {
+            return false;
+        }
+    }
     switch (type1->kind) {
         case TYPE_ARRAY:
-            if (type1->size != type2->size)
+             if ((type2->kind == TYPE_IARRAY) && (type1->refType->kind == type2->refType->kind))
+            {
+                return true;
+            }
+            if (type1->size != type2->size) {
                 return false;
+            }
         case TYPE_IARRAY:
         case TYPE_POINTER:
             return equalType(type1->refType, type2->refType);
@@ -671,6 +733,9 @@ void printType (Type type)
             printf("^");
             printType(type->refType);
             break;
+        // add unexpected non null behavior debug message
+        default:
+            printf("wrong type");
     }
 }
 

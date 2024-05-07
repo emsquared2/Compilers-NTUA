@@ -218,6 +218,10 @@ void          endFunctionHeader  (SymbolEntry * f, Type type);
 void          destroyEntry       (SymbolEntry * e);
 SymbolEntry * lookupEntry        (const char * name, LookupType type,
                                   bool err);
+// function to find the closest defined function
+// Used in semantic analysis on Return. 
+// 1st implementation
+SymbolEntry * lookupLastFunction (void);
 
 Type          typeArray          (RepInteger size, Type refType);
 Type          typeIArray         (Type refType);
@@ -227,6 +231,10 @@ unsigned int  sizeOfType         (Type type);
 bool          equalType          (Type type1, Type type2);
 void          printType          (Type type);
 void          printMode          (PassMode mode);
+
+void          destroyType        (Type type);
+
+Type          findArrayType      (Type type);
 
 
 #endif

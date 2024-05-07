@@ -25,6 +25,14 @@ void Array::printOn(std::ostream &out) const
     dims->printOn(out);
 }
 
+void Array::sem()
+{
+    for (Const *dim: dims->getDims()) {
+        if (dim->getVal() <= 0) 
+            SemanticError("Array dimension must be greater than 0");
+    }
+}
+
 Type Array::ConvertToType() const
 {
     Type baseType = (data_type == TYPE_INTEGER) ? typeInteger : typeChar;
@@ -35,7 +43,7 @@ Type Array::ConvertToType() const
     return baseType;
 }
 
-bool Array::getUnknown() 
+bool Array::getUnknown()
 {
     return unknown;
 }

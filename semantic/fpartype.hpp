@@ -11,6 +11,7 @@ public:
     FParType(Array *arr);
     ~FParType();
     virtual void printOn(std::ostream &out) const override;
+    virtual void sem() override;
     virtual Type ConvertToType() const override;
 
 private:

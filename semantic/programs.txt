@@ -20,7 +20,7 @@ toolessparam        --> CORRECT:    call function with less arguments line 18
 toomuchparam        --> CORRECT:    call function with more arguments line 15
 undeclfunc          --> CORRECT:    undeclared function call
 undeffunc           --> CORRECT:    undefined function           
-zerosizearrays      --> WRONG:      To be fixed in llv - compile() method
+zerosizearrays      --> CORRECT:    Error: Array dimension must be greater than 0 at line 9
 
 
 Notes:
@@ -31,7 +31,7 @@ Notes:
 
 
 Fixes:
-1) add check of 0 sized array --> This will be fixed later in llvm. We will check that every expr in expr_list will evaluate to a positive integer. 
+1) add check of 0 sized array --> fixed 06/04/2024
 
 
 Minor issues:

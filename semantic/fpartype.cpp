@@ -42,6 +42,17 @@ void FParType::printOn(std::ostream &out) const
     out << ")";
 }
 
+void FParType::sem() {
+    switch (data_type)
+    {
+        case TYPE_IARRAY:
+        case TYPE_ARRAY:
+            array->sem();
+            break;
+
+    }
+}
+
 Type FParType::ConvertToType() const
 {
     switch (data_type)

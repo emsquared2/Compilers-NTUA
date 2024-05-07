@@ -28,4 +28,5 @@ void Decl::sem()
     {
         newVariable(id->getName(), type);
     }
+    parser_type->sem();
 }

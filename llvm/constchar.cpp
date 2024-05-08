@@ -10,3 +10,8 @@ void ConstChar::sem()
 {
     type = typeChar;
 }
+
+llvm::Value* ConstChar::compiler() const
+{
+    return c8(var);
+}

@@ -19,3 +19,23 @@ void BinOp::sem()
     right->type_check(typeInteger);
     type = typeInteger;
 }
+
+
+llvm::Value* BinOp::compile() const
+{
+    llvm::Value *l = left->compile();
+    llvm::Value *r = right->compile();
+
+    if(!l or !r)
+        return nullptr;
+
+    switch (op) {
+      case "+": return Builder.CreateAdd(l, r, "addtmp");
+      case "-": return Builder.CreateSub(l, r, "subtmp");
+      case "*": return Builder.CreateMul(l, r, "multmp");
+      case "/": return Builder.CreateSDiv(l, r, "divtmp");
+      case "%": return Builder.CreateSRem(l, r, "modtmp");
+      default: return nullptr;
+    }
+    return nullptr;
+}

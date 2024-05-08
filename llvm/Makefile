@@ -1,16 +1,16 @@
 .PHONY: clean distclean default
 
-CPP_FILES := $(wildcard *.cpp)
+LLVMCONFIG=llvm-config
 
-# Exclude ast.cpp from the list
-# CPP_FILES := $(filter-out ast.cpp, $(CPP_FILES))
+CPP_FILES := $(wildcard *.cpp)
 
 HPP_FILES := $(wildcard *.hpp)
 
 OBJECT_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
 
-CXX=c++
-CXXFLAGS=-Wall -std=c++11 -g
+CXX=clang++
+CXXFLAGS=-Wall -g `$(LLVMCONFIG) --cxxflags`
+LDFLAGS=`$(LLVMCONFIG) --ldflags --system-libs --libs all`
 
 default: grace
 
@@ -32,7 +32,7 @@ error.o    : error.c general.h error.h
 symbol.o   : symbol.c symbol.h general.h error.h
 
 grace: $(OBJECT_FILES) symbol.o parser.o lexer.o general.o error.o
-	$(CXX) $(CXXFLAGS) -o grace $^
+	$(CXX) $(CXXFLAGS) -o grace $^ $(LDFLAGS)
 
 clean: 
 	$(RM) lexer.cpp parser.cpp parser.hpp parser.output *.output *.o

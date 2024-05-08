@@ -28,3 +28,11 @@ void StmtList::sem()
     for (Stmt *s : stmt_list)
         s->sem();
 }
+
+llvm::Value* StmtList::compile() const
+{
+    for(Stmt *s : stmt_list)
+        s->compile();
+
+    return nullptr;
+}

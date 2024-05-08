@@ -9,8 +9,9 @@ public:
     Const(int val);
     ~Const();
     virtual void printOn(std::ostream &out) const override;
-    virtual void sem() override;
     int getVal();
+    virtual void sem() override;
+    virtual llvm::Value* compile() const override;
 
 private:
     const int val;

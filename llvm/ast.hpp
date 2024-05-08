@@ -4,6 +4,17 @@
 #include <iostream>
 #include <vector>
 
+#include <llvm/IR/Value.h>
+#include <llvm/IR/IRBuilder.h>
+#include "llvm/IR/LLVMContext.h"
+#include "llvm/IR/Module.h"
+#include <llvm/IR/Verifier.h>
+
+
+/* ---------------------------------------------------------------------
+   --------------------------- Symbol Table ----------------------------
+   --------------------------------------------------------------------- */
+
 /* Link C with C++ */
 extern "C"
 {
@@ -90,6 +101,7 @@ public:
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem(){};
     void SemanticError(const char *msg);
+    virtual llvm::Value* compile() const = 0;
 
 protected:
     int lineno;

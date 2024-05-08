@@ -28,3 +28,9 @@ void Block::sem()
         (*s)->sem();
     }
 }
+
+llvm::Value* Block::compile() const
+{
+    stmt_list->compile();
+    return nullptr;
+}

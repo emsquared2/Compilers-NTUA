@@ -34,3 +34,23 @@ void CompCond::sem()
 
     type = typeBoolean;
 }
+
+llvm::Value* CompCond::compile() const
+{
+    llvm::Value *l = left->compile();
+    llvm::Value *r = right->compile();
+
+    if(!l or !r)
+        return nullptr;
+
+    switch (op) {
+        case "=": return Builder.CreateICmpEQ(l, r, "cmpeqtmp");
+        case "#": return Builder.CreateICmpNE(l, r, "cmpnetmp");
+        case "<": return Builder.CreateICmpSLT(l, r, "cmplttmp");
+        case ">": return Builder.CreateICmpSGT(l, r, "cmpgttmp");
+        case "<=": return Builder.CreateICmpSLE(l, r, "cmpletmp");
+        case ">=": return Builder.CreateICmpSGE(l, r, "cmpgetmp");
+        default: return nullptr;
+    }
+    return nullptr;
+}

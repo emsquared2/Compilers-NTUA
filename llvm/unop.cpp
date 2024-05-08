@@ -17,3 +17,14 @@ void UnOp::sem()
     right->type_check(typeInteger);
     type = typeInteger;
 }
+
+llvm::Value* UnOp::compile() const
+{
+    llvm::Value* r = expr->compile();
+    switch (op) {
+        case "+": return r;
+        case "-": return Builder.CreateNeg(r, "unarytemp");
+        default: return nullptr;
+    }
+    return nullptr;
+}

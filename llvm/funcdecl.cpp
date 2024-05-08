@@ -17,3 +17,9 @@ void FuncDecl::sem()
     returnedFunction.pop_back();
     closeScope();
 }
+
+llvm::Value* FuncDecl::compile() const
+{
+    header->compile();
+    return nullptr;
+}

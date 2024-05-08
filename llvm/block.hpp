@@ -13,6 +13,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     std::vector<Stmt *> getList();
     virtual void sem() override;
+    virtual llvm::Value* compile() const override;
 
 private:
     std::vector<Stmt *> stmt_list;

@@ -6,9 +6,14 @@
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
-#include "llvm/IR/LLVMContext.h"
-#include "llvm/IR/Module.h"
+#include <llvm/IR/Module.h>
 #include <llvm/IR/Verifier.h>
+#include <llvm/IR/LegacyPassManager.h>
+#include <llvm/IR/Function.h>
+
+#include <llvm/Support/raw_ostream.h>
+#include <llvm/Transforms/Scalar.h>
+#include <llvm/Transforms/Scalar/GVN.h>
 
 
 /* ---------------------------------------------------------------------
@@ -51,21 +56,21 @@ extern "C"
     extern void destroyType(Type type);
 }
 
-
 /* ---------------------------------------------------------------------
    ----------------------------- Parameter -----------------------------
    --------------------------------------------------------------------- */
 
 // This class represents a function parameter and is used in addLibrary and addLibraryFunction.
-class Parameter {
+class Parameter
+{
 public:
-    Parameter(const char* n, Type t, PassMode pm) : name(n), type(t), pass_mode(pm) {}
-    const char* getName() const { return name; }
+    Parameter(const char *n, Type t, PassMode pm) : name(n), type(t), pass_mode(pm) {}
+    const char *getName() const { return name; }
     Type getType() const { return type; }
     PassMode getPassMode() const { return pass_mode; }
 
 private:
-    const char* name;
+    const char *name;
     Type type;
     PassMode pass_mode;
 };
@@ -99,17 +104,37 @@ public:
     AST();
     virtual ~AST() = default;
     virtual void printOn(std::ostream &out) const = 0;
-    virtual void sem(){};
-    void SemanticError(const char *msg);
-    virtual llvm::Value* compile() const = 0;
+    virtual void sem() {};
+    void SemanticError(const char *msg);    
+    virtual llvm::Value *compile() const = 0;
+
+    void llvm_compile_and_dump();
 
 protected:
+    // Global LLVM variables related to the LLVM suite.
+    static llvm::LLVMContext TheContext;
+    static llvm::IRBuilder<> Builder;
+    static std::unique_ptr<llvm::Module> TheModule;
+    static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
+
+     // Useful LLVM types.
+    static llvm::Type *i8;
+    static llvm::Type *i32;
+    static llvm::Type *i64;
+
+    // Useful LLVM helper functions.
+    llvm::ConstantInt* c8(char c) const {
+        return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
+    }
+    llvm::ConstantInt* c32(int n) const {
+        return llvm::ConstantInt::get(TheContext, llvm::APInt(32, n, true));
+    }
+
     int lineno;
 };
 
-
 inline std::vector<bool> returnedFunction;
- 
+
 inline std::ostream &operator<<(std::ostream &out, const AST &t)
 {
     t.printOn(out);

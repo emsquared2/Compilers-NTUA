@@ -2,7 +2,7 @@
 
 extern int yylineno;
 
-AST::AST() : lineno(yylineno) {};
+AST::AST() : lineno(yylineno){};
 
 void AST::SemanticError(const char *msg)
 {
@@ -11,16 +11,47 @@ void AST::SemanticError(const char *msg)
     exit(1);
 }
 
+void AST::llvm_compile_and_dump()
+{
+    TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
+    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+
+    // add optimization functions
+
+    TheFPM->doInitialization();
+
+    llvm::FunctionType *funcType = llvm::FunctionType::get(i32, false); // false indicates the function does not take variadic arguments.
+    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
+
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
+    Builder.SetInsertPoint(BB);
+    // Emit the program code.
+    compile();
+    Builder.CreateRet(c32(0));
+    
+    // Verify the IR.
+    bool bad = verifyModule(*TheModule, &llvm::errs());
+    if (bad)
+    {
+        std::cerr << "The IR is bad!" << std::endl;
+        std::exit(1);
+    }
+    TheFPM->run(*main);
+    // Print out the IR.
+    TheModule->print(llvm::outs(), nullptr);
+}
+
 /* ---------------------------------------------------------------------
    ----------------------- Add Library Functions -----------------------
    --------------------------------------------------------------------- */
 
-void addLibraryFunction(const char* func_name, const std::vector<Parameter*>& params, Type return_type) 
+void addLibraryFunction(const char *func_name, const std::vector<Parameter *> &params, Type return_type)
 {
-    SymbolEntry* f = newFunction(func_name);
+    SymbolEntry *f = newFunction(func_name);
     openScope();
 
-    for (const auto& param : params) {
+    for (const auto &param : params)
+    {
         newParameter(param->getName(), param->getType(), param->getPassMode(), f);
     }
 
@@ -28,7 +59,8 @@ void addLibraryFunction(const char* func_name, const std::vector<Parameter*>& pa
     closeScope();
 }
 
-void addLibrary() {
+void addLibrary()
+{
 
     std::vector<Parameter *> params;
     Type string = typeIArray(typeChar);
@@ -55,7 +87,7 @@ void addLibrary() {
     params.push_back(new Parameter("s", string, PASS_BY_REFERENCE));
     addLibraryFunction("writeString", params, typeVoid);
     params.clear();
-    
+
     /* ---------------------------------
     --------- Input Functions ----------
     ------------------------------------ */
@@ -71,13 +103,13 @@ void addLibrary() {
     // readString
 
     params.push_back(new Parameter("n", typeInteger, PASS_BY_VALUE));
-    params.push_back(new Parameter("s", string, PASS_BY_REFERENCE)); 
+    params.push_back(new Parameter("s", string, PASS_BY_REFERENCE));
     addLibraryFunction("readString", params, typeVoid);
     params.clear();
 
-   /* ---------------------------------
-    ------- Conversion Functions ------
-    ------------------------------------ */
+    /* ---------------------------------
+     ------- Conversion Functions ------
+     ------------------------------------ */
 
     // ascii
 
@@ -114,7 +146,7 @@ void addLibrary() {
     params.push_back(new Parameter("src", string, PASS_BY_REFERENCE));
     addLibraryFunction("strcpy", params, typeVoid);
     params.clear();
-    
+
     // strcat
 
     params.push_back(new Parameter("trg", string, PASS_BY_REFERENCE));
@@ -123,5 +155,4 @@ void addLibrary() {
     params.clear();
 
     destroyType(string);
-
 }

@@ -1,0 +1,38 @@
+array       :
+arraydim    :
+arrayelem   :
+assign      :
+ast         :
+binop       : DONE
+block       : DONE
+callexpr    : 
+callstmt    : 
+compcond    : DONE
+cond        : not needed abstract
+const       : DONE
+constchar   : DONE
+conststr    : 
+customtype  : not needed (?)
+decl        : 
+expr        : not needed abstract
+exprlist    : DONE
+fparam      :
+fparamlist  :
+fpartype    : not needed (?)
+funcdecl    :
+funcdef     :
+header      :
+id          :
+idlist      : 
+if          : DONE
+localdef    :
+localdeflist: 
+lvalue      : not needed abstract
+nothing     : DONE
+opcond      : DONE
+rettype     : not needed (?)
+return      :
+stmt        : not needed abstract
+stmtlist    : DONE
+unop        : DONE
+while       : DONE

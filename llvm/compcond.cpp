@@ -35,22 +35,26 @@ void CompCond::sem()
     type = typeBoolean;
 }
 
-llvm::Value* CompCond::compile() const
+llvm::Value *CompCond::compile() const
 {
     llvm::Value *l = left->compile();
     llvm::Value *r = right->compile();
 
-    if(!l or !r)
+    if (!l || !r)
         return nullptr;
 
-    switch (op) {
-        case "=": return Builder.CreateICmpEQ(l, r, "cmpeqtmp");
-        case "#": return Builder.CreateICmpNE(l, r, "cmpnetmp");
-        case "<": return Builder.CreateICmpSLT(l, r, "cmplttmp");
-        case ">": return Builder.CreateICmpSGT(l, r, "cmpgttmp");
-        case "<=": return Builder.CreateICmpSLE(l, r, "cmpletmp");
-        case ">=": return Builder.CreateICmpSGE(l, r, "cmpgetmp");
-        default: return nullptr;
-    }
-    return nullptr;
+    if (op == "=")
+        return Builder.CreateICmpEQ(l, r, "eqtmp");
+    else if (op == "#")
+        return Builder.CreateICmpNE(l, r, "netmp");
+    else if (op == "<")
+        return Builder.CreateICmpSLT(l, r, "lttmp");
+    else if (op == ">")
+        return Builder.CreateICmpSGT(l, r, "gttmp");
+    else if (op == "<=")
+        return Builder.CreateICmpSLE(l, r, "letmp");
+    else if (op == ">=")
+        return Builder.CreateICmpSGE(l, r, "getmp");
+    else
+        return nullptr;
 }

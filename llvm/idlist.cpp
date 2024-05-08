@@ -36,3 +36,9 @@ void IdList::sem()
     for (Id *i : idlist)
         i->sem();
 }
+
+llvm::Value* IdList::compile() const
+{
+    for(Id *i : idlist)
+        i->compile();
+}

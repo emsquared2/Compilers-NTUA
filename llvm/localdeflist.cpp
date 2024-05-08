@@ -33,3 +33,11 @@ void LocalDefList::sem() {
         (*l)->sem();
     }
 }
+
+llvm::Value* LocalDefList::compile() const
+{
+    for (auto l = locals.rbegin(); l != locals.rend(); ++l)
+    {
+        (*l)->compile();
+    }
+}

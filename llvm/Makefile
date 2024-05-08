@@ -1,6 +1,6 @@
 .PHONY: clean distclean default
 
-LLVMCONFIG=llvm-config
+LLVMCONFIG=llvm-config-18
 
 CPP_FILES := $(wildcard *.cpp)
 

@@ -13,6 +13,7 @@ public:
     virtual void sem() override;
     void append(FParam *param);
     void setSymbolEntry(SymbolEntry *f);
+    virtual llvm::Value *compile() cost override;
 
 private:
     std::vector<FParam *> params;

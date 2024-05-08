@@ -35,7 +35,7 @@ llvm::Value* While::compile() const
     Builder.SetInsertPoint(LoopBB);
 
     // Compile the condition
-    llvm::Value* *condition = cond->compile();
+    llvm::Value *condition = cond->compile();
 
     // Conditional branch based on the condition
     Builder.CreateCondBr(condition, BodyBB, AfterBB);

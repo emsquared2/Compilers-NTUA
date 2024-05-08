@@ -54,12 +54,11 @@ llvm::Value* If::compile() const
     Builder.SetInsertPoint(ElseBB);
 
     // Compile statement inside the 'else' block, if it exists
-    if (stmt2 != nullptr)
-      stmt2->compile();
-
-    // Create branch to the 'endif' block if 'else' block exists or conditionally if not
-    if(!stmt2)  
+    if (stmt2 != nullptr) {
+        stmt2->compile();
+        // Create branch to the 'endif' block if 'else' block exists or conditionally if not
         Builder.CreateBr(AfterBB);
+    }
 
     // Set insertion point for the 'endif' block
     Builder.SetInsertPoint(AfterBB);

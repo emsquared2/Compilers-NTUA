@@ -41,3 +41,11 @@ void FParamList::sem()
         (*param)->sem();
     }
 }
+
+llvm::Value *FParamList::compile() const
+{
+    for (auto param = params.rbegin(); param != params.rend(); ++param)
+    {
+        (*param)->compile();
+    }
+}

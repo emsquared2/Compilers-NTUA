@@ -11,6 +11,7 @@ public:
     ~OpCond();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
+e     virtual llvm::Value *compile() const override;
 
 private:
     Cond *left;

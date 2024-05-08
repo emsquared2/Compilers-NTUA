@@ -14,6 +14,7 @@ public:
     std::vector<Expr *> getExprList();
     bool isEmpty();
     virtual void sem() override;
+    virtual llvm::Value* compile() const override;
 
 private:
     std::vector<Expr *> expr_list;

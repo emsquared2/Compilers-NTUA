@@ -98,6 +98,8 @@ enum DataType
    -------------------------------- AST --------------------------------
    --------------------------------------------------------------------- */
 
+typedef llvm::Type llvmType;
+
 class AST
 {
 public:
@@ -106,10 +108,16 @@ public:
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem() {};
     void SemanticError(const char *msg);
-    llvm::Value *LogErrorV(const char *Str) const;   
+
+    llvm::Value *LogErrorV(const char *Str) const;  
+    llvmType *getLLVMType(Type t); 
     virtual llvm::Value *compile() const = 0;
 
     void llvm_compile_and_dump();
+
+    // Functions for library functions
+    void llvmAddLibraryFunction(const char * func_name, const std::vector<llvmType*> params_type, llvmType* return_type);
+    void llvmAddLibrary();
 
 protected:
     // Global LLVM variables related to the LLVM suite.
@@ -122,6 +130,7 @@ protected:
     static llvm::Type *i8;
     static llvm::Type *i32;
     static llvm::Type *i64;
+    static llvm::Type *voidTy;
 
     // Useful LLVM helper functions.
     llvm::ConstantInt* c8(char c) const {
@@ -129,6 +138,9 @@ protected:
     }
     llvm::ConstantInt* c32(int n) const {
         return llvm::ConstantInt::get(TheContext, llvm::APInt(32, n, true));
+    }
+    llvm::ConstantInt* c64(int n) const {
+        return llvm::ConstantInt::get(TheContext, llvm::APInt(64, n, true));
     }
 
     int lineno;

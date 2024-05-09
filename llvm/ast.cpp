@@ -11,46 +11,6 @@ void AST::SemanticError(const char *msg)
     exit(1);
 }
 
-void AST::llvm_compile_and_dump()
-{
-    TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
-    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
-
-    // add optimization functions
-
-    TheFPM->doInitialization();
-
-    llvm::FunctionType *funcType = llvm::FunctionType::get(i32, false); // false indicates the function does not take variadic arguments.
-    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
-
-    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
-    Builder.SetInsertPoint(BB);
-    // Emit the program code.
-    compile();
-    Builder.CreateRet(c32(0));
-    
-    // Verify the IR.
-    bool bad = verifyModule(*TheModule, &llvm::errs());
-    if (bad)
-    {
-        std::cerr << "The IR is bad!" << std::endl;
-        std::exit(1);
-    }
-    TheFPM->run(*main);
-    // Print out the IR.
-    TheModule->print(llvm::outs(), nullptr);
-}
-
-/* ---------------------------------------------------------------------
-   ----------------------- Add Library Functions -----------------------
-   --------------------------------------------------------------------- */
-
-llvm::Value* AST::LogErrorV(const char *Str) const
-{
-    fprintf(stderr, "Error: %s\n", Str);
-    return nullptr;
-}
-
 /* ---------------------------------------------------------------------
    ----------------------- Add Library Functions -----------------------
    --------------------------------------------------------------------- */
@@ -165,4 +125,123 @@ void addLibrary()
     params.clear();
 
     destroyType(string);
+}
+
+/* ---------------------------------------------------------------------
+   ------------------- Add Library Functions - LLVM --------------------
+   --------------------------------------------------------------------- */
+
+void AST::llvmAddLibraryFunction(const char * func_name, const std::vector<llvmType*> params_type, llvmType* return_type)
+{
+  llvm::FunctionType *t = llvm::FunctionType::get(return_type, params_type, false);
+  llvm::Function::Create(t, llvm::Function::ExternalLinkage, func_name, TheModule.get());
+}
+
+void AST::llvmAddLibrary() {
+
+    /* ---------------------------------
+    --------- Output Functions ---------
+    ------------------------------------ */
+
+    llvmAddLibraryFunction("writeInteger", std::vector<llvmType*>{i64}, voidTy);
+    llvmAddLibraryFunction("writeChar", std::vector<llvmType*>{i8}, voidTy);
+    llvmAddLibraryFunction("writeString", std::vector<llvmType*>{llvm::PointerType::get(i8, 0)}, voidTy);
+
+    /* ---------------------------------
+    --------- Input Functions ----------
+    ------------------------------------ */
+
+    llvmAddLibraryFunction("readInteger", std::vector<llvmType*>{}, i64);
+    llvmAddLibraryFunction("readChar", std::vector<llvmType*>{}, i8);
+    llvmAddLibraryFunction("readString", std::vector<llvmType*>{i64, llvm::PointerType::get(i8, 0)}, voidTy);
+
+    /* ---------------------------------
+    ------ Conversion Functions -------
+    ------------------------------------ */
+
+    llvmAddLibraryFunction("ascii", std::vector<llvmType*>{i8}, i64);
+    llvmAddLibraryFunction("chr", std::vector<llvmType*>{i64}, i8);
+
+    /* ---------------------------------
+    ---------- String Functions --------
+    ------------------------------------ */
+
+    llvmAddLibraryFunction("strlen", std::vector<llvmType*>{llvm::PointerType::get(i8, 0)}, i64);
+    llvmAddLibraryFunction("strcmp", std::vector<llvmType*>{llvm::PointerType::get(i8, 0), llvm::PointerType::get(i8, 0)}, i64);
+    llvmAddLibraryFunction("strcpy", std::vector<llvmType*>{llvm::PointerType::get(i8, 0), llvm::PointerType::get(i8, 0)}, voidTy);
+    llvmAddLibraryFunction("strcat", std::vector<llvmType*>{llvm::PointerType::get(i8, 0), llvm::PointerType::get(i8, 0)}, voidTy);
+}
+
+/* ---------------------------------------------------------------------
+   ----------------------- LLVM Compile and Dump -----------------------
+   --------------------------------------------------------------------- */
+
+
+void AST::llvm_compile_and_dump()
+{
+    
+    TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
+
+    // Add Library Functions
+    llvmAddLibrary();
+
+    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+
+    // add optimization functions
+
+    TheFPM->doInitialization();
+
+    // Create and add entry point for main function
+    llvm::FunctionType *funcType = llvm::FunctionType::get(i32, false); // false indicates the function does not take variadic arguments.
+    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
+
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
+    Builder.SetInsertPoint(BB);
+    // Emit the program code.
+    compile();
+    Builder.CreateRet(c32(0));
+    
+    // Verify the IR.
+    bool bad = verifyModule(*TheModule, &llvm::errs());
+    if (bad)
+    {
+        std::cerr << "The IR is bad!" << std::endl;
+        std::exit(1);
+    }
+    TheFPM->run(*main);
+    // Print out the IR.
+    TheModule->print(llvm::outs(), nullptr);
+}
+
+/* ---------------------------------------------------------------------
+   ----------------------------- LogErrorV -----------------------------
+   --------------------------------------------------------------------- */
+
+llvm::Value* AST::LogErrorV(const char *Str) const
+{
+    fprintf(stderr, "Error: %s\n", Str);
+    return nullptr;
+}
+
+/* ---------------------------------------------------------------------
+   ---------------------------- getLLVMType ----------------------------
+   --------------------------------------------------------------------- */
+
+
+llvmType * AST::getLLVMType(Type t) {
+    if (equalType(t, typeVoid))
+        return llvmType::getVoidTy(TheContext);
+    else if (equalType(t, typeInteger))
+        return llvmType::getInt32Ty(TheContext);
+    else if (equalType(t, typeChar))
+        return llvmType::getInt8Ty(TheContext);
+    else {
+        llvmType *elementType = getLLVMType(t->refType);
+        // Array 
+        if (t->size > 0) {
+            return llvm::ArrayType::get(elementType, t->size);
+        }
+        else
+            return elementType;
+    }
 }

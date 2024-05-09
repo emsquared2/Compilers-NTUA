@@ -11,6 +11,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     int ReturnValue();
     virtual void sem() override;
+    virtual llvm::Value *compile() const override;
 
 private:
     Expr *expr;

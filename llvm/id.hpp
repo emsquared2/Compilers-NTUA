@@ -11,6 +11,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual const char *getName() const override;
     virtual void sem() override;
+    virtual llvm::Value *compile() const override;
 
 private:
     std::string name;

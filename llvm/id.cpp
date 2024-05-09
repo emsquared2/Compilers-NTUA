@@ -38,3 +38,14 @@ void Id::sem()
             break;
     }
 }
+
+llvm::Value * Id::compile() const
+{
+    // SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
+
+    // if (!e) {
+    //     std::string msg = "Id: Could not compile " + name + ".";
+    //     LogErrorV(name.c_str());
+    // }
+    
+}

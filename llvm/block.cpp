@@ -31,6 +31,9 @@ void Block::sem()
 
 llvm::Value* Block::compile() const
 {
-    stmt_list->compile();
+    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+    {
+        (*s)->compile();
+    }
     return nullptr;
 }

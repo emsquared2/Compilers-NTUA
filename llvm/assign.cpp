@@ -35,3 +35,17 @@ void Assign::sem()
     if (!equalType(expr_type, typeInteger) && !equalType(expr_type, typeChar))
         SemanticError("Assign: Expr's type should be typeInteger or typeChar");
 }
+
+llvm::Value * Assign::compile() const
+{
+    llvm::Value *lValPtr = l_value->compile();
+    if (!lValPtr)
+        return LogErrorV("Assign: LValue could not be compiled.");
+
+    llvm::Value * exprValue = expr->compile();
+    if (!exprValue)
+        return LogErrorV("Assign: Expression could not be compiled.");
+
+    Builder.CreateStore(exprValue, lValPtr);
+    return nullptr;
+}

@@ -50,3 +50,13 @@ void Return::sem()
     // Declare that function has return statement
     returnedFunction.back() = true;
 }
+
+llvm::Value * Return::compile() const
+{
+    if (expr != nullptr)
+        Builder.CreateRet(expr->compile());
+    else
+        Builder.CreateRetVoid();
+
+    return nullptr;
+}

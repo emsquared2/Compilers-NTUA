@@ -30,3 +30,16 @@ void Decl::sem()
     }
     parser_type->sem();
 }
+llvm::Value * Decl::compile() const
+{
+    llvmType *llvm_type = parser_type->getLLVMType(type);
+
+    for (Id *id : idlist->get_idlist()) {
+        // Create an allocation in the entry block
+        llvm::Value *allocaInst = Builder.CreateAlloca(llvm_type, nullptr, id->getName());
+        // Optionally initialize or store other metadata
+        // var[id->getName()] = allocaInst; /* var --> possibly a map<string, llvm:Value* */
+    }
+
+    return nullptr;
+}

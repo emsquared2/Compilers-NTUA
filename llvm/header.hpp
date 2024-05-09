@@ -16,6 +16,7 @@ public:
     FParamList * getFParamList();
     Type getReturnType();
     Id * getId();
+    virtual llvm::Value *compile() const override;
 
 private:
     Id *id;

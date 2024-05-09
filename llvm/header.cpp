@@ -86,3 +86,16 @@ void Header::sem()
     endFunctionHeader(function, type);
 }
 
+llvm::Value * Header::compile() const
+{
+    fparamlist->compile();
+
+    llvm::Function *function = TheModule->getFunction(id->getName());
+    if (!function) {
+        llvmType *return_type = ret_type->getLLVMType(type);
+
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, /* parameter llvm types*/ false); 
+        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id->getName(), TheModule.get());
+    }
+    return function;
+}

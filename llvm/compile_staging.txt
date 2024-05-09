@@ -1,5 +1,5 @@
 array       :
-arraydim    :
+arraydim    : not needed
 arrayelem   :
 assign      : DONE
 ast         :
@@ -18,7 +18,7 @@ expr        : not needed, abstract
 exprlist    : DONE
 fparam      :
 fparamlist  : DONE
-fpartype    : not needed, type
+fpartype    : 
 funcdecl    : DONE
 funcdef     :
 header      : DONE (almost)

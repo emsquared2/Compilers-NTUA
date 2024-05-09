@@ -47,7 +47,7 @@ llvm::Value *OpCond::compile() const
         else if (op == "or")
             return Builder.CreateOr(l, r, "ortemp");
         else
-            return nullptr;
+            return LogErrorV("invalid binary operator");
     }
     else
     {
@@ -56,5 +56,7 @@ llvm::Value *OpCond::compile() const
 
         if (op == "not")
             return Builder.CreateNot(r, "nottemp");
+        else
+            return LogErrorV("invalid binary operator");
     }
 }

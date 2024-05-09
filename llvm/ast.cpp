@@ -45,6 +45,16 @@ void AST::llvm_compile_and_dump()
    ----------------------- Add Library Functions -----------------------
    --------------------------------------------------------------------- */
 
+llvm::Value* AST::LogErrorV(const char *Str) const
+{
+    fprintf(stderr, "Error: %s\n", Str);
+    return nullptr;
+}
+
+/* ---------------------------------------------------------------------
+   ----------------------- Add Library Functions -----------------------
+   --------------------------------------------------------------------- */
+
 void addLibraryFunction(const char *func_name, const std::vector<Parameter *> &params, Type return_type)
 {
     SymbolEntry *f = newFunction(func_name);

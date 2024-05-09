@@ -56,5 +56,5 @@ llvm::Value *CompCond::compile() const
     else if (op == ">=")
         return Builder.CreateICmpSGE(l, r, "getmp");
     else
-        return nullptr;
+        return LogErrorV("invalid binary operator");
 }

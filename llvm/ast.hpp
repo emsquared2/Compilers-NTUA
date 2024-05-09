@@ -105,7 +105,8 @@ public:
     virtual ~AST() = default;
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem() {};
-    void SemanticError(const char *msg);    
+    void SemanticError(const char *msg);
+    llvm::Value *LogErrorV(const char *Str) const;   
     virtual llvm::Value *compile() const = 0;
 
     void llvm_compile_and_dump();

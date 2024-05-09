@@ -41,4 +41,6 @@ llvm::Value *ExprList::compile() const
 {
     for (Expr *e : expr_list)
         e->compile();
+
+    return nullptr;
 }

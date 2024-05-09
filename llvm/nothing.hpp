@@ -9,6 +9,7 @@ public:
     ~Nothing();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
+    virtual llvm::Value* compile() const override;
 };
 
 #endif

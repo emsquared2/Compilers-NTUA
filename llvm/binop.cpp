@@ -29,13 +29,16 @@ llvm::Value* BinOp::compile() const
     if(!l or !r)
         return nullptr;
 
-    switch (op) {
-      case "+": return Builder.CreateAdd(l, r, "addtmp");
-      case "-": return Builder.CreateSub(l, r, "subtmp");
-      case "*": return Builder.CreateMul(l, r, "multmp");
-      case "/": return Builder.CreateSDiv(l, r, "divtmp");
-      case "%": return Builder.CreateSRem(l, r, "modtmp");
-      default: return nullptr;
-    }
-    return nullptr;
+    if (op == "+")
+        return Builder.CreateAdd(l, r, "addtmp");
+    else if (op == "-")
+        return Builder.CreateSub(l, r, "subtmp");
+    else if (op == "*")
+        return Builder.CreateMul(l, r, "multmp");
+    else if (op == "div")
+        return Builder.CreateSDiv(l, r, "divtmp");
+    else if (op == "mod")
+        return Builder.CreateSRem(l, r, "modtmp");
+    else
+        return nullptr;
 }

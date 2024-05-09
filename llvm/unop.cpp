@@ -20,11 +20,12 @@ void UnOp::sem()
 
 llvm::Value* UnOp::compile() const
 {
-    llvm::Value* r = expr->compile();
-    switch (op) {
-        case "+": return r;
-        case "-": return Builder.CreateNeg(r, "unarytemp");
-        default: return nullptr;
-    }
-    return nullptr;
+    llvm::Value* r = right->compile();
+
+    if(op == "+")
+        return r;
+    else if (op == "-")
+        return Builder.CreateNeg(r, "unarytemp");
+    else
+        return nullptr;
 }

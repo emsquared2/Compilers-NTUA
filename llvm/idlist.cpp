@@ -41,4 +41,6 @@ llvm::Value* IdList::compile() const
 {
     for(Id *i : idlist)
         i->compile();
+        
+    return nullptr;
 }

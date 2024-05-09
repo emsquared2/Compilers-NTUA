@@ -10,3 +10,7 @@ void Nothing::sem()
 {
     type = typeVoid;
 }
+llvm::Value* Nothing::compile() const
+{
+    return nullptr;
+}

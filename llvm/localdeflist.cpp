@@ -40,4 +40,5 @@ llvm::Value* LocalDefList::compile() const
     {
         (*l)->compile();
     }
+    return nullptr;
 }

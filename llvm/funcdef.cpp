@@ -19,9 +19,10 @@ void FuncDef::sem()
     local_def_list->sem();
     block->sem();
 
-    SymbolEntry * function = lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
+    SymbolEntry *function = lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
 
-    if(!equalType(header->getReturnType(), typeVoid) && !returnedFunction.back()) {
+    if (!equalType(header->getReturnType(), typeVoid) && !returnedFunction.back())
+    {
         std::string func_name = header->getId()->getName();
         std::string msg = "Non-void function " + func_name + " has no return statement.";
         SemanticError(msg.c_str());
@@ -34,20 +35,20 @@ void FuncDef::sem()
 void FuncDef::ProgramSem()
 {
     /* Program should:
-        *      1) NOT take parameters
-        *     2) Return nothing, i.e. have type typeVoid
-        */ 
+     *      1) NOT take parameters
+     *     2) Return nothing, i.e. have type typeVoid
+     */
 
-    if(header->getFParamList() != nullptr)
+    if (header->getFParamList() != nullptr)
         SemanticError("Program cannot take parameters.");
 
-    if(!equalType(header->getReturnType(), typeVoid))
+    if (!equalType(header->getReturnType(), typeVoid))
         SemanticError("Program should have type void.");
 
     sem();
 }
 
-llvm::Value * FuncDef::compile() const
+llvm::Function *FuncDef::compile() const
 {
     llvm::Function *function = header->compile();
     if (!function)
@@ -56,11 +57,12 @@ llvm::Value * FuncDef::compile() const
     // Create a new basic block to start insertion into.
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", function);
     Builder.SetInsertPoint(BB);
-    
-    unsigned int current_arg = 0;
-    std::vector<llvmType*> llvm_param_types = header->getLLVM_param_types();
 
-    for (auto &Arg : function->args()) {
+    unsigned int current_arg = 0;
+    std::vector<llvmType *> llvm_param_types = header->getLLVM_param_types();
+
+    for (auto &Arg : function->args())
+    {
 
         // Create an alloca for this variable.
         llvm::AllocaInst *Alloca = Builder.CreateAlloca(llvm_param_types[current_arg++], nullptr, Arg.getName());
@@ -84,7 +86,7 @@ llvm::Value * FuncDef::compile() const
 
     if (!Builder.GetInsertBlock()->getTerminator())
     {
-        if(equalType(header->getReturnType(), typeInteger) || equalType(header->getReturnType(), typeChar))
+        if (equalType(header->getReturnType(), typeInteger) || equalType(header->getReturnType(), typeChar))
             Builder.CreateRet(c64(0));
         else
             Builder.CreateRetVoid();

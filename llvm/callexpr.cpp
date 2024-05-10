@@ -40,10 +40,6 @@ void CallExpr::sem()
             SemanticError(msg.c_str());
         }
 
-        // std::cout << "Actual Type -> ";
-        // printType(e->getType());
-        // std::cout << std::endl;
-
         (*e)->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */
@@ -72,8 +68,9 @@ void CallExpr::sem()
     type = function->u.eFunction.resultType;
 }
 
-llvm::Value* CallExpr::compile() const {
-    
+llvm::Value *CallExpr::compile() const
+{
+
     llvm::StringRef Callee = id->getName();
     std::vector<Expr *> Args = expr_list->getExprList();
 

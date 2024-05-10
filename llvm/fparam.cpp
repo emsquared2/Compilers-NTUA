@@ -34,7 +34,7 @@ void FParam::sem()
 {
     /* Arrays passed as function parameters can only be passed by reference */
     bool isArrayType = !equalType(type, typeInteger) && !equalType(type, typeChar);
-    if(isArrayType && pass_mode != PASS_BY_REFERENCE)
+    if (isArrayType && pass_mode != PASS_BY_REFERENCE)
     {
         SemanticError("Arrays can only be passed by reference.");
     }
@@ -45,6 +45,12 @@ void FParam::sem()
     function = nullptr;
 }
 
-Type FParam::getType(){
+Type FParam::getType()
+{
     return type;
+}
+
+llvm::Value *FParam::compile() const
+{
+    
 }

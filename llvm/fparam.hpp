@@ -17,8 +17,6 @@ public:
 
     IdList * getIdList();
 
-    Type getType();
-
 private:
     IdList *idlist;
     FParType *fpartype;

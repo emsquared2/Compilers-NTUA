@@ -113,8 +113,3 @@ llvm::Function *Header::compile() const
 
     return function;
 }
-
-std::vector<llvmType*> Header::getLLVM_param_types()
-{
-    return fparamlist->getLLVM_params();
-}

@@ -59,20 +59,19 @@ llvm::Function *FuncDef::compile() const
     Builder.SetInsertPoint(BB);
 
     unsigned int current_arg = 0;
+    std::vector<llvm::StringRef> llvm_param_names = header->getLLVM_param_names();
     std::vector<llvmType *> llvm_param_types = header->getLLVM_param_types();
-    std::vector<llvm::StringRef> fparams = header->getLLVM_param_names();
 
     for (auto &Arg : function->args())
     {
-
         // Create an alloca for this variable.
-        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, fparams[current_arg], llvm_param_types[current_arg++]);
+        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm_param_names[current_arg], llvm_param_types[current_arg]);
 
         // Store the initial value into the alloca.
         Builder.CreateStore(&Arg, Alloca);
 
         // Add arguments to variable symbol table.
-        NamedValues[std::string(fparams[current_arg++])] = Alloca;
+        NamedValues[std::string(llvm_param_names[current_arg++])] = Alloca;
     }
 
     std::vector<LocalDef *> locals = local_def_list->getLocals();

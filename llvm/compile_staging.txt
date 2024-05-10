@@ -5,8 +5,8 @@ assign      : DONE
 ast         :
 binop       : DONE
 block       : DONE
-callexpr    : 
-callstmt    : 
+callexpr    : DONE
+callstmt    : DONE
 compcond    : DONE
 cond        : not needed, abstract
 const       : DONE

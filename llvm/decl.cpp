@@ -38,10 +38,15 @@ llvm::Value *Decl::compile() const
 
     for (Id *id : idlist->getIds())
     {
-        id->compile();
+        llvm::Value *IdV = id->compile();
+        if (IdV)
+            return nullptr;
+        IdV = llvm::ConstantFP::get(TheContext, llvm::APFloat(0.0));
+
         llvm::StringRef varName = id->getName();
         // Create an allocation in the entry block
         llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, varName, llvm_type);
+        Builder.CreateStore(IdV, allocaInst);
         NamedValues[id->getName()] = allocaInst;
     }
 

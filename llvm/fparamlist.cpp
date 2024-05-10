@@ -42,14 +42,6 @@ void FParamList::sem()
     }
 }
 
-llvm::Value *FParamList::compile() const
-{
-    for (auto param = params.rbegin(); param != params.rend(); ++param)
-    {
-        (*param)->compile();
-    }
-}
-
 std::vector<llvmType *> FParamList::getLLVM_params()
 {
     std::vector<llvmType *> llvm_params;
@@ -77,4 +69,12 @@ std::vector<llvm::StringRef> FParamList::getLLVM_param_names()
             llvm_param_names.push_back((*id)->getName());
     }
     return llvm_param_names;
+}
+
+llvm::Value *FParamList::compile() const
+{
+    for (auto param = params.rbegin(); param != params.rend(); ++param)
+    {
+        (*param)->compile();
+    }
 }

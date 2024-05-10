@@ -34,6 +34,11 @@ void LocalDefList::sem() {
     }
 }
 
+std::vector<LocalDef*> LocalDefList::getLocals()
+{
+    return locals;
+}
+
 llvm::Value* LocalDefList::compile() const
 {
     for (auto l = locals.rbegin(); l != locals.rend(); ++l)
@@ -41,9 +46,4 @@ llvm::Value* LocalDefList::compile() const
         (*l)->compile();
     }
     return nullptr;
-}
-
-std::vector<LocalDef*> LocalDefList::getLocals()
-{
-    return locals;
 }

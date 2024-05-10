@@ -148,6 +148,10 @@ protected:
 
     static std::map<std::string, llvm::AllocaInst *> NamedValues;
 
+    /// CreateEntryBlockAlloca - Create an alloca instruction in the entry block of
+    /// the function.  This is used for mutable variables etc.
+    static llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, llvm::StringRef VarName, llvmType *llvm_type);
+
     int lineno;
 };
 

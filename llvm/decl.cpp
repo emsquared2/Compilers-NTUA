@@ -1,8 +1,8 @@
 #include "decl.hpp"
 
-Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt) 
-{ 
-    type = parser_type->ConvertToType(); 
+Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt)
+{
+    type = parser_type->ConvertToType();
 }
 
 Decl::~Decl()
@@ -24,21 +24,25 @@ void Decl::printOn(std::ostream &out) const
 
 void Decl::sem()
 {
-    for (Id *id : idlist->get_idlist())
+    for (Id *id : idlist->getIds())
     {
         newVariable(id->getName(), type);
     }
     parser_type->sem();
 }
-llvm::Value * Decl::compile() const
+
+llvm::Value *Decl::compile() const
 {
+    llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
     llvmType *llvm_type = parser_type->getLLVMType(type);
 
-    for (Id *id : idlist->get_idlist()) {
+    for (Id *id : idlist->getIds())
+    {
+        id->compile();
+        llvm::StringRef varName = id->getName();
         // Create an allocation in the entry block
-        llvm::Value *allocaInst = Builder.CreateAlloca(llvm_type, nullptr, id->getName());
-        // Optionally initialize or store other metadata
-        // var[id->getName()] = allocaInst; /* var --> possibly a map<string, llvm:Value* */
+        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, varName, llvm_type);
+        NamedValues[id->getName()] = allocaInst;
     }
 
     return nullptr;

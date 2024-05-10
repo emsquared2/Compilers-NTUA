@@ -9,9 +9,9 @@ IdList::~IdList()
     }
 }
 
-const std::vector<Id *> IdList::get_idlist() 
-{ 
-    return idlist; 
+const std::vector<Id *> IdList::getIds()
+{
+    return idlist;
 }
 
 void IdList::append(Id *id)
@@ -37,10 +37,10 @@ void IdList::sem()
         i->sem();
 }
 
-llvm::Value* IdList::compile() const
+llvm::Value *IdList::compile() const
 {
-    for(Id *i : idlist)
+    for (Id *i : idlist)
         i->compile();
-        
+
     return nullptr;
 }

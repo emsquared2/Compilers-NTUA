@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
@@ -14,7 +15,6 @@
 #include <llvm/Support/raw_ostream.h>
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
-
 
 /* ---------------------------------------------------------------------
    --------------------------- Symbol Table ----------------------------
@@ -109,14 +109,14 @@ public:
     virtual void sem() {};
     void SemanticError(const char *msg);
 
-    llvm::Value *LogErrorV(const char *Str) const;  
-    llvmType *getLLVMType(Type t); 
+    llvm::Value *LogErrorV(const char *Str) const;
+    llvmType *getLLVMType(Type t);
     virtual llvm::Value *compile() const = 0;
 
     void llvm_compile_and_dump();
 
     // Functions for library functions
-    void llvmAddLibraryFunction(const char * func_name, const std::vector<llvmType*> params_type, llvmType* return_type);
+    void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);
     void llvmAddLibrary();
 
 protected:
@@ -126,22 +126,31 @@ protected:
     static std::unique_ptr<llvm::Module> TheModule;
     static std::unique_ptr<llvm::legacy::FunctionPassManager> TheFPM;
 
-     // Useful LLVM types.
+    // Useful LLVM types.
     static llvm::Type *i8;
     static llvm::Type *i32;
     static llvm::Type *i64;
     static llvm::Type *voidTy;
 
     // Useful LLVM helper functions.
-    llvm::ConstantInt* c8(char c) const {
+    llvm::ConstantInt *c8(char c) const
+    {
         return llvm::ConstantInt::get(TheContext, llvm::APInt(8, c, true));
     }
-    llvm::ConstantInt* c32(int n) const {
+    llvm::ConstantInt *c32(int n) const
+    {
         return llvm::ConstantInt::get(TheContext, llvm::APInt(32, n, true));
     }
-    llvm::ConstantInt* c64(int n) const {
+    llvm::ConstantInt *c64(int n) const
+    {
         return llvm::ConstantInt::get(TheContext, llvm::APInt(64, n, true));
     }
+
+    static std::map<std::string, llvm::AllocaInst *> NamedValues;
+
+    /// CreateEntryBlockAlloca - Create an alloca instruction in the entry block of
+    /// the function.  This is used for mutable variables etc.
+    static llvm::AllocaInst *CreateEntryBlockAlloca(llvm::Function *TheFunction, llvm::StringRef VarName, llvmType *llvm_type);
 
     int lineno;
 };

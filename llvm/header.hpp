@@ -13,12 +13,13 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
     void set_forward_declaration();
-    FParamList * getFParamList();
+    FParamList *getFParamList();
     Type getReturnType();
-    Id * getId();
+    Id *getId();
     virtual llvm::Function *compile() const override;
 
-    std::vector<llvmType*> getLLVM_param_types();
+    std::vector<llvmType *> getLLVM_param_types();
+    std::vector<llvm::StringRef> getLLVM_param_names();
 
 private:
     Id *id;

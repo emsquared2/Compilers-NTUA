@@ -12,6 +12,10 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
     void setSymbolEntry(SymbolEntry *f);
+    Type getType();
+    llvm::Value *compile() const override;
+
+    IdList * getIdList();
 
     Type getType();
 

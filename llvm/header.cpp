@@ -86,7 +86,7 @@ void Header::sem()
     endFunctionHeader(function, type);
 }
 
-llvm::Value * Header::compile() const
+llvm::Function * Header::compile() const
 {
     fparamlist->compile();
 
@@ -94,8 +94,14 @@ llvm::Value * Header::compile() const
     if (!function) {
         llvmType *return_type = ret_type->getLLVMType(type);
 
-        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, /* parameter llvm types*/ false); 
+        std::vector<llvmType*> llvm_param_types = fparamlist->getLLVM_params();
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false); 
         function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id->getName(), TheModule.get());
     }
     return function;
+}
+
+std::vector<llvmType*> Header::getLLVM_param_types()
+{
+    return fparamlist->getLLVM_params();
 }

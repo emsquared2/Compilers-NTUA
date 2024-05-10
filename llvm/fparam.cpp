@@ -44,3 +44,7 @@ void FParam::sem()
 
     function = nullptr;
 }
+
+Type FParam::getType(){
+    return type;
+}

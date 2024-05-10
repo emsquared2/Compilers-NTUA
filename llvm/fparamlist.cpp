@@ -49,3 +49,15 @@ llvm::Value *FParamList::compile() const
         (*param)->compile();
     }
 }
+
+std::vector<llvmType*> FParamList::getLLVM_params()
+{
+    std::vector<llvmType*> llvm_params;
+    for (auto param = params.rbegin(); param != params.rend(); ++param)
+    {
+        Type t = (*param)->getType();
+        llvmType *param_type = (*param)->getLLVMType(t);
+        llvm_params.push_back(param_type);
+    }
+    return llvm_params;
+}

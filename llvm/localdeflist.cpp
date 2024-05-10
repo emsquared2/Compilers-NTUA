@@ -42,3 +42,8 @@ llvm::Value* LocalDefList::compile() const
     }
     return nullptr;
 }
+
+std::vector<LocalDef*> LocalDefList::getLocals()
+{
+    return locals;
+}

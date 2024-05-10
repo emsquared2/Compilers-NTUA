@@ -15,6 +15,8 @@ public:
     void setSymbolEntry(SymbolEntry *f);
     virtual llvm::Value *compile() const override;
 
+    std::vector<llvmType*> getLLVM_params();
+
 private:
     std::vector<FParam *> params;
     SymbolEntry *function;

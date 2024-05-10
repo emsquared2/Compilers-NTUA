@@ -30,6 +30,11 @@ void FParam::setSymbolEntry(SymbolEntry *f)
     function = f;
 }
 
+IdList *FParam::getIdList()
+{
+    return idlist;
+}
+
 void FParam::sem()
 {
     /* Arrays passed as function parameters can only be passed by reference */
@@ -39,7 +44,7 @@ void FParam::sem()
         SemanticError("Arrays can only be passed by reference.");
     }
 
-    for (Id *id : idlist->get_idlist())
+    for (Id *id : idlist->getIds())
         newParameter(id->getName(), type, pass_mode, function);
 
     function = nullptr;
@@ -52,5 +57,5 @@ Type FParam::getType()
 
 llvm::Value *FParam::compile() const
 {
-    
+    llvmType *t;
 }

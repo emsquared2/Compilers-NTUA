@@ -16,6 +16,7 @@ public:
     virtual llvm::Value *compile() const override;
 
     std::vector<llvmType*> getLLVM_params();
+    std::vector<llvm::StringRef> getLLVM_param_names();
 
 private:
     std::vector<FParam *> params;

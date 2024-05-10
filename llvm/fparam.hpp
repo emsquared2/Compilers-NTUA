@@ -15,6 +15,8 @@ public:
     Type getType();
     llvm::Value *compile() const override;
 
+    IdList * getIdList();
+
 private:
     IdList *idlist;
     FParType *fpartype;

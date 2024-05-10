@@ -9,11 +9,11 @@ class IdList : public AST
 public:
     IdList();
     ~IdList();
-    const std::vector<Id *> get_idlist();
+    const std::vector<Id *> getIds();
     void append(Id *id);
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
-    virtual llvm::Value* compile() const override;
+    virtual llvm::Value *compile() const override;
 
 private:
     std::vector<Id *> idlist;

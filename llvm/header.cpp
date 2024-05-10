@@ -1,8 +1,8 @@
 #include "header.hpp"
 
-Header::Header(Id *id, RetType *t, FParamList *fpl = nullptr) : id(id), ret_type(t), fparamlist(fpl) 
-{ 
-    type = ret_type->ConvertToType(); 
+Header::Header(Id *id, RetType *t, FParamList *fpl = nullptr) : id(id), ret_type(t), fparamlist(fpl)
+{
+    type = ret_type->ConvertToType();
 }
 
 Header::~Header()
@@ -34,7 +34,7 @@ void Header::set_forward_declaration()
     forward_declaration = true;
 }
 
-FParamList * Header::getFParamList()
+FParamList *Header::getFParamList()
 {
     return fparamlist;
 }
@@ -43,7 +43,7 @@ Type Header::getReturnType()
 {
     return type;
 }
-Id * Header::getId()
+Id *Header::getId()
 {
     return id;
 }
@@ -77,31 +77,39 @@ void Header::sem()
 
     Option 2 on the other hand might be a cleaner option as the SymbolEntry is abstracted from the classes.
     */
-    if (fparamlist != nullptr) {
+    if (fparamlist != nullptr)
+    {
         fparamlist->setSymbolEntry(function);
         fparamlist->sem();
-
     }
 
     endFunctionHeader(function, type);
 }
 
-llvm::Function * Header::compile() const
-{
-    fparamlist->compile();
-
-    llvm::Function *function = TheModule->getFunction(id->getName());
-    if (!function) {
-        llvmType *return_type = ret_type->getLLVMType(type);
-
-        std::vector<llvmType*> llvm_param_types = fparamlist->getLLVM_params();
-        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false); 
-        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id->getName(), TheModule.get());
-    }
-    return function;
-}
-
-std::vector<llvmType*> Header::getLLVM_param_types()
+std::vector<llvmType *> Header::getLLVM_param_types()
 {
     return fparamlist->getLLVM_params();
+}
+
+std::vector<llvm::StringRef> Header::getLLVM_param_names()
+{
+    return fparamlist->getLLVM_param_names();
+}
+
+llvm::Function *Header::compile() const
+{
+    // fparamlist->compile();
+
+    llvm::Function *function = TheModule->getFunction(id->getName());
+
+    if (!function)
+    {
+        llvmType *return_type = ret_type->getLLVMType(type);
+        std::vector<llvmType *> llvm_param_types = fparamlist->getLLVM_params();
+
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
+        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id->getName(), TheModule.get());
+    }
+
+    return function;
 }

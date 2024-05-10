@@ -46,3 +46,52 @@ void FuncDef::ProgramSem()
 
     sem();
 }
+
+llvm::Value * FuncDef::compile() const
+{
+    llvm::Function *function = header->compile();
+    if (!function)
+        return nullptr;
+
+    // Create a new basic block to start insertion into.
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", function);
+    Builder.SetInsertPoint(BB);
+    
+    unsigned int current_arg = 0;
+    std::vector<llvmType*> llvm_param_types = header->getLLVM_param_types();
+
+    for (auto &Arg : function->args()) {
+
+        // Create an alloca for this variable.
+        llvm::AllocaInst *Alloca = Builder.CreateAlloca(llvm_param_types[current_arg++], nullptr, Arg.getName());
+
+        // Store the initial value into the alloca.
+        Builder.CreateStore(&Arg, Alloca);
+
+        // Add arguments to variable symbol table.
+        NamedValues[std::string(Arg.getName())] = Alloca;
+    }
+
+    std::vector<LocalDef *> locals = local_def_list->getLocals();
+
+    for (auto l = locals.rbegin(); l != locals.rend(); ++l)
+    {
+        (*l)->compile();
+        Builder.SetInsertPoint(BB);
+    }
+
+    block->compile();
+
+    if (!Builder.GetInsertBlock()->getTerminator())
+    {
+        if(equalType(header->getReturnType(), typeInteger) || equalType(header->getReturnType(), typeChar))
+            Builder.CreateRet(c64(0));
+        else
+            Builder.CreateRetVoid();
+    }
+
+    // Validate the generated code, checking for consistency.
+    llvm::verifyFunction(*function);
+
+    return function;
+}

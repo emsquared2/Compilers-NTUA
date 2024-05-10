@@ -20,9 +20,9 @@ fparam      :
 fparamlist  : DONE
 fpartype    : 
 funcdecl    : DONE
-funcdef     :
+funcdef     : DONE
 header      : DONE (almost)
-id          :
+id          : DONE
 idlist      : DONE
 if          : DONE
 localdef    : not needed, abstract

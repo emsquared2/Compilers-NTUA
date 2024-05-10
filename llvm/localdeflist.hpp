@@ -14,6 +14,8 @@ public:
     void append(LocalDef *l);
     virtual llvm::Value* compile() const override;
 
+    std::vector<LocalDef*> getLocals();
+
 private:
     std::vector<LocalDef *> locals;
 };

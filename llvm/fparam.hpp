@@ -13,6 +13,8 @@ public:
     virtual void sem() override;
     void setSymbolEntry(SymbolEntry *f);
 
+    Type getType();
+
 private:
     IdList *idlist;
     FParType *fpartype;

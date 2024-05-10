@@ -111,7 +111,7 @@ public:
 
     llvm::Value *LogErrorV(const char *Str) const;
     llvmType *getLLVMType(Type t);
-    virtual llvm::Value *compile() const = 0;
+    virtual llvm::Value *compile() const {};
 
     void llvm_compile_and_dump();
 

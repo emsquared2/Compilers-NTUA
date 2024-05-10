@@ -167,6 +167,7 @@ program:
     | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
         $$ = $1; 
         $1->ProgramSem();
+        $1->llvm_compile_and_dump();
         delete $$;
     }
 ;

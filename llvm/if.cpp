@@ -60,6 +60,7 @@ llvm::Value* If::compile() const
     ThenBB = Builder.GetInsertBlock();
 
     // Emit else block.
+    // TheFunction->getBasicBlockList().push_back(ElseBB);
     // TheFunction->insert(TheFunction->end(), ElseBB);
 
     // Set insertion point for the 'else' block
@@ -79,6 +80,7 @@ llvm::Value* If::compile() const
     ElseBB = Builder.GetInsertBlock();
 
     // Emit after block.
+    // TheFunction->getBasicBlockList().push_back(AfterBB);
     // TheFunction->insert(TheFunction->end(), AfterBB);
     // Set insertion point for the 'endif' block
     Builder.SetInsertPoint(AfterBB);

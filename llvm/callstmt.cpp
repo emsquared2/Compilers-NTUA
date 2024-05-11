@@ -99,5 +99,5 @@ llvm::Value *CallStmt::compile() const
             return nullptr;
     }
 
-    return Builder.CreateCall(CalleeF, ArgsV, "calltmp");
+    return Builder.CreateCall(CalleeF, ArgsV);
 }

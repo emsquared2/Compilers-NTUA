@@ -39,6 +39,22 @@ void Id::sem()
     }
 }
 
+llvm::Value *Id::compile_ptr() const
+{
+    // Look this variable up in the function.
+    llvm::AllocaInst *A = NamedValues[name];
+    if (!A)
+    {
+        std::string msg = "Id: Unknown variable name: " + name + ".";
+        return LogErrorV(msg.c_str());
+    }
+
+    // // Load the value.
+    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, name.c_str());
+
+    // return A;
+}
+
 llvm::Value *Id::compile() const
 {
     // Look this variable up in the function.
@@ -46,9 +62,11 @@ llvm::Value *Id::compile() const
     if (!A)
     {
         std::string msg = "Id: Unknown variable name: " + name + ".";
-        return LogErrorV(name.c_str());
+        return LogErrorV(msg.c_str());
     }
 
-    // Load the value.
+    // // Load the value.
     return Builder.CreateLoad(A->getAllocatedType(), A, name.c_str());
+
+    // return A;
 }

@@ -38,7 +38,7 @@ void Assign::sem()
 
 llvm::Value * Assign::compile() const
 {
-    llvm::Value *LValPtr = l_value->compile();
+    llvm::Value *LValPtr = l_value->compile_ptr();
     if (!LValPtr)
         return LogErrorV("Assign: LValue could not be compiled.");
 

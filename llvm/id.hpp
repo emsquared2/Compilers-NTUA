@@ -12,6 +12,7 @@ public:
     virtual const char *getName() const override;
     virtual void sem() override;
     virtual llvm::Value *compile() const override;
+    virtual llvm::Value *compile_ptr() const override;
 
 private:
     std::string name;

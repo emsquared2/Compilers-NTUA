@@ -38,7 +38,8 @@ llvm::Value *Decl::compile() const
 
     for (Id *id : idlist->getIds())
     {
-        id->compile();
+        // Compile not needed as the variables are now declared
+        //id->compile();
 
         llvm::StringRef varName = id->getName();
         // Create an allocation in the entry block

@@ -191,8 +191,8 @@ void AST::llvm_compile_and_dump()
 
 
     // Create and add entry point for main function
-    llvm::FunctionType *funcType = llvm::FunctionType::get(i32, false); // false indicates the function does not take variadic arguments.
-    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
+    llvm::FunctionType *funcType = llvm::FunctionType::get(i64, false); // false indicates the function does not take variadic arguments.
+    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_grace_main", TheModule.get());
 
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
     Builder.SetInsertPoint(BB);
@@ -202,7 +202,7 @@ void AST::llvm_compile_and_dump()
 
     Builder.CreateCall(llvm::dyn_cast<llvm::Function>(main_function));
 
-    Builder.CreateRet(c32(0));
+    Builder.CreateRet(c64(0));
 
     // Print out the IR.
     TheModule->print(llvm::outs(), nullptr);
@@ -249,7 +249,7 @@ llvmType *AST::getLLVMType(Type t)
     if (equalType(t, typeVoid))
         return llvmType::getVoidTy(TheContext);
     else if (equalType(t, typeInteger))
-        return llvmType::getInt32Ty(TheContext);
+        return llvmType::getInt64Ty(TheContext);
     else if (equalType(t, typeChar))
         return llvmType::getInt8Ty(TheContext);
     else

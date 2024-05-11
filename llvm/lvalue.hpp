@@ -7,6 +7,7 @@ class LValue : public Expr
 {
 public:
     virtual const char *getName() const {};
+    virtual llvm::Value * compile_ptr() const {}
 };
 
 #endif

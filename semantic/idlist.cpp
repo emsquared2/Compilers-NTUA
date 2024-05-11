@@ -9,9 +9,9 @@ IdList::~IdList()
     }
 }
 
-const std::vector<Id *> IdList::get_idlist() 
-{ 
-    return idlist; 
+const std::vector<Id *> IdList::getIds()
+{
+    return idlist;
 }
 
 void IdList::append(Id *id)

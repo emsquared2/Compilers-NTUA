@@ -1,8 +1,8 @@
 #include "decl.hpp"
 
-Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt) 
-{ 
-    type = parser_type->ConvertToType(); 
+Decl::Decl(IdList *idl, FParType *fpt) : idlist(idl), parser_type(fpt)
+{
+    type = parser_type->ConvertToType();
 }
 
 Decl::~Decl()
@@ -24,7 +24,7 @@ void Decl::printOn(std::ostream &out) const
 
 void Decl::sem()
 {
-    for (Id *id : idlist->get_idlist())
+    for (Id *id : idlist->getIds())
     {
         newVariable(id->getName(), type);
     }

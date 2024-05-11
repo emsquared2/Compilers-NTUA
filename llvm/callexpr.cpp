@@ -72,7 +72,7 @@ llvm::Value *CallExpr::compile() const
 {
 
     llvm::StringRef Callee = id->getName();
-    std::vector<Expr *> Args = expr_list->getExprList();
+    std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *> {};
 
     // Look up the name in the global module table.
     llvm::Function *CalleeF = TheModule->getFunction(Callee);
@@ -84,7 +84,7 @@ llvm::Value *CallExpr::compile() const
         return LogErrorV("Incorrect # arguments passed");
 
     std::vector<llvm::Value *> ArgsV;
-    for (unsigned i = 0, e = Args.size(); i != e; ++i)
+    for (int i = Args.size() - 1; i >= 0; --i)
     {
         ArgsV.push_back(Args[i]->compile());
         if (!ArgsV.back())

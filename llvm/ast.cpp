@@ -139,7 +139,6 @@ void AST::llvmAddLibraryFunction(const char *func_name, const std::vector<llvmTy
 
 void AST::llvmAddLibrary()
 {
-
     /* ---------------------------------
     --------- Output Functions ---------
     ------------------------------------ */
@@ -179,7 +178,6 @@ void AST::llvmAddLibrary()
 
 void AST::llvm_compile_and_dump()
 {
-
     TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
 
     // Add Library Functions
@@ -191,16 +189,24 @@ void AST::llvm_compile_and_dump()
 
     TheFPM->doInitialization();
 
+
     // Create and add entry point for main function
     llvm::FunctionType *funcType = llvm::FunctionType::get(i32, false); // false indicates the function does not take variadic arguments.
     llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
 
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
     Builder.SetInsertPoint(BB);
+
     // Emit the program code.
-    compile();
+    llvm::Value *main_function = compile();
+
+    Builder.CreateCall(llvm::dyn_cast<llvm::Function>(main_function));
+
     Builder.CreateRet(c32(0));
 
+    // Print out the IR.
+    TheModule->print(llvm::outs(), nullptr);
+    std::cout << std::endl;
     // Verify the IR.
     bool bad = verifyModule(*TheModule, &llvm::errs());
     if (bad)
@@ -209,8 +215,6 @@ void AST::llvm_compile_and_dump()
         std::exit(1);
     }
     TheFPM->run(*main);
-    // Print out the IR.
-    TheModule->print(llvm::outs(), nullptr);
 }
 
 /* ---------------------------------------------------------------------

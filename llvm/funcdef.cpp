@@ -50,6 +50,8 @@ void FuncDef::ProgramSem()
 
 llvm::Function *FuncDef::compile() const
 {
+    llvm::BasicBlock *BB_ofAbovelvelFunc = Builder.GetInsertBlock();
+
     llvm::Function *function = header->compile();
     if (!function)
         return nullptr;
@@ -95,6 +97,8 @@ llvm::Function *FuncDef::compile() const
 
     // Validate the generated code, checking for consistency.
     llvm::verifyFunction(*function);
+
+    Builder.SetInsertPoint(BB_ofAbovelvelFunc);
 
     return function;
 }

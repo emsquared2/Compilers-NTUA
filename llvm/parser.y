@@ -44,6 +44,17 @@
     #include "unop.hpp"
     #include "while.hpp"
 
+    llvm::LLVMContext AST::TheContext;
+    llvm::IRBuilder<> AST::Builder(TheContext);
+    std::unique_ptr<llvm::Module> AST::TheModule;
+    std::unique_ptr<llvm::legacy::FunctionPassManager> AST::TheFPM;
+    std::map<std::string, llvm::AllocaInst *> AST::NamedValues;
+
+    llvmType *AST::i8 = llvm::IntegerType::get(TheContext, 8);
+    llvmType *AST::i32 = llvm::IntegerType::get(TheContext, 32);
+    llvmType *AST::i64 = llvm::IntegerType::get(TheContext, 64);
+    llvmType *AST::voidTy = llvmType::getVoidTy(TheContext);
+
     #define YYDEBUG 1
 
 %}
@@ -164,7 +175,7 @@
 // Maybe implement class Program
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
-    | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
+    | func_def      { std::cout << "AST: " << *$1 << std::endl; 
         $$ = $1; 
         $1->ProgramSem();
         $1->llvm_compile_and_dump();

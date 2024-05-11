@@ -5,15 +5,15 @@ assign      : DONE
 ast         :
 binop       : DONE
 block       : DONE
-callexpr    : 
-callstmt    : 
+callexpr    : DONE                  might change
+callstmt    : DONE (?)              might change
 compcond    : DONE
 cond        : not needed, abstract
 const       : DONE
 constchar   : DONE
 conststr    : DONE
 customtype  : not needed, type
-decl        : DONE (almost)
+decl        : DONE                  might
 expr        : not needed, abstract
 exprlist    : DONE
 fparam      :
@@ -21,7 +21,7 @@ fparamlist  : DONE
 fpartype    : 
 funcdecl    : DONE
 funcdef     : DONE
-header      : DONE (almost)
+header      : DONE                      perhaps compile fparamlist too
 id          : DONE
 idlist      : DONE
 if          : DONE
@@ -29,14 +29,14 @@ localdef    : not needed, abstract
 localdeflist: DONE
 lvalue      : not needed, abstract
 nothing     : DONE
-opcond      : DONE
+opcond      : DONE                      might change
 rettype     : not needed, type
 return      : DONE
 stmt        : not needed, abstract
 stmtlist    : DONE
 unop        : DONE
-while       : DONE
-
+while       : DONE ?
 
 Notes from Kaleidoscope:
 1. Regarding if-then-else clause. We are diregarding in our current approach the nested if-then-else and no implementation of the phi node.
+2. Implement phi node in while->compile()

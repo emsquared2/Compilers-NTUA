@@ -37,24 +37,24 @@ void CompCond::sem()
 
 llvm::Value *CompCond::compile() const
 {
-    llvm::Value *l = left->compile();
-    llvm::Value *r = right->compile();
+    llvm::Value *L = left->compile();
+    llvm::Value *R = right->compile();
 
-    if (!l || !r)
+    if (!L || !R)
         return nullptr;
 
     if (op == "=")
-        return Builder.CreateICmpEQ(l, r, "eqtmp");
+        return Builder.CreateICmpEQ(L, R, "eqtmp");
     else if (op == "#")
-        return Builder.CreateICmpNE(l, r, "netmp");
+        return Builder.CreateICmpNE(L, R, "netmp");
     else if (op == "<")
-        return Builder.CreateICmpSLT(l, r, "lttmp");
+        return Builder.CreateICmpSLT(L, R, "lttmp");
     else if (op == ">")
-        return Builder.CreateICmpSGT(l, r, "gttmp");
+        return Builder.CreateICmpSGT(L, R, "gttmp");
     else if (op == "<=")
-        return Builder.CreateICmpSLE(l, r, "letmp");
+        return Builder.CreateICmpSLE(L, R, "letmp");
     else if (op == ">=")
-        return Builder.CreateICmpSGE(l, r, "getmp");
+        return Builder.CreateICmpSGE(L, R, "getmp");
     else
         return LogErrorV("invalid binary operator");
 }

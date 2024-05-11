@@ -20,12 +20,12 @@ void UnOp::sem()
 
 llvm::Value* UnOp::compile() const
 {
-    llvm::Value* r = right->compile();
+    llvm::Value* R = right->compile();
 
     if(op == "+")
-        return r;
+        return R;
     else if (op == "-")
-        return Builder.CreateNeg(r, "unarytemp");
+        return Builder.CreateNeg(R, "unarytemp");
     else
         return nullptr;
 }

@@ -33,29 +33,29 @@ void OpCond::sem()
 llvm::Value *OpCond::compile() const
 {
 
-    llvm::Value *r = right->compile();
+    llvm::Value *R = right->compile();
 
     if (left != nullptr)
     {
-        llvm::Value *l = left->compile();
+        llvm::Value *L = left->compile();
 
-        if (!l || !r)
+        if (!L || !R)
             return nullptr;
 
         if (op == "and")
-            return Builder.CreateAnd(l, r, "andtemp");
+            return Builder.CreateAnd(L, R, "andtemp");
         else if (op == "or")
-            return Builder.CreateOr(l, r, "ortemp");
+            return Builder.CreateOr(L, R, "ortemp");
         else
             return LogErrorV("invalid binary operator");
     }
     else
     {
-        if (!r)
+        if (!R)
             return nullptr;
 
         if (op == "not")
-            return Builder.CreateNot(r, "nottemp");
+            return Builder.CreateNot(R, "nottemp");
         else
             return LogErrorV("invalid binary operator");
     }

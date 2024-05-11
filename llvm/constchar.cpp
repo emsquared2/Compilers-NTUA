@@ -11,7 +11,7 @@ void ConstChar::sem()
     type = typeChar;
 }
 
-llvm::Value* ConstChar::compiler() const
+llvm::Value* ConstChar::compile() const
 {
     return c8(var);
 }

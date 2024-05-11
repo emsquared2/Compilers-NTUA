@@ -23,22 +23,22 @@ void BinOp::sem()
 
 llvm::Value* BinOp::compile() const
 {
-    llvm::Value *l = left->compile();
-    llvm::Value *r = right->compile();
+    llvm::Value *L = left->compile();
+    llvm::Value *R = right->compile();
 
-    if(!l or !r)
+    if(!L || !R)
         return nullptr;
 
     if (op == "+")
-        return Builder.CreateAdd(l, r, "addtmp");
+        return Builder.CreateAdd(L, R, "addtmp");
     else if (op == "-")
-        return Builder.CreateSub(l, r, "subtmp");
+        return Builder.CreateSub(L, R, "subtmp");
     else if (op == "*")
-        return Builder.CreateMul(l, r, "multmp");
+        return Builder.CreateMul(L, R, "multmp");
     else if (op == "div")
-        return Builder.CreateSDiv(l, r, "divtmp");
+        return Builder.CreateSDiv(L, R, "divtmp");
     else if (op == "mod")
-        return Builder.CreateSRem(l, r, "modtmp");
+        return Builder.CreateSRem(L, R, "modtmp");
     else
         return nullptr;
 }

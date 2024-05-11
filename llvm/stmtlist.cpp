@@ -31,7 +31,7 @@ void StmtList::sem()
 
 llvm::Value* StmtList::compile() const
 {
-    for(Stmt *s : stmt_list)
+    for (Stmt *s : stmt_list)
         s->compile();
 
     return nullptr;

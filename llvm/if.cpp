@@ -28,7 +28,11 @@ void If::sem()
 llvm::Value* If::compile() const
 {
     // Compile condition
-    llvm::Value *v = cond->compile();
+    llvm::Value *CondV = cond->compile();
+
+    // Convert condition to a bool by comparing non-equal to 0.0.
+    CondV = Builder.CreateFCmpONE(
+    CondV, llvm::ConstantFP::get(TheContext, llvm::APFloat(0.0)), "ifcond");
 
     // Grab current function
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
@@ -39,30 +43,51 @@ llvm::Value* If::compile() const
     llvm::BasicBlock *AfterBB = llvm::BasicBlock::Create(TheContext, "endif", TheFunction);
   
     // Branch based on the condition
-    Builder.CreateCondBr(v, ThenBB, ElseBB);
+    Builder.CreateCondBr(CondV, ThenBB, ElseBB);
 
     // Set insertion point for the 'then' block
     Builder.SetInsertPoint(ThenBB);
     
     // Compile statement inside the 'then' block
-    stmt1->compile();
+    llvm::Value *ThenV = stmt1->compile();
+    if (!ThenV)
+        return nullptr;
     
     // Create branch to the 'endif' block
     Builder.CreateBr(AfterBB);
+
+    // Codegen of 'Then' can change the current block, update ThenBB for the PHI.
+    ThenBB = Builder.GetInsertBlock();
+
+    // Emit else block.
+    // TheFunction->getBasicBlockList().push_back(ElseBB);
+    // TheFunction->insert(TheFunction->end(), ElseBB);
 
     // Set insertion point for the 'else' block
     Builder.SetInsertPoint(ElseBB);
 
     // Compile statement inside the 'else' block, if it exists
-    if (stmt2 != nullptr) {
-        stmt2->compile();
-        // Create branch to the 'endif' block if 'else' block exists or conditionally if not
-        Builder.CreateBr(AfterBB);
-    }
+    if (stmt2 != nullptr) 
+        return nullptr;
+    llvm::Value *ElseV = stmt2->compile();
+    if (!ElseV)
+        return nullptr;
 
+    // Create branch to the 'endif' block if 'else' block exists or conditionally if not
+    Builder.CreateBr(AfterBB);
+
+    // Codegen of 'Else' can change the current block, update ElseBB for the PHI.
+    ElseBB = Builder.GetInsertBlock();
+
+    // Emit after block.
+    // TheFunction->getBasicBlockList().push_back(AfterBB);
+    // TheFunction->insert(TheFunction->end(), AfterBB);
     // Set insertion point for the 'endif' block
     Builder.SetInsertPoint(AfterBB);
+    llvm::PHINode *PN = Builder.CreatePHI(llvmType::getDoubleTy(TheContext), 2, "iftmp");
+        
+    PN->addIncoming(ThenV, ThenBB);
+    PN->addIncoming(ElseV, ElseBB);
     
-    // Return null since If statement doesn't produce a value
-    return nullptr;
+    return PN;
 }

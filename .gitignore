@@ -7,6 +7,6 @@ parser.hpp
 *.output
 /syntax-gen/proper
 /syntax-gen/*.beam
-/semantic/deprecated
+**/deprecated/
 
 .DS_Store

@@ -5,6 +5,8 @@
 %{
 #include <cstdio>
 #include <cstdlib>
+#include <cstring>
+
 #include "ast.hpp"
 #include "array.hpp"
 #include "arraydim.hpp"
@@ -100,7 +102,7 @@ Esc \\([ntr0\\\'\"]|x{HEX}{HEX})
 
 \'([^\'\"\\]|{Esc})\' { yylval.c = Const_Char(yytext); return T_const_char; }
 
-\"([^\'\"\\]|{Esc})*\" { yylval.str = strdup(yytext); return T_const_str; }
+\"([^\'\"\\]|{Esc})*\" { yylval.str = Const_String(yytext); return T_const_str; }
 
 [\+\-\*\=\#\<\>] { return yytext[0]; }
 
@@ -144,6 +146,32 @@ char Const_Char(const char* seq) {
                 return '\0'; // This will never be reached
         }
     }
+}
+
+char* Const_String(const char* yytext) {
+    char* buffer = (char*)malloc(strlen(yytext) - 1);
+    int j = 0;
+    for (int i = 1; i < strlen(yytext) - 1; ++i) {
+        if (yytext[i] == '\\' && i + 1 < strlen(yytext) - 1) {
+            switch (yytext[i + 1]) {
+                case 'n': buffer[j++] = '\n'; i++; break;
+                case 't': buffer[j++] = '\t'; i++; break;
+                case 'r': buffer[j++] = '\r'; i++; break;
+                case '\\': buffer[j++] = '\\'; i++; break;
+                case '"': buffer[j++] = '"'; i++; break;
+                case '0': buffer[j++] = '\0'; i++; break;
+                default:
+                    buffer[j++] = '\\';
+                    buffer[j++] = yytext[i + 1];
+                    i++;
+                    break;
+            }
+        } else {
+            buffer[j++] = yytext[i];
+        }
+    }
+    buffer[j] = '\0';
+    return buffer;
 }
 
 void yyerror(const char *msg) {

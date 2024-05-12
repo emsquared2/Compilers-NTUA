@@ -43,15 +43,15 @@ void Id::sem()
 
 llvm::Value *Id::compile_ptr() const
 {
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+
     // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
+    llvm::AllocaInst *A = NamedValues[mangled_name];
     if (!A)
     {
-        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + '_' + ".";
+        std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
     }
-
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
     // // Load the value.
     return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, mangled_name.c_str());
 
@@ -60,15 +60,16 @@ llvm::Value *Id::compile_ptr() const
 
 llvm::Value *Id::compile() const
 {
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+
     // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
+    llvm::AllocaInst *A = NamedValues[mangled_name];
     if (!A)
     {
-        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + ".";
+        std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
     }
 
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
     // // Load the value.
     return Builder.CreateLoad(A->getAllocatedType(), A, mangled_name.c_str());
 

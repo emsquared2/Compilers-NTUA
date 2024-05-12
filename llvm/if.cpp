@@ -27,7 +27,6 @@ void If::sem()
 
 llvm::Value *If::compile() const
 {
-    std::cout << "If compile" << std::endl;
     // Compile condition
     llvm::Value *v = cond->compile();
 

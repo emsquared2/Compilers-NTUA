@@ -37,6 +37,7 @@ stmtlist    : DONE
 unop        : DONE
 while       : DONE
 
-Notes from Kaleidoscope:
-1. Regarding if-then-else clause. We are diregarding in our current approach the nested if-then-else and no implementation of the phi node.
-2. Implement phi node in while->compile()
+Issues #24:
+1. Regarding if-then-else clause. We are diregarding in our current approach the nested if-then-else and no implementation of the phi node. - wrongly attributed as issue
+2. Implement phi node in while->compile() - wrongly attributed as issue
+3. StringRef can be reverted back - fix could be to just use a temp string 

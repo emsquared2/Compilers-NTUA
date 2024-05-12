@@ -26,17 +26,57 @@ void ArrayElem::sem()
 
     left->sem();
 
-    for(Expr *e : expr_list) {
+    for (Expr *e : expr_list)
+    {
         e->type_check(typeInteger);
         e->sem();
     }
 
     Type t = left->getType();
-    if(t->refType == nullptr) {
+    if (t->refType == nullptr)
+    {
         std::string name = left->getName();
         std::string msg = "Variable " + name + " is not of type Array";
         SemanticError(msg.c_str());
     }
-    
+
     type = findArrayType(t);
+}
+
+llvm::Value *ArrayElem::compile_ptr() const
+{
+    std::string name = left->getName();
+
+    // Look this variable up in the function.
+    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
+    if (!A)
+    {
+        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + '_' + ".";
+        return LogErrorV(msg.c_str());
+    }
+
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+    // // Load the value.
+    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, mangled_name.c_str());
+
+    // return A;
+}
+
+llvm::Value *ArrayElem::compile() const
+{
+    std::string name = left->getName();
+
+    // Look this variable up in the function.
+    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
+    if (!A)
+    {
+        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + ".";
+        return LogErrorV(msg.c_str());
+    }
+
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+    // // Load the value.
+    return Builder.CreateLoad(A->getAllocatedType(), A, mangled_name.c_str());
+
+    // return A;
 }

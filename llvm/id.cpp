@@ -15,6 +15,8 @@ void Id::sem()
     // Check if the identifier exists.
     SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
 
+    setScope(e->scopeId);
+
     switch (e->entryType)
     {
     case ENTRY_VARIABLE:
@@ -42,15 +44,16 @@ void Id::sem()
 llvm::Value *Id::compile_ptr() const
 {
     // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name];
+    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
     if (!A)
     {
-        std::string msg = "Id: Unknown variable name: " + name + ".";
+        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + '_' + ".";
         return LogErrorV(msg.c_str());
     }
 
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
     // // Load the value.
-    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, name.c_str());
+    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, mangled_name.c_str());
 
     // return A;
 }
@@ -58,15 +61,16 @@ llvm::Value *Id::compile_ptr() const
 llvm::Value *Id::compile() const
 {
     // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name];
+    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
     if (!A)
     {
-        std::string msg = "Id: Unknown variable name: " + name + ".";
+        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + ".";
         return LogErrorV(msg.c_str());
     }
 
+    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
     // // Load the value.
-    return Builder.CreateLoad(A->getAllocatedType(), A, name.c_str());
+    return Builder.CreateLoad(A->getAllocatedType(), A, mangled_name.c_str());
 
     // return A;
 }

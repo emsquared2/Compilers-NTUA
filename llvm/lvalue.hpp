@@ -7,7 +7,13 @@ class LValue : public Expr
 {
 public:
     virtual const char *getName() const {};
-    virtual llvm::Value * compile_ptr() const {}
+    virtual llvm::Value * compile_ptr() const {};
+
+    void setScope(int sc);
+    int getScope();
+
+protected:
+    int scope = -1;
 };
 
 #endif

@@ -19,7 +19,7 @@ public:
     virtual llvm::Function *compile() const override;
 
     std::vector<llvmType *> getLLVM_param_types();
-    std::vector<llvm::StringRef> getLLVM_param_names();
+    std::vector<std::string> getLLVM_param_names();
 
 private:
     Id *id;

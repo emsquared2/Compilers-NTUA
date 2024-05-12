@@ -56,6 +56,8 @@ const Type typeBoolean = &(typeConst[2]);
 const Type typeChar    = &(typeConst[3]);
 const Type typeReal    = &(typeConst[4]);
 
+static int currentScopeId = 0;
+
 
 /* ---------------------------------------------------------------------
    ----- Implementation of auxiliary functions of the symbol table -----
@@ -178,6 +180,9 @@ void openScope ()
     else
         newScope->nestingLevel = currentScope->nestingLevel + 1;
     
+    newScope->scopeId = currentScopeId;
+    currentScopeId++;
+
     currentScope = newScope;
 }
 
@@ -231,6 +236,7 @@ static SymbolEntry * newEntry (const char * name)
     strcpy((char *) (e->id), name);
     e->hashValue    = PJW_hash(name) % hashTableSize;
     e->nestingLevel = currentScope->nestingLevel;
+    e->scopeId      = currentScope->scopeId;
     insertEntry(e);
     return e;
 }

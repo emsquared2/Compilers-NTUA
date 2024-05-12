@@ -26,7 +26,8 @@ void Decl::sem()
 {
     for (Id *id : idlist->getIds())
     {
-        newVariable(id->getName(), type);
+        SymbolEntry *var = newVariable(id->getName(), type);
+        id->setScope(var->scopeId);
     }
     parser_type->sem();
 }
@@ -41,10 +42,12 @@ llvm::Value *Decl::compile() const
         // Compile not needed as the variables are now declared
         //id->compile();
 
-        llvm::StringRef varName = id->getName();
+        // Use mangled name for llvm variable instead of real name to consider different scopes.
+        std::string varName = std::string(id->getName()) + '_' + std::to_string(id->getScope()) + '_';
+
         // Create an allocation in the entry block
-        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, varName, llvm_type);
-        NamedValues[id->getName()] = allocaInst;
+        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(varName), llvm_type);
+        NamedValues[varName] = allocaInst;
     }
 
     return nullptr;

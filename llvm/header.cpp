@@ -88,24 +88,29 @@ void Header::sem()
 
 std::vector<llvmType *> Header::getLLVM_param_types()
 {
-    return (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *> {}; 
+    return (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
 }
 
-std::vector<llvm::StringRef> Header::getLLVM_param_names()
+// std::vector<llvm::StringRef> Header::getLLVM_param_names()
+std::vector<std::string> Header::getLLVM_param_names()
 {
-    return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<llvm::StringRef> {};
+    // return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<llvm::StringRef>{};
+    return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<std::string>{};
 }
 
 llvm::Function *Header::compile() const
 {
     // fparamlist->compile();
-    llvm::Function *function = TheModule->getFunction(id->getName());
+    std::string id_name = id->getName();
+    // std::string id_name = id->getName() + '_' + std::to_string(id->getScope());
+    llvm::Function *function = TheModule->getFunction(id_name);
     if (!function)
     {
         llvmType *return_type = ret_type->getLLVMType(type);
         std::vector<llvmType *> llvm_param_types = (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
+
         llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
-        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id->getName(), TheModule.get());
+        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id_name, TheModule.get());
     }
 
     return function;

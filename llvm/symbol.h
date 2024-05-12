@@ -108,6 +108,7 @@ typedef struct SymbolEntry_tag SymbolEntry;
 struct SymbolEntry_tag {
    const char   * id;                 /* Identifier name               */
    EntryType      entryType;          /* Record type                   */
+   unsigned int   scopeId;            /* Scope id                      */
    unsigned int   nestingLevel;       /* Nesting depth                 */
    unsigned int   hashValue;          /* Hash value                    */
    SymbolEntry  * nextHash;           /* Next entry in H.T             */
@@ -166,6 +167,7 @@ struct SymbolEntry_tag {
 typedef struct Scope_tag Scope;
 
 struct Scope_tag {
+    unsigned int   scopeId;                  /* Scope id                */
     unsigned int   nestingLevel;             /* Nesting depth           */
     unsigned int   negOffset;                /* Current negative offset */
     Scope        * parent;                   /* Surrounding scope       */

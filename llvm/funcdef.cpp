@@ -50,6 +50,7 @@ void FuncDef::ProgramSem()
 
 llvm::Function *FuncDef::compile() const
 {
+
     llvm::BasicBlock *BB_ofAbovelvelFunc = Builder.GetInsertBlock();
 
     llvm::Function *function = header->compile();
@@ -61,13 +62,13 @@ llvm::Function *FuncDef::compile() const
     Builder.SetInsertPoint(BB);
 
     unsigned int current_arg = 0;
-    std::vector<llvm::StringRef> llvm_param_names = header->getLLVM_param_names();
+    std::vector<std::string> llvm_param_names = header->getLLVM_param_names();
     std::vector<llvmType *> llvm_param_types = header->getLLVM_param_types();
 
     for (auto &Arg : function->args())
     {
         // Create an alloca for this variable.
-        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm_param_names[current_arg], llvm_param_types[current_arg]);
+        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm::StringRef(llvm_param_names[current_arg]), llvm_param_types[current_arg]);
 
         // Store the initial value into the alloca.
         Builder.CreateStore(&Arg, Alloca);

@@ -2,7 +2,7 @@ array       :
 arraydim    : not needed
 arrayelem   :
 assign      : DONE
-ast         :
+ast         : DONE
 binop       : DONE
 block       : DONE
 callexpr    : DONE                  might change
@@ -35,7 +35,7 @@ return      : DONE
 stmt        : not needed, abstract
 stmtlist    : DONE
 unop        : DONE
-while       : DONE ?
+while       : DONE
 
 Notes from Kaleidoscope:
 1. Regarding if-then-else clause. We are diregarding in our current approach the nested if-then-else and no implementation of the phi node.

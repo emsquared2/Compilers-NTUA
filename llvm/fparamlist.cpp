@@ -57,16 +57,18 @@ std::vector<llvmType *> FParamList::getLLVM_params()
     return llvm_params;
 }
 
-std::vector<llvm::StringRef> FParamList::getLLVM_param_names()
+std::vector<std::string> FParamList::getLLVM_param_names()
 {
-    std::vector<llvm::StringRef> llvm_param_names;
+    std::vector<std::string> llvm_param_names;
     for (auto param = params.rbegin(); param != params.rend(); ++param)
     {
         Type t = (*param)->getType();
 
         std::vector<Id *> ids = (*param)->getIdList()->getIds();
-        for (auto id = ids.rbegin(); id != ids.rend(); ++id)
-            llvm_param_names.push_back((*id)->getName());
+        for (auto id = ids.rbegin(); id != ids.rend(); ++id) {
+            std::string mangled_name = std::string((*id)->getName()) + '_' + std::to_string((*id)->getScope()) + '_';
+            llvm_param_names.push_back(mangled_name);
+        }
     }
     return llvm_param_names;
 }

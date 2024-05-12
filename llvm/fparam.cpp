@@ -44,8 +44,10 @@ void FParam::sem()
         SemanticError("Arrays can only be passed by reference.");
     }
 
-    for (Id *id : idlist->getIds())
-        newParameter(id->getName(), type, pass_mode, function);
+    for (Id *id : idlist->getIds()) {
+        SymbolEntry *param = newParameter(id->getName(), type, pass_mode, function);
+        id->setScope(param->scopeId);        
+    }
 
     function = nullptr;
 }

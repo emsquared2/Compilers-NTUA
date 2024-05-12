@@ -255,12 +255,13 @@ llvmType *AST::getLLVMType(Type t)
     else
     {
         llvmType *elementType = getLLVMType(t->refType);
+
         // Array
         if (t->size > 0)
         {
             return llvm::ArrayType::get(elementType, t->size);
         }
         else
-            return elementType;
+            return llvm::PointerType::get(elementType, 0);
     }
 }

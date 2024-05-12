@@ -45,38 +45,50 @@ void ArrayElem::sem()
 
 llvm::Value *ArrayElem::compile_ptr() const
 {
-    std::string name = left->getName();
+    llvm::Value* basePtr = left->compile_ptr(); // Get the base pointer to the array
 
-    // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
-    if (!A)
-    {
-        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + '_' + ".";
-        return LogErrorV(msg.c_str());
+    if (!basePtr)
+        return nullptr;
+
+    // Ensure the pointer is indeed a pointer type
+    llvm::PointerType* ptrType = llvm::dyn_cast<llvm::PointerType>(basePtr->getType());
+    if (!ptrType)
+        return LogErrorV("Base pointer is not a pointer type.");
+
+    std::vector<llvm::Value*> indices;
+    std::vector<Expr*> expr_list = exprlist->getExprList();
+    
+    // LLVM arrays are zero-indexed, push 0 as the first index for the base pointer
+    indices.push_back(c64(0));
+    
+    for (Expr* expr : expr_list) {
+        llvm::Value* index = expr->compile();
+        if (index) {
+            indices.push_back(index);
+        } else {
+            return LogErrorV("Index expression compilation failed.");
+        }
     }
 
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
-    // // Load the value.
-    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, mangled_name.c_str());
-
-    // return A;
+    // Ensure that the basePtr points to an actual array
+    if (ptrType->getElementType()->isArrayTy() || ptrType->getElementType()->isStructTy()) {
+        // Create the GEP instruction to calculate the element pointer
+        llvm::Value* elementPtr = Builder.CreateGEP(ptrType->getElementType(), basePtr, indices);
+        return elementPtr;
+    } else {
+        return LogErrorV("Pointer type does not point to an array or struct.");
+    }
 }
 
 llvm::Value *ArrayElem::compile() const
 {
-    std::string name = left->getName();
+    // Get the pointer to the element
+    llvm::Value* elementPtr = this->compile_ptr();
 
-    // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[name + '_' + std::to_string(scope) + '_'];
-    if (!A)
-    {
-        std::string msg = "Id: Unknown variable name: " + name + '_' + std::to_string(scope) + ".";
-        return LogErrorV(msg.c_str());
-    }
-
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
-    // // Load the value.
-    return Builder.CreateLoad(A->getAllocatedType(), A, mangled_name.c_str());
-
-    // return A;
+    // Load the value from the pointer
+    if (elementPtr)
+        return Builder.CreateLoad(elementPtr->getType()->getPointerElementType(), elementPtr);
+        // return Builder.CreateLoad(left->getLLVMType(type), elementPtr);
+    else
+        return nullptr;
 }

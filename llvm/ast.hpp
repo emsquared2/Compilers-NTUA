@@ -16,6 +16,23 @@
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
 
+#include "llvm/Analysis/BasicAliasAnalysis.h"
+#include "llvm/Analysis/TypeBasedAliasAnalysis.h"
+#include <llvm/Transforms/InstCombine/InstCombine.h>
+#include <llvm/Transforms/Utils.h>
+
+#include "llvm/IR/Module.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/TargetRegistry.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/raw_ostream.h"
+
+#include "llvm/Support/Host.h"
+#include "llvm/Support/system_error.h"
+#include "llvm/IR/LLVMContext.h"
+
 /* ---------------------------------------------------------------------
    --------------------------- Symbol Table ----------------------------
    --------------------------------------------------------------------- */
@@ -117,6 +134,11 @@ public:
     // Functions for library functions
     void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);
     void llvmAddLibrary();
+    
+    void FPM_Optimizations();
+    llvm::Function *MainCodeGen(llvm::Value* main_function);
+    void emitLLVMIR(const std::string& outputTarget);
+    void emitAssembly(const std::string & outputTarget);
 
 protected:
     // Global LLVM variables related to the LLVM suite.
@@ -163,5 +185,9 @@ inline std::ostream &operator<<(std::ostream &out, const AST &t)
     t.printOn(out);
     return out;
 };
+
+// Flags and filename
+extern bool optimize, genFinal, genIntermediate;
+extern std::string filename;
 
 #endif

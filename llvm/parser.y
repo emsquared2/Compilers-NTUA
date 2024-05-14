@@ -44,6 +44,9 @@
     #include "unop.hpp"
     #include "while.hpp"
 
+    #include <getopt.h>
+    extern FILE* yyin;
+
     llvm::LLVMContext AST::TheContext;
     llvm::IRBuilder<> AST::Builder(TheContext);
     std::unique_ptr<llvm::Module> AST::TheModule;
@@ -175,7 +178,7 @@
 // Maybe implement class Program
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
-    | func_def      { std::cout << "AST: " << *$1 << std::endl; 
+    | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
         $$ = $1; 
         $1->ProgramSem();
         $1->llvm_compile_and_dump();
@@ -367,7 +370,42 @@ cond:
 
 %%
 
-int main() {
+int main(int argc, ar **argv) {
+
+    #ifdef YYDEBUG
+        int yydebug = 1;
+    #endif
+
+    int opt;
+    genIntermediate = false;
+    genFinal = false;
+
+    while ((opt = getopt(argc, argv, "ifo")) != -1) {
+        switch (opt) {
+            case 'i':
+                genIntermediate = true;
+                break;
+            case 'f':
+                genFinal = true;
+                break;
+            case 'o':
+                optimize = true;
+                break;
+            default:
+                fprintf(stderr, "Usage: %s [-i] [-f] [-o]\n", argv[0]);
+                exit(EXIT_FAILURE);
+        }
+    }
+
+    if (!genIntermediate && !genFinal) {    
+        FILE* fp = fopen(argv[argc-1], "r");
+        if (fp == NULL) {
+            fprintf(stderr, "Error opening file %s\n", argv[argc-1]);
+            exit(EXIT_FAILURE);
+        }
+        yyin = fp;
+        filename = argv[argc-1];
+    }
 
     // Initialize the symbol table with hash table of size 1024
     initSymbolTable(1024);
@@ -381,12 +419,8 @@ int main() {
     // Open program scope
     openScope();
 
-    #ifdef YYDEBUG
-        int yydebug = 1;
-    #endif
-
     int result = yyparse();
-    if (result == 0) printf("Success.\n");
+    // if (result == 0) printf("Success.\n")
 
     // Close scope for library functions
     closeScope();

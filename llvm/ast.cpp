@@ -173,6 +173,144 @@ void AST::llvmAddLibrary()
 }
 
 /* ---------------------------------------------------------------------
+   ------------------------- FPM Optimizations -------------------------
+   --------------------------------------------------------------------- */
+
+void AST::FPM_Optimizations()
+{
+  TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+  if (optimize)
+  {
+    /* Analysis passes used by the transform passes */
+    TheFPM->add(llvm::createTypeBasedAAWrapperPass());
+    TheFPM->add(llvm::createBasicAAWrapperPass());
+    
+    /* Initial CFGS simplification pass */
+    TheFPM->add(llvm::createCFGSimplificationPass());    
+    /* Scalar Replacement of Aggregates */
+    TheFPM->add(llvm::createSROAPass());
+    /* Promote memory to registers */
+    TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
+    /* Eliminates trivially redundant computations */
+    TheFPM->add(llvm::createEarlyCSEPass());
+    /* Simple "peephole" optimizations */
+    TheFPM->add(llvm::createInstructionCombiningPass());
+    /* Reassociate expressions */
+    TheFPM->add(llvm::createReassociatePass());
+    /* Eliminate common subexpressions */
+    TheFPM->add(llvm::createGVNPass());
+    /* Propagate conditionals */
+    TheFPM->add(llvm::createCorrelatedValuePropagationPass());
+    /* Function-level constant propagation and merging */
+    TheFPM->add(llvm::createSCCPPass());
+    /* Dead code elimination*/
+    TheFPM->add(llvm::createDeadCodeEliminationPass());
+    /* Delete unreachable blocks */
+    TheFPM->add(llvm::createCFGSimplificationPass());
+  }
+}
+
+/* ---------------------------------------------------------------------
+   --------------------------- Main CodeGen ----------------------------
+   --------------------------------------------------------------------- */
+
+llvm::Function * AST::MainCodeGen(llvm::Value* main_function)
+{   
+    // Create and add entry point for main function
+    llvm::FunctionType *funcType = llvm::FunctionType::get(i64, {}, false); // false indicates the function does not take variadic arguments.
+    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
+    
+
+    // Create the basic block for the main function
+    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
+    Builder.SetInsertPoint(BB);
+
+    Builder.CreateCall(llvm::dyn_cast<llvm::Function>(main_function));
+    Builder.CreateRet(c64(0));
+    
+    return main;
+}
+
+/* ---------------------------------------------------------------------
+   ----------------------------- emitLLVMIR ----------------------------
+   --------------------------------------------------------------------- */
+
+/**
+ * Generates the LLVM Intermediate Representation (IR) for the current module
+ * and outputs it to a file specified by the `Filename`.
+ *
+ * @param Filename: The intended output filename (implicitly used as 'Filename').
+ */
+void AST::emitLLVMIR(const std::string& Filename)
+{
+    std::error_code EC;
+    llvm::raw_fd_ostream oss(Filename, EC);
+    TheModule->print(oss, nullptr);
+}
+
+/* ---------------------------------------------------------------------
+   ---------------------------- emitAssembly ---------------------------
+   --------------------------------------------------------------------- */
+
+/**
+ * Generates the assembly code for the current module according to a specified
+ * target architecture and outputs it to an object file.
+ *
+ * @param Filename: The target specification for generating the assembly code.
+ */
+void AST::emitAssembly(const std::string & Filename)
+{
+    std::error_code EC;
+    llvm::raw_fd_ostream dest(Filename, EC, llvm::sys::fs::OF_None);
+
+    // Initialize the target registry etc.
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
+
+    auto TargetTriple = sys::getDefaultTargetTriple();
+    TheModule->setTargetTriple(TargetTriple);
+
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    // Print an error and exit if we couldn't find the requested target.
+    // This generally occurs if we've forgotten to initialise the
+    // TargetRegistry or we have a bogus target triple.
+    if (!Target) {
+        llvm::errs() << Error;
+        exit(1);
+    }
+
+    auto CPU = "generic";
+    auto Features = "";
+
+    TargetOptions opt;
+    auto TheTargetMachine = Target->createTargetMachine(
+        TargetTriple, CPU, Features, opt, Reloc::PIC_);
+
+    TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+    if (EC) {
+       llvm::errs() << "Could not open file: " << EC.message();
+        exit(1);
+    }
+
+    legacy::PassManager pass;
+    auto FileType = CodeGenFileType::ObjectFile;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        llvm::errs() << "TheTargetMachine can't emit a file of this type";
+        exit(1);
+    }
+
+    pass.run(*TheModule);
+    dest.flush();
+}
+
+/* ---------------------------------------------------------------------
    ----------------------- LLVM Compile and Dump -----------------------
    --------------------------------------------------------------------- */
 
@@ -180,41 +318,45 @@ void AST::llvm_compile_and_dump()
 {
     TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
 
+    // add optimization functions
+    FPM_Optimizations();
+
     // Add Library Functions
     llvmAddLibrary();
 
-    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
-
-    // add optimization functions
-
-    TheFPM->doInitialization();
-
-
-    // Create and add entry point for main function
-    llvm::FunctionType *funcType = llvm::FunctionType::get(i64, false); // false indicates the function does not take variadic arguments.
-    llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "_grace_main", TheModule.get());
-
-    llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
-    Builder.SetInsertPoint(BB);
-
     // Emit the program code.
     llvm::Value *main_function = compile();
-
-    Builder.CreateCall(llvm::dyn_cast<llvm::Function>(main_function));
-
-    Builder.CreateRet(c64(0));
-
-    // Print out the IR.
-    TheModule->print(llvm::outs(), nullptr);
-    std::cout << std::endl;
+    llvm::Function *main = MainCodeGen(main_function);
+    
     // Verify the IR.
     bool bad = verifyModule(*TheModule, &llvm::errs());
     if (bad)
     {
         std::cerr << "The IR is bad!" << std::endl;
+        TheModule->print(llvm::errs(), nullptr);
         std::exit(1);
     }
-    TheFPM->run(*main);
+
+    // // Print out the IR.
+    // TheModule->print(llvm::outs(), nullptr);
+    // std::cout << std::endl;
+
+    /* Dump IR and final code to correct files/stdout */
+    if (genIntermediate)
+        /* Dump intermidiate code to stdout */
+        emitLLVMIR("-");
+    else if (genFinal)
+        /* Dump final code to stdout */
+        emitAssembly("-");
+    else
+    {
+        std::string imm_filename = filename.substr(0, filename.find_last_of('.')) + ".imm";
+        emitLLVMIR(imm_filename);
+        std::string asm_filename = filename.substr(0, filename.find_last_of('.')) + ".asm";
+        emitAssembly(asm_filename);
+    }
+    if (optimize)
+        TheFPM->run(*main);
 }
 
 /* ---------------------------------------------------------------------
@@ -265,3 +407,7 @@ llvmType *getLLVMType(Type t, llvm::LLVMContext& context)
             return llvm::PointerType::get(elementType, 0);
     }
 }
+
+// Flags and filename
+bool optimize, genFinal, genIntermediate;
+std::string filename;

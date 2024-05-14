@@ -80,7 +80,7 @@ llvm::Value *ArrayElem::compile_ptr() const
     }
 }
 
-llvm::Value *ArrayElem::compile() const
+llvm::Value *ArrayElem::compile()
 {
     // Get the pointer to the element
     llvm::Value* elementPtr = this->compile_ptr();

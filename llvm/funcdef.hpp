@@ -15,7 +15,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
     void ProgramSem();
-    virtual llvm::Function *compile() const override;
+    virtual llvm::Function *compile() override;
 
 private:
     Header *header;

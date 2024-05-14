@@ -73,7 +73,15 @@ std::vector<std::string> FParamList::getLLVM_param_names()
     return llvm_param_names;
 }
 
-llvm::Value *FParamList::compile() const
+std::vector<FParam *> FParamList::getParams()
+{
+    std::vector<FParam *> prms;
+    for (auto param = params.rbegin(); param != params.rend(); ++param)
+        prms.push_back(*param);
+    return prms;
+}
+
+llvm::Value *FParamList::compile()
 {
     for (auto param = params.rbegin(); param != params.rend(); ++param)
     {

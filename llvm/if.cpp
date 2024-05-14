@@ -25,7 +25,7 @@ void If::sem()
         stmt2->sem();
 }
 
-llvm::Value *If::compile() const
+llvm::Value *If::compile()
 {
     // Compile condition
     llvm::Value *v = cond->compile();

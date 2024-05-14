@@ -18,7 +18,7 @@ void FuncDecl::sem()
     closeScope();
 }
 
-llvm::Value* FuncDecl::compile() const
+llvm::Value* FuncDecl::compile()
 {
     header->compile();
     return nullptr;

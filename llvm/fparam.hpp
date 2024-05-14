@@ -13,7 +13,7 @@ public:
     virtual void sem() override;
     void setSymbolEntry(SymbolEntry *f);
     Type getType();
-    llvm::Value *compile() const override;
+    llvm::Value *compile() override;
 
     IdList * getIdList();
 

@@ -35,7 +35,7 @@ void CompCond::sem()
     type = typeBoolean;
 }
 
-llvm::Value *CompCond::compile() const
+llvm::Value *CompCond::compile()
 {
     llvm::Value *L = left->compile();
     llvm::Value *R = right->compile();

@@ -29,7 +29,7 @@ void Block::sem()
     }
 }
 
-llvm::Value* Block::compile() const
+llvm::Value* Block::compile()
 {
     for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
     {

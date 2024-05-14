@@ -11,7 +11,7 @@ public:
     ~Assign();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
-    virtual llvm::Value* compile() const override;
+    virtual llvm::Value* compile() override;
 
 private:
     LValue *l_value;

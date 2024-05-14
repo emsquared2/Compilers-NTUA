@@ -29,7 +29,7 @@ void StmtList::sem()
         s->sem();
 }
 
-llvm::Value* StmtList::compile() const
+llvm::Value* StmtList::compile()
 {
     for (Stmt *s : stmt_list)
         s->compile();

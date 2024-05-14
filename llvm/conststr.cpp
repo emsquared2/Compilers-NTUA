@@ -15,7 +15,7 @@ void ConstStr::sem()
     // type = typeArray(len, typeChar);
     type = typeIArray(typeChar);
 }
-llvm::Value* ConstStr::compile() const
+llvm::Value* ConstStr::compile()
 {
     return Builder.CreateGlobalStringPtr(llvm::StringRef(str));
 }

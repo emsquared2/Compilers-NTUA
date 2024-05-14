@@ -13,7 +13,7 @@ public:
     void append(Id *id);
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
-    virtual llvm::Value *compile() const override;
+    virtual llvm::Value *compile() override;
 
 private:
     std::vector<Id *> idlist;

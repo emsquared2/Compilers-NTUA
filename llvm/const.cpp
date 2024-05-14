@@ -15,7 +15,7 @@ void Const::sem()
     type = typeInteger;
 }
 
-llvm::Value* Const::compile() const
+llvm::Value* Const::compile()
 {
     return c64(val);
 }

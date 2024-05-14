@@ -110,7 +110,7 @@ public:
     void SemanticError(const char *msg);
 
     llvm::Value *LogErrorV(const char *Str) const;
-    virtual llvm::Value *compile() const {};
+    virtual llvm::Value *compile() {};
 
     void llvm_compile_and_dump();
 

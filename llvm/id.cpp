@@ -58,7 +58,7 @@ llvm::Value *Id::compile_ptr() const
     // return A;
 }
 
-llvm::Value *Id::compile() const
+llvm::Value *Id::compile()
 {
     std::string mangled_name = name + '_' + std::to_string(scope) + '_';
 

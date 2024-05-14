@@ -13,10 +13,11 @@ public:
     virtual void sem() override;
     void append(FParam *param);
     void setSymbolEntry(SymbolEntry *f);
-    virtual llvm::Value *compile() const override;
+    virtual llvm::Value *compile() override;
 
     std::vector<llvmType*> getLLVM_params();
     std::vector<std::string> getLLVM_param_names();
+    std::vector<FParam *> getParams();
 
 private:
     std::vector<FParam *> params;

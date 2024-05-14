@@ -19,7 +19,7 @@ void While::sem()
     stmt->sem();
 }
 
-llvm::Value *While::compile() const
+llvm::Value *While::compile()
 {
     // Grab the current function
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();

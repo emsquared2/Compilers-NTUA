@@ -76,7 +76,7 @@ void CallStmt::sem()
         SemanticError("CallStmt: Function should have void return type");
 }
 
-llvm::Value *CallStmt::compile() const
+llvm::Value *CallStmt::compile()
 {
 
     llvm::StringRef Callee = id->getName();

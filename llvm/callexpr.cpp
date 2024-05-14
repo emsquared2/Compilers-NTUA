@@ -68,7 +68,7 @@ void CallExpr::sem()
     type = function->u.eFunction.resultType;
 }
 
-llvm::Value *CallExpr::compile() const
+llvm::Value *CallExpr::compile()
 {
 
     llvm::StringRef Callee = id->getName();

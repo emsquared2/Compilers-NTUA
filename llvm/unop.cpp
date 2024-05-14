@@ -18,7 +18,7 @@ void UnOp::sem()
     type = typeInteger;
 }
 
-llvm::Value* UnOp::compile() const
+llvm::Value* UnOp::compile()
 {
     llvm::Value* R = right->compile();
 

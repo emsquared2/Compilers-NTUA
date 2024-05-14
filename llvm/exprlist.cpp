@@ -37,7 +37,7 @@ void ExprList::sem()
         e->sem();
 }
 
-llvm::Value *ExprList::compile() const
+llvm::Value *ExprList::compile()
 {
     for (Expr *e : expr_list)
         e->compile();

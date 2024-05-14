@@ -16,7 +16,7 @@ public:
     FParamList *getFParamList();
     Type getReturnType();
     Id *getId();
-    virtual llvm::Function *compile() const override;
+    virtual llvm::Function *compile() override;
 
     std::vector<llvmType *> getLLVM_param_types();
     std::vector<std::string> getLLVM_param_names();

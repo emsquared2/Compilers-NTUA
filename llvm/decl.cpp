@@ -32,7 +32,7 @@ void Decl::sem()
     parser_type->sem();
 }
 
-llvm::Value *Decl::compile() const
+llvm::Value *Decl::compile()
 {
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
     llvmType *llvm_type = getLLVMType(type, TheContext);

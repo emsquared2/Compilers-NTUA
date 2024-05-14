@@ -36,7 +36,7 @@ void Assign::sem()
         SemanticError("Assign: Expr's type should be typeInteger or typeChar");
 }
 
-llvm::Value * Assign::compile() const
+llvm::Value * Assign::compile()
 {
     llvm::Value *LValPtr = l_value->compile_ptr();
     if (!LValPtr)

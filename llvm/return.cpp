@@ -51,7 +51,7 @@ void Return::sem()
     returnedFunction.back() = true;
 }
 
-llvm::Value * Return::compile() const
+llvm::Value * Return::compile()
 {
     if (expr != nullptr)
         Builder.CreateRet(expr->compile());

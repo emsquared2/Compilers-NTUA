@@ -30,7 +30,7 @@ void OpCond::sem()
     type = typeBoolean;
 }
 
-llvm::Value *OpCond::compile() const
+llvm::Value *OpCond::compile()
 {
 
     llvm::Value *R = right->compile();

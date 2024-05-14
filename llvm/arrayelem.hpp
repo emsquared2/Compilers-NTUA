@@ -12,7 +12,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual std::string getArrayElem();
     virtual void sem() override;
-    virtual llvm::Value *compile() const override;
+    virtual llvm::Value *compile() override;
     virtual llvm::Value *compile_ptr() const override;
 
 private:

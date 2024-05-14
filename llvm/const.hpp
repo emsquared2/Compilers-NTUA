@@ -11,7 +11,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     int getVal();
     virtual void sem() override;
-    virtual llvm::Value* compile() const override;
+    virtual llvm::Value* compile() override;
 
 private:
     const int val;

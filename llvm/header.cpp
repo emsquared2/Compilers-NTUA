@@ -98,7 +98,7 @@ std::vector<std::string> Header::getLLVM_param_names()
     return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<std::string>{};
 }
 
-llvm::Function *Header::compile() const
+llvm::Function *Header::compile()
 {
     // fparamlist->compile();
     std::string id_name = id->getName();

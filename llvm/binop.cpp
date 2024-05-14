@@ -21,7 +21,7 @@ void BinOp::sem()
 }
 
 
-llvm::Value* BinOp::compile() const
+llvm::Value* BinOp::compile()
 {
     llvm::Value *L = left->compile();
     llvm::Value *R = right->compile();

@@ -48,7 +48,7 @@ void FuncDef::ProgramSem()
     sem();
 }
 
-llvm::Function *FuncDef::compile() const
+llvm::Function *FuncDef::compile()
 {
 
     llvm::BasicBlock *BB_ofAbovelvelFunc = Builder.GetInsertBlock();

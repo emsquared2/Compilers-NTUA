@@ -39,7 +39,7 @@ std::vector<LocalDef*> LocalDefList::getLocals()
     return locals;
 }
 
-llvm::Value* LocalDefList::compile() const
+llvm::Value* LocalDefList::compile()
 {
     for (auto l = locals.rbegin(); l != locals.rend(); ++l)
     {

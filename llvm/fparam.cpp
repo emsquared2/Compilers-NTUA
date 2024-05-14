@@ -57,7 +57,7 @@ Type FParam::getType()
     return type;
 }
 
-llvm::Value *FParam::compile() const
+llvm::Value *FParam::compile()
 {
     llvmType *t;
 }

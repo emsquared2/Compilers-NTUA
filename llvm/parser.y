@@ -370,7 +370,7 @@ cond:
 
 %%
 
-int main(int argc, ar **argv) {
+int main(int argc, char **argv) {
 
     #ifdef YYDEBUG
         int yydebug = 1;

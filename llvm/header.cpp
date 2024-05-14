@@ -106,7 +106,7 @@ llvm::Function *Header::compile() const
     llvm::Function *function = TheModule->getFunction(id_name);
     if (!function)
     {
-        llvmType *return_type = ret_type->getLLVMType(type);
+        llvmType *return_type = getLLVMType(type, TheContext);
         std::vector<llvmType *> llvm_param_types = (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
 
         llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);

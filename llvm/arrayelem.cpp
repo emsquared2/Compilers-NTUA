@@ -88,7 +88,7 @@ llvm::Value *ArrayElem::compile() const
     // Load the value from the pointer
     if (elementPtr)
         return Builder.CreateLoad(elementPtr->getType()->getPointerElementType(), elementPtr);
-        // return Builder.CreateLoad(left->getLLVMType(type), elementPtr);
+        // return Builder.CreateLoad(getLLVMType(type, TheContext), elementPtr);
     else
         return nullptr;
 }

@@ -110,7 +110,6 @@ public:
     void SemanticError(const char *msg);
 
     llvm::Value *LogErrorV(const char *Str) const;
-    llvmType *getLLVMType(Type t);
     virtual llvm::Value *compile() const {};
 
     void llvm_compile_and_dump();
@@ -154,6 +153,8 @@ protected:
 
     int lineno;
 };
+
+llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 
 inline std::vector<bool> returnedFunction;
 

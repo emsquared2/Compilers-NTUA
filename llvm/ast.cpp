@@ -244,17 +244,17 @@ llvm::AllocaInst *AST::CreateEntryBlockAlloca(llvm::Function *TheFunction,
    ---------------------------- getLLVMType ----------------------------
    --------------------------------------------------------------------- */
 
-llvmType *AST::getLLVMType(Type t)
+llvmType *getLLVMType(Type t, llvm::LLVMContext& context)
 {
     if (equalType(t, typeVoid))
-        return llvmType::getVoidTy(TheContext);
+        return llvmType::getVoidTy(context);
     else if (equalType(t, typeInteger))
-        return llvmType::getInt64Ty(TheContext);
+        return llvmType::getInt64Ty(context);
     else if (equalType(t, typeChar))
-        return llvmType::getInt8Ty(TheContext);
+        return llvmType::getInt8Ty(context);
     else
     {
-        llvmType *elementType = getLLVMType(t->refType);
+        llvmType *elementType = getLLVMType(t->refType, context);
 
         // Array
         if (t->size > 0)

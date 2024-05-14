@@ -48,7 +48,7 @@ std::vector<llvmType *> FParamList::getLLVM_params()
     for (auto param = params.rbegin(); param != params.rend(); ++param)
     {
         Type t = (*param)->getType();
-        llvmType *param_type = (*param)->getLLVMType(t);
+        llvmType *param_type = getLLVMType(t, TheContext);
 
         std::vector<Id *> ids = (*param)->getIdList()->getIds();
         for (auto id = ids.rbegin(); id != ids.rend(); ++id)

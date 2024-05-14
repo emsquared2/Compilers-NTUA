@@ -35,7 +35,7 @@ void Decl::sem()
 llvm::Value *Decl::compile() const
 {
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
-    llvmType *llvm_type = parser_type->getLLVMType(type);
+    llvmType *llvm_type = getLLVMType(type, TheContext);
 
     for (Id *id : idlist->getIds())
     {

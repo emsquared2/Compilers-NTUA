@@ -29,6 +29,8 @@
 #include "llvm/MC/TargetRegistry.h"
 #include "llvm/TargetParser/Host.h"
 
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/ErrorHandling.h"
 
 /* ---------------------------------------------------------------------
    --------------------------- Symbol Table ----------------------------
@@ -117,22 +119,26 @@ typedef llvm::Type llvmType;
 class AST
 {
 public:
+    // Base methods
     AST();
     virtual ~AST() = default;
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem() {};
     void SemanticError(const char *msg);
-
     llvm::Value *LogErrorV(const char *Str) const;
     virtual llvm::Value *compile() {};
-
-    void llvm_compile_and_dump();
 
     // Functions for library functions
     void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);
     void llvmAddLibrary();
     
+    // Function for initialization
+    void llvm_compile_and_dump();
+
+    // Function for optimizations
     void FPM_Optimizations();
+
+    // Functions for Code Generation
     llvm::Function *MainCodeGen(llvm::Value* main_function);
     void emitLLVMIR(const std::string& outputTarget);
     void emitAssembly(const std::string & outputTarget);
@@ -172,6 +178,11 @@ protected:
 
     int lineno;
 };
+
+
+/* ---------------------------------------------------------------------
+   ------------------------------- UTILS -------------------------------
+   --------------------------------------------------------------------- */
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 

@@ -12,7 +12,7 @@ void AST::SemanticError(const char *msg)
 }
 
 /* ---------------------------------------------------------------------
-   ----------------------- Add Library Functions -----------------------
+   ------------------- Add Library Functions - SEM  --------------------
    --------------------------------------------------------------------- */
 
 void addLibraryFunction(const char *func_name, const std::vector<Parameter *> &params, Type return_type)
@@ -178,34 +178,33 @@ void AST::llvmAddLibrary()
 
 void AST::FPM_Optimizations()
 {
+  // Initialize the function pass manager with the current LLVM module.
   TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+
   if (optimize)
   {
-    /* Analysis passes used by the transform passes */
+    // Add type-based alias analysis pass which provides information about pointer aliasing.
     TheFPM->add(llvm::createTypeBasedAAWrapperPass());
+    // Add basic alias analysis pass providing less precise but fast aliasing information.
     TheFPM->add(llvm::createBasicAAWrapperPass());
     
-    /* Initial CFGS simplification pass */
-    TheFPM->add(llvm::createCFGSimplificationPass());    
-    /* Scalar Replacement of Aggregates */
+    // Simplify the control flow graph (e.g., remove unreachable blocks).
+    TheFPM->add(llvm::createCFGSimplificationPass());
+    // Perform Scalar Replacement of Aggregates (breaks aggregates into individual scalars).
     TheFPM->add(llvm::createSROAPass());
-    /* Promote memory to registers */
+    // Promote 'alloca' memory to register memory where possible.
     TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
-    /* Eliminates trivially redundant computations */
+    // Perform early Common Subexpression Elimination, removing redundant expressions.
     TheFPM->add(llvm::createEarlyCSEPass());
-    /* Simple "peephole" optimizations */
+    // Perform simple peephole optimizations and bit-twiddling optzns.
     TheFPM->add(llvm::createInstructionCombiningPass());
-    /* Reassociate expressions */
+    // Reassociate expressions to allow for better constant propagation.
     TheFPM->add(llvm::createReassociatePass());
-    /* Eliminate common subexpressions */
+    // Eliminate common subexpressions, enhancing the efficiency of generated code.
     TheFPM->add(llvm::createGVNPass());
-    // /* Propagate conditionals */
-    // TheFPM->add(llvm::createCorrelatedValuePropagationPass());
-    // /* Function-level constant propagation and merging */
-    // TheFPM->add(llvm::createSCCPPass());
-    /* Dead code elimination*/      
+    // Dead Code Elimination: Remove unused code that does not affect program output.
     TheFPM->add(llvm::createDeadCodeEliminationPass());
-    /* Delete unreachable blocks */
+    // Further simplify CFG, removing dead blocks and merging blocks.
     TheFPM->add(llvm::createCFGSimplificationPass());
   }
 }
@@ -299,7 +298,8 @@ void AST::emitAssembly(const std::string & Filename)
     }
 
     llvm::legacy::PassManager pass;
-    auto FileType = llvm::CodeGenFileType::ObjectFile;
+    // auto FileType = llvm::CodeGenFileType::ObjectFile;
+    auto FileType = llvm::CodeGenFileType::AssemblyFile;
 
     if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
         llvm::errs() << "TheTargetMachine can't emit a file of this type";
@@ -318,7 +318,7 @@ void AST::llvm_compile_and_dump()
 {
     TheModule = std::make_unique<llvm::Module>("grace program", TheContext);
 
-    // add optimization functions
+    // Add optimization functions
     FPM_Optimizations();
 
     // Add Library Functions
@@ -350,13 +350,15 @@ void AST::llvm_compile_and_dump()
         emitAssembly("-");
     else
     {
+        /* Dump intermidiate code to *.imm file */
         std::string imm_filename = filename.substr(0, filename.find_last_of('.')) + ".imm";
         emitLLVMIR(imm_filename);
+        /* Dump final code to *.asm file */
         std::string asm_filename = filename.substr(0, filename.find_last_of('.')) + ".asm";
         emitAssembly(asm_filename);
     }
-    if (optimize)
-        TheFPM->run(*main);
+    // if (optimize)
+    //     TheFPM->run(*main);
 }
 
 /* ---------------------------------------------------------------------

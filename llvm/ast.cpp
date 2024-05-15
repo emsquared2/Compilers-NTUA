@@ -178,35 +178,36 @@ void AST::llvmAddLibrary()
 
 void AST::FPM_Optimizations()
 {
-  // Initialize the function pass manager with the current LLVM module.
-  TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
+    // Initialize the function pass manager with the current LLVM module.
+    TheFPM = std::make_unique<llvm::legacy::FunctionPassManager>(TheModule.get());
 
-  if (optimize)
-  {
-    // Add type-based alias analysis pass which provides information about pointer aliasing.
-    TheFPM->add(llvm::createTypeBasedAAWrapperPass());
-    // Add basic alias analysis pass providing less precise but fast aliasing information.
-    TheFPM->add(llvm::createBasicAAWrapperPass());
-    
-    // Simplify the control flow graph (e.g., remove unreachable blocks).
-    TheFPM->add(llvm::createCFGSimplificationPass());
-    // Perform Scalar Replacement of Aggregates (breaks aggregates into individual scalars).
-    TheFPM->add(llvm::createSROAPass());
-    // Promote 'alloca' memory to register memory where possible.
-    TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
-    // Perform early Common Subexpression Elimination, removing redundant expressions.
-    TheFPM->add(llvm::createEarlyCSEPass());
-    // Perform simple peephole optimizations and bit-twiddling optzns.
-    TheFPM->add(llvm::createInstructionCombiningPass());
-    // Reassociate expressions to allow for better constant propagation.
-    TheFPM->add(llvm::createReassociatePass());
-    // Eliminate common subexpressions, enhancing the efficiency of generated code.
-    TheFPM->add(llvm::createGVNPass());
-    // Dead Code Elimination: Remove unused code that does not affect program output.
-    TheFPM->add(llvm::createDeadCodeEliminationPass());
-    // Further simplify CFG, removing dead blocks and merging blocks.
-    TheFPM->add(llvm::createCFGSimplificationPass());
-  }
+    if (optimize)
+    {
+        // Add type-based alias analysis pass which provides information about pointer aliasing.
+        TheFPM->add(llvm::createTypeBasedAAWrapperPass());
+        // Add basic alias analysis pass providing less precise but fast aliasing information.
+        TheFPM->add(llvm::createBasicAAWrapperPass());
+        
+        // Simplify the control flow graph (e.g., remove unreachable blocks).
+        TheFPM->add(llvm::createCFGSimplificationPass());
+        // Perform Scalar Replacement of Aggregates (breaks aggregates into individual scalars).
+        TheFPM->add(llvm::createSROAPass());
+        // Promote 'alloca' memory to register memory where possible.
+        TheFPM->add(llvm::createPromoteMemoryToRegisterPass());
+        // Perform early Common Subexpression Elimination, removing redundant expressions.
+        TheFPM->add(llvm::createEarlyCSEPass());
+        // Perform simple peephole optimizations and bit-twiddling optzns.
+        TheFPM->add(llvm::createInstructionCombiningPass());
+        // Reassociate expressions to allow for better constant propagation.
+        TheFPM->add(llvm::createReassociatePass());
+        // Eliminate common subexpressions, enhancing the efficiency of generated code.
+        TheFPM->add(llvm::createGVNPass());
+        // Dead Code Elimination: Remove unused code that does not affect program output.
+        TheFPM->add(llvm::createDeadCodeEliminationPass());
+        // Further simplify CFG, removing dead blocks and merging blocks.
+        TheFPM->add(llvm::createCFGSimplificationPass());
+    }
+    TheFPM->doInitialization();
 }
 
 /* ---------------------------------------------------------------------
@@ -357,8 +358,8 @@ void AST::llvm_compile_and_dump()
         std::string asm_filename = filename.substr(0, filename.find_last_of('.')) + ".asm";
         emitAssembly(asm_filename);
     }
-    // if (optimize)
-    //     TheFPM->run(*main);
+    if (optimize)
+        TheFPM->run(*main);
 }
 
 /* ---------------------------------------------------------------------

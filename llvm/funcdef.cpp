@@ -96,10 +96,20 @@ llvm::Function *FuncDef::compile()
             Builder.CreateRetVoid();
     }
 
+    if (optimize)
+    {
+        optimizeFunc(function);
+    }
+
     // Validate the generated code, checking for consistency.
     llvm::verifyFunction(*function);
 
     Builder.SetInsertPoint(BB_ofAbovelvelFunc);
 
     return function;
+}
+
+void FuncDef::optimizeFunc(llvm::Function *function)
+{
+    TheFPM->run(*function);
 }

@@ -44,9 +44,10 @@
     #include "unop.hpp"
     #include "while.hpp"
 
-    #include <getopt.h>
-    extern FILE* yyin;
+    #include <getopt.h>     // For command line options parsing
+    extern FILE* yyin;      // File stream for lexer input
 
+    // Define LLVM-specific structures for code generation
     llvm::LLVMContext AST::TheContext;
     llvm::IRBuilder<> AST::Builder(TheContext);
     std::unique_ptr<llvm::Module> AST::TheModule;
@@ -58,14 +59,14 @@
     llvmType *AST::i64 = llvm::IntegerType::get(TheContext, 64);
     llvmType *AST::voidTy = llvmType::getVoidTy(TheContext);
 
-    #define YYDEBUG 1
+    #define YYDEBUG 1       // Enable Bison's debug mode
 
 %}
 
 %expect 1
-%define parse.error /*detailed*/ verbose
-%verbose
-%define parse.trace
+%define parse.error verbose     // Define verbose error reporting
+%verbose                        // Enable verbose parsing output
+%define parse.trace             // Enable parsing trace
 
 %union {
 
@@ -175,7 +176,6 @@
 
 %%
 
-// Maybe implement class Program
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
     | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
@@ -221,7 +221,7 @@ fpar_type:
         }
     }
     | data_type '[' ']' bracket_extended    { $4->setUnknownFirstDim();  $$ = new FParType(new Array($1, $4)); }
-; // array 
+;
 
 bracket_extended: 
     /* nothing */                                  { $$ = new ArrayDim();      }
@@ -290,7 +290,6 @@ stmt:
     | "return" expr ';'                     { $$ = new Return($2); }    
 ;
 
-// Maybe refactor implementation
 l_value: 
     l_value_helper array_elem_l_value     
     { 
@@ -324,7 +323,7 @@ expr:
     | T_const_char      { $$ = new ConstChar($1); }
     | l_value           { $$ = $1; }
     | '(' expr ')'      { $$ = $2; }
-    | func_call_expr    { $$ = $1; } // Check if run function needed.  
+    | func_call_expr    { $$ = $1; }
     | '+' expr          { $$ = new UnOp("+", $2); }
     | '-' expr          { $$ = new UnOp("-", $2); }
     | expr '+' expr     { $$ = new BinOp($1, "+", $3);}
@@ -337,8 +336,6 @@ expr:
 const: 
     T_const           { $$ = new Const($1); }
 ;
-// changed impl just to have correct type (custom Const class instead of int)
-// Might need further examination ## 
 
 func_call_stmt: 
     id '(' ')'                    { $$ = new CallStmt($1, nullptr); }
@@ -370,16 +367,20 @@ cond:
 
 %%
 
-int main(int argc, char **argv) {
-
+int main(int argc, char **argv) 
+{
+    // Enable debug if YYDEBUG is defined
     #ifdef YYDEBUG
         int yydebug = 1;
     #endif
 
+    // Variables to track command line options
     int opt;
     genIntermediate = false;
     genFinal = false;
+    optimize = false;
 
+    // Process command line options
     while ((opt = getopt(argc, argv, "ifo")) != -1) {
         switch (opt) {
             case 'i':
@@ -392,20 +393,29 @@ int main(int argc, char **argv) {
                 optimize = true;
                 break;
             default:
-                fprintf(stderr, "Usage: %s [-i] [-f] [-o]\n", argv[0]);
+                fprintf(stderr, "Usage: %s [-i] [-f] [-o] <input_file>\n", argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
 
-    if (!genIntermediate && !genFinal) {    
-        FILE* fp = fopen(argv[argc-1], "r");
+    // Determine the input source based on command line arguments
+    FILE* fp;
+    if (optind < argc) {
+        // A file is specified on the command line
+        fp = fopen(argv[optind], "r");
         if (fp == NULL) {
-            fprintf(stderr, "Error opening file %s\n", argv[argc-1]);
+            fprintf(stderr, "Error opening file %s\n", argv[optind]);
             exit(EXIT_FAILURE);
         }
-        yyin = fp;
-        filename = argv[argc-1];
+    } else {
+        // If no file is specified, also print usage information and exit
+        fprintf(stderr, "Usage: %s [-i] [-f] [-o] <input_file>\n", argv[0]);
+        exit(EXIT_FAILURE);
     }
+
+    yyin = fp;
+    filename = argv[optind];  // This will always be valid as we exit if no file is specified
+
 
     // Initialize the symbol table with hash table of size 1024
     initSymbolTable(1024);
@@ -413,16 +423,17 @@ int main(int argc, char **argv) {
     // Open scope for library functions
     openScope();
 
-    // Add library
+    // Add library functions
     addLibrary();
 
     // Open program scope
     openScope();
 
+    // Parse the input
     int result = yyparse();
     // if (result == 0) printf("Success.\n")
 
-    // Close scope for library functions
+    // Close library functions' scope
     closeScope();
 
     // Close program scope
@@ -431,5 +442,6 @@ int main(int argc, char **argv) {
     // Destroy the symbol table.
     destroySymbolTable();
     
+    // Return parsing result
     return result;
 }

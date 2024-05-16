@@ -431,7 +431,7 @@ int main(int argc, char **argv)
 
     // Parse the input
     int result = yyparse();
-    // if (result == 0) printf("Success.\n")
+    // if (result == 0) printf("Success.\n");
 
     // Close library functions' scope
     closeScope();

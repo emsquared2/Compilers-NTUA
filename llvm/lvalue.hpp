@@ -11,9 +11,12 @@ public:
 
     void setScope(int sc);
     int getScope();
+    void setRef(bool r);
+    bool getRef();
 
 protected:
     int scope = -1;
+    bool ref;
 };
 
 #endif

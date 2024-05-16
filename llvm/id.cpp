@@ -9,6 +9,10 @@ const char *Id::getName() const
 {
     return name.c_str();
 }
+std::string Id::getMangledName() const
+{
+    return name + '_' + std::to_string(scope) + '_';
+}
 
 void Id::sem()
 {
@@ -43,7 +47,7 @@ void Id::sem()
 
 llvm::Value *Id::compile_ptr() const
 {
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+    std::string mangled_name = getMangledName();
 
     // Look this variable up in the function.
     llvm::AllocaInst *A = NamedValues[mangled_name];
@@ -60,7 +64,7 @@ llvm::Value *Id::compile_ptr() const
 
 llvm::Value *Id::compile()
 {
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+    std::string mangled_name = getMangledName();
 
     // Look this variable up in the function.
     llvm::AllocaInst *A = NamedValues[mangled_name];

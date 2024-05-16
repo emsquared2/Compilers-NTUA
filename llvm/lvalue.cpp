@@ -9,3 +9,13 @@ int LValue::getScope()
 {
     return scope;
 }
+
+void LValue::setRef(bool r)
+{
+    ref = r;
+}
+
+bool LValue::getRef()
+{
+    return ref;
+}

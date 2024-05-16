@@ -13,7 +13,8 @@ public:
     std::string getMangledName() const;
     virtual void sem() override;
     virtual llvm::Value *compile() override;
-    virtual llvm::Value *compile_ptr() const override;
+    virtual llvm::Value *compile_ptr() override;
+    virtual llvm::Value *compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) override;
 
 private:
     std::string name;

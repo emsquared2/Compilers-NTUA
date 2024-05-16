@@ -13,7 +13,7 @@ public:
     virtual std::string getArrayElem();
     virtual void sem() override;
     virtual llvm::Value *compile() override;
-    virtual llvm::Value *compile_ptr() const override;
+    virtual llvm::Value *compile_ptr() override;
 
 private:
     LValue *left;

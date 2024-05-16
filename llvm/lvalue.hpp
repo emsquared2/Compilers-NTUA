@@ -7,7 +7,8 @@ class LValue : public Expr
 {
 public:
     virtual const char *getName() const {};
-    virtual llvm::Value * compile_ptr() const {};
+    virtual llvm::Value * compile_ptr() {};
+    virtual llvm::Value * compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) {};
 
     void setScope(int sc);
     int getScope();

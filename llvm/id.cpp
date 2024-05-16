@@ -34,6 +34,8 @@ void Id::sem()
         break;
     case ENTRY_PARAMETER:
         type = e->u.eParameter.type;
+        // if (e->u.eParameter.mode == PASS_BY_REFERENCE)
+        //     ref = true;
         break;
     // Can it be Temporary?
     case ENTRY_TEMPORARY:
@@ -45,37 +47,41 @@ void Id::sem()
     }
 }
 
-llvm::Value *Id::compile_ptr() const
+llvm::Value * Id::compile_ptr()
 {
     std::string mangled_name = getMangledName();
 
     // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[mangled_name];
-    if (!A)
-    {
+    llvm::Value * LValAddr = NamedValues[mangled_name];
+    if (!LValAddr) {
         std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
     }
-    // // Load the value.
-    return Builder.CreateLoad(llvm::PointerType::get(A->getAllocatedType(), 0), A, mangled_name.c_str());
-
-    // return A;
+    if (!ref) 
+        return LValAddr;
+    else
+        return Builder.CreateLoad(llvm::PointerType::get(getLLVMType(type, TheContext), 0), LValAddr); 
 }
 
-llvm::Value *Id::compile()
+llvm::Value * Id::compile()
 {
-    std::string mangled_name = getMangledName();
-
-    // Look this variable up in the function.
-    llvm::AllocaInst *A = NamedValues[mangled_name];
-    if (!A)
+    llvm::Value *LValAddr = compile_ptr();
+    if (!LValAddr) 
     {
-        std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
+        std::string msg = "Id: Unknown variable name: " + getMangledName() + ".";
         return LogErrorV(msg.c_str());
     }
+    // Load the value
+    return Builder.CreateLoad(getLLVMType(type, TheContext), LValAddr);
+}
 
-    // // Load the value.
-    return Builder.CreateLoad(A->getAllocatedType(), A, mangled_name.c_str());
+llvm::Value * Id::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
+{
 
-    // return A;
+    /* push 0 in the beginning of the offsets to dereference the GEP pointer */
+    offsets->insert(offsets->begin(), c64(0));
+
+    /* end of the recursion - return the address and the type of the matrix */
+    *t = getLLVMType(type, TheContext);
+    return compile_ptr();
 }

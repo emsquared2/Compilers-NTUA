@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Comment out line 435 in parser.y
+
 # Counter for correct program results
 successes=0
 
@@ -18,7 +20,7 @@ for file in "${program_dir}"*; do
     ((total_programs++))  # Increment total programs counter
 
     # Run the grace executable with this file and capture the output
-    result=$( "$grace_executable" < "$file" )
+    result=$( "$grace_executable" -io "$file" )
 
     # Extract the last line of the result
     last_line=$(echo "$result" | tail -n 1)

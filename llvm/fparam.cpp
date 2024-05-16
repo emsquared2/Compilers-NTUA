@@ -57,7 +57,12 @@ Type FParam::getType()
     return type;
 }
 
+PassMode FParam::getPassMode()
+{
+    return pass_mode;
+}
+
 llvm::Value *FParam::compile()
 {
-    llvmType *t;
+    return LogErrorV("FParam->compile() should never be called!");
 }

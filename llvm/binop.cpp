@@ -1,6 +1,6 @@
 #include "binop.hpp"
 
-BinOp::BinOp(Expr *l, char *s, Expr *r) : left(l), op(s), right(r) {}
+BinOp::BinOp(Expr *l, const char *s, Expr *r) : left(l), op(s), right(r) {}
 
 BinOp::~BinOp()
 {
@@ -29,15 +29,16 @@ llvm::Value* BinOp::compile()
     if(!L || !R)
         return nullptr;
 
-    if (op == "+")
+    std::string str_op = std::string(op);
+    if (str_op == "+")
         return Builder.CreateAdd(L, R, "addtmp");
-    else if (op == "-")
+    else if (str_op == "-")
         return Builder.CreateSub(L, R, "subtmp");
-    else if (op == "*")
+    else if (str_op == "*")
         return Builder.CreateMul(L, R, "multmp");
-    else if (op == "div")
+    else if (str_op == "div")
         return Builder.CreateSDiv(L, R, "divtmp");
-    else if (op == "mod")
+    else if (str_op == "mod")
         return Builder.CreateSRem(L, R, "modtmp");
     else
         return nullptr;

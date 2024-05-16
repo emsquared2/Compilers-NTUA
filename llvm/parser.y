@@ -169,11 +169,6 @@
 %type<cons> const
 %type<id> id;
 
-// %type<callstmt> func_call_stmt
-// %type<callexpr> func_call_expr
-
-
-
 %%
 
 program:
@@ -319,7 +314,7 @@ id :
 
 expr:
     // T_const             { $$ = new Const($1); }
-    const
+    const               { /* Eliminate warning */ }
     | T_const_char      { $$ = new ConstChar($1); }
     | l_value           { $$ = $1; }
     | '(' expr ')'      { $$ = $2; }
@@ -369,11 +364,6 @@ cond:
 
 int main(int argc, char **argv) 
 {
-    // Enable debug if YYDEBUG is defined
-    #ifdef YYDEBUG
-        int yydebug = 1;
-    #endif
-
     // Variables to track command line options
     int opt;
     genIntermediate = false;
@@ -431,6 +421,7 @@ int main(int argc, char **argv)
 
     // Parse the input
     int result = yyparse();
+    // Comment out in order to run test_llvm.sh
     // if (result == 0) printf("Success.\n");
 
     // Close library functions' scope

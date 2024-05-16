@@ -1,8 +1,8 @@
 #include "opcond.hpp"
 
-OpCond::OpCond(Cond *l, char *s, Cond *r) : left(l), op(s), right(r) {}
+OpCond::OpCond(Cond *l, const char *s, Cond *r) : left(l), op(s), right(r) {}
 
-OpCond::OpCond(char *s, Cond *r) : left(), op(s), right(r) {}
+OpCond::OpCond(const char *s, Cond *r) : left(), op(s), right(r) {}
 
 OpCond::~OpCond()
 {
@@ -34,6 +34,7 @@ llvm::Value *OpCond::compile()
 {
 
     llvm::Value *R = right->compile();
+    std::string op_str = std::string(op);
 
     if (left != nullptr)
     {
@@ -42,9 +43,9 @@ llvm::Value *OpCond::compile()
         if (!L || !R)
             return nullptr;
 
-        if (op == "and")
+        if (op_str == "and")
             return Builder.CreateAnd(L, R, "andtemp");
-        else if (op == "or")
+        else if (op_str == "or")
             return Builder.CreateOr(L, R, "ortemp");
         else
             return LogErrorV("invalid binary operator");
@@ -54,7 +55,7 @@ llvm::Value *OpCond::compile()
         if (!R)
             return nullptr;
 
-        if (op == "not")
+        if (op_str == "not")
             return Builder.CreateNot(R, "nottemp");
         else
             return LogErrorV("invalid binary operator");

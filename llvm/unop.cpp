@@ -1,6 +1,6 @@
 #include "unop.hpp"
 
-UnOp::UnOp(char *s, Expr *e) : op(s), right(e) {}
+UnOp::UnOp(const char *s, Expr *e) : op(s), right(e) {}
 
 UnOp::~UnOp()
 {
@@ -21,10 +21,11 @@ void UnOp::sem()
 llvm::Value* UnOp::compile()
 {
     llvm::Value* R = right->compile();
+    std::string op_str = std::string(op);
 
-    if(op == "+")
+    if(op_str == "+")
         return R;
-    else if (op == "-")
+    else if (op_str == "-")
         return Builder.CreateNeg(R, "unarytemp");
     else
         return nullptr;

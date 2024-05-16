@@ -10,7 +10,6 @@ public:
     ArrayElem(LValue *l, ExprList *e);
     ~ArrayElem();
     virtual void printOn(std::ostream &out) const override;
-    virtual std::string getArrayElem();
     virtual void sem() override;
     virtual llvm::Value *compile() override;
     virtual llvm::Value *compile_ptr() override;

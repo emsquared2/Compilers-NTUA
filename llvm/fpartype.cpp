@@ -49,6 +49,8 @@ void FParType::sem() {
         case TYPE_ARRAY:
             array->sem();
             break;
+        default:
+            break;
 
     }
 }

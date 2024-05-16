@@ -6,8 +6,8 @@
 class OpCond : public Cond
 {
 public:
-    OpCond(Cond *l, char *s, Cond *r);
-    OpCond(char *s, Cond *r);
+    OpCond(Cond *l, const char *s, Cond *r);
+    OpCond(const char *s, Cond *r);
     ~OpCond();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
@@ -15,7 +15,7 @@ public:
 
 private:
     Cond *left;
-    char *op;
+    const char *op;
     Cond *right;
 };
 #endif

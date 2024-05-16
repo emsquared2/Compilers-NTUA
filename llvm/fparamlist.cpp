@@ -49,7 +49,6 @@ std::vector<llvmType *> FParamList::getLLVM_params()
     {
         Type t = (*param)->getType();
 
-        
         PassMode pass_mode = (*param)->getPassMode();
         llvmType *param_type = getLLVMType(t, TheContext);
         // llvmType *param_type = (pass_mode == PASS_BY_VALUE) ? getLLVMType(t, TheContext) : llvm::PointerType::get(getLLVMType(t, TheContext), 0);
@@ -66,8 +65,6 @@ std::vector<std::string> FParamList::getLLVM_param_names()
     std::vector<std::string> llvm_param_names;
     for (auto param = params.rbegin(); param != params.rend(); ++param)
     {
-        Type t = (*param)->getType();
-
         std::vector<Id *> ids = (*param)->getIdList()->getIds();
         for (auto id = ids.rbegin(); id != ids.rend(); ++id) {
             std::string mangled_name = std::string((*id)->getMangledName());
@@ -91,4 +88,6 @@ llvm::Value *FParamList::compile()
     {
         (*param)->compile();
     }
+
+    return nullptr;
 }

@@ -12,7 +12,7 @@ public:
     ~Array();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
-    virtual Type ConvertToType() const;
+    virtual Type ConvertToType() const override;
     bool getUnknown();
 
 private:

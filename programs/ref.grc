@@ -1,0 +1,32 @@
+fun solve () : nothing
+
+    fun incr (ref val : int) : nothing
+    {
+        writeString("Entering incr... \n");
+        writeString("Initial value: ");
+        writeInteger(val);
+        val <- val + 1;
+        writeString("\nFinal value: ");
+        writeInteger(val);
+        writeString("\nLeaving incr... \n");
+    }
+
+   var number, expected : int;
+
+{ $ solve
+   writeString("Please, give me the number to increase: ");
+   number <- readInteger();
+   expected <- number + 1;
+   incr(number);
+   writeString("\nExpected value: ");
+   writeInteger(expected);
+   writeString("\nActual value: ");
+   writeInteger(number);
+
+   if number # expected then {
+      writeString("\nCall by reference did not work!\n");
+   }
+   else {
+      writeString("\nCall by reference worked fine!\n");
+   }
+} $ solve

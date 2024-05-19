@@ -16,6 +16,7 @@ public:
     llvm::Value *compile() override;
 
     IdList * getIdList();
+    PassMode getPassMode();
 
 private:
     IdList *idlist;

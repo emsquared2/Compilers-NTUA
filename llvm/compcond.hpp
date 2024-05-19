@@ -7,7 +7,7 @@
 class CompCond : public Cond
 {
 public:
-    CompCond(Expr *l, char *s, Expr *r);
+    CompCond(Expr *l, const char *s, Expr *r);
     ~CompCond();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
@@ -15,7 +15,7 @@ public:
 
 private:
     Expr *left;
-    char *op;
+    const char *op;
     Expr *right;
 };
 

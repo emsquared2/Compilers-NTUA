@@ -1,6 +1,6 @@
 #include "compcond.hpp"
 
-CompCond::CompCond(Expr *l, char *s, Expr *r) : left(l), op(s), right(r) {}
+CompCond::CompCond(Expr *l, const char *s, Expr *r) : left(l), op(s), right(r) {}
 
 CompCond::~CompCond()
 {
@@ -43,17 +43,18 @@ llvm::Value *CompCond::compile()
     if (!L || !R)
         return nullptr;
 
-    if (op == "=")
+    std::string op_str = std::string(op);
+    if (op_str == "=")
         return Builder.CreateICmpEQ(L, R, "eqtmp");
-    else if (op == "#")
+    else if (op_str == "#")
         return Builder.CreateICmpNE(L, R, "netmp");
-    else if (op == "<")
+    else if (op_str == "<")
         return Builder.CreateICmpSLT(L, R, "lttmp");
-    else if (op == ">")
+    else if (op_str == ">")
         return Builder.CreateICmpSGT(L, R, "gttmp");
-    else if (op == "<=")
+    else if (op_str == "<=")
         return Builder.CreateICmpSLE(L, R, "letmp");
-    else if (op == ">=")
+    else if (op_str == ">=")
         return Builder.CreateICmpSGE(L, R, "getmp");
     else
         return LogErrorV("invalid binary operator");

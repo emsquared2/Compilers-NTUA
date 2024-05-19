@@ -38,14 +38,14 @@ void Assign::sem()
 
 llvm::Value * Assign::compile()
 {
-    llvm::Value *LValPtr = l_value->compile_ptr();
-    if (!LValPtr)
+    llvm::Value *LValAddr = l_value->compile_ptr();
+    if (!LValAddr)
         return LogErrorV("Assign: LValue could not be compiled.");
 
     llvm::Value * ExprValue = expr->compile();
     if (!ExprValue)
         return LogErrorV("Assign: Expression could not be compiled.");
 
-    Builder.CreateStore(ExprValue, LValPtr);
+    Builder.CreateStore(ExprValue, LValAddr);
     return nullptr;
 }

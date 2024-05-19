@@ -16,10 +16,7 @@ void ArrayElem::printOn(std::ostream &out) const
     }
     out << ")";
 }
-std::string ArrayElem::getArrayElem()
-{
-    // return left->getName() + "[" + std::to_string(expr->eval()) + "]";
-}
+
 void ArrayElem::sem()
 {
     std::vector<Expr *> expr_list = exprlist->getExprList();
@@ -43,7 +40,7 @@ void ArrayElem::sem()
     type = findArrayType(t);
 }
 
-llvm::Value *ArrayElem::compile_ptr() const
+llvm::Value *ArrayElem::compile_ptr()
 {
     return nullptr;
     // llvm::Value* basePtr = left->compile_ptr(); // Get the base pointer to the array
@@ -94,3 +91,4 @@ llvm::Value *ArrayElem::compile()
     // else
     //     return nullptr;
 }
+

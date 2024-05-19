@@ -10,19 +10,8 @@ void Return::printOn(std::ostream &out) const
     out << ")";
 }
 
-int Return::ReturnValue() 
-{
-    // return (expr != nullptr) ? expr->eval() : 0;
-}
-
 void Return::sem()
 {
-    /* TODO: Get return type.
-     * There are 2 options:
-     *      a) Use a stack that keeps the return types (function decls are nested so you only need to check the last element).
-     *      b) Implement a method in symbol.c in order to get the return type from the last function in scope.
-     */
-
     SymbolEntry *func = lookupLastFunction();
 
     Type return_type = func->u.eFunction.resultType;

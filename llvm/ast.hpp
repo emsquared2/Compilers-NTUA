@@ -126,7 +126,7 @@ public:
     virtual void sem() {};
     void SemanticError(const char *msg);
     llvm::Value *LogErrorV(const char *Str) const;
-    virtual llvm::Value *compile() {};
+    virtual llvm::Value *compile() { return nullptr; }
 
     // Functions for library functions
     void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);

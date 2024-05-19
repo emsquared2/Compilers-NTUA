@@ -43,12 +43,11 @@ llvm::Value *Decl::compile()
         //id->compile();
 
         // Use mangled name for llvm variable instead of real name to consider different scopes.
-        std::string varName = std::string(id->getName()) + '_' + std::to_string(id->getScope()) + '_';
+        std::string mangled_name = id->getMangledName();
 
         // Create an allocation in the entry block
-        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(varName), llvm_type);
-        NamedValues[varName] = allocaInst;
+        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(mangled_name), llvm_type);
+        NamedValues[mangled_name] = allocaInst;
     }
-
     return nullptr;
 }

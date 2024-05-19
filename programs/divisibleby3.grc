@@ -43,7 +43,8 @@ fun main() : nothing
 
 
 { $ main
-  n <- 54;
+  writeString("Please, give a number to check if it is divisible by 3: ");
+  n <- readInteger();
   writeInteger(n);
   writeString(" is ");
   if divisibleBy3(n) # 1 then

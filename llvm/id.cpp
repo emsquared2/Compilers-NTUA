@@ -34,8 +34,8 @@ void Id::sem()
         break;
     case ENTRY_PARAMETER:
         type = e->u.eParameter.type;
-        // if (e->u.eParameter.mode == PASS_BY_REFERENCE)
-        //     ref = true;
+        if (e->u.eParameter.mode == PASS_BY_REFERENCE)
+            ref = true;
         break;
     // Can it be Temporary?
     case ENTRY_TEMPORARY:
@@ -57,10 +57,15 @@ llvm::Value * Id::compile_ptr()
         std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
     }
-    if (!ref) 
-        return LValAddr;
-    else
-        return Builder.CreateLoad(llvm::PointerType::get(getLLVMType(type, TheContext), 0), LValAddr); 
+    return ref ? Builder.CreateLoad(llvm::PointerType::get(getLLVMType(type, TheContext), 0), LValAddr) : LValAddr;
+}
+
+llvm::Value * Id::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
+{
+    /* push 0 in the beginning of the offsets to dereference the GEP pointer */
+    // offsets->insert(offsets->begin(), c64(0));
+    *t = getLLVMType(type, TheContext);
+    return compile_ptr();
 }
 
 llvm::Value * Id::compile()
@@ -71,17 +76,5 @@ llvm::Value * Id::compile()
         std::string msg = "Id: Unknown variable name: " + getMangledName() + ".";
         return LogErrorV(msg.c_str());
     }
-    // Load the value
     return Builder.CreateLoad(getLLVMType(type, TheContext), LValAddr);
-}
-
-llvm::Value * Id::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
-{
-
-    /* push 0 in the beginning of the offsets to dereference the GEP pointer */
-    offsets->insert(offsets->begin(), c64(0));
-
-    /* end of the recursion - return the address and the type of the matrix */
-    *t = getLLVMType(type, TheContext);
-    return compile_ptr();
 }

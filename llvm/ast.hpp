@@ -16,6 +16,22 @@
 #include <llvm/Transforms/Scalar.h>
 #include <llvm/Transforms/Scalar/GVN.h>
 
+#include "llvm/Analysis/BasicAliasAnalysis.h"
+#include "llvm/Analysis/TypeBasedAliasAnalysis.h"
+#include <llvm/Transforms/InstCombine/InstCombine.h>
+#include <llvm/Transforms/Utils.h>
+
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
+#include "llvm/Support/TargetSelect.h"
+#include "llvm/MC/TargetRegistry.h"
+#include "llvm/TargetParser/Host.h"
+
+#include "llvm/IR/DataLayout.h"
+#include "llvm/Support/ErrorHandling.h"
+
 /* ---------------------------------------------------------------------
    --------------------------- Symbol Table ----------------------------
    --------------------------------------------------------------------- */
@@ -103,20 +119,29 @@ typedef llvm::Type llvmType;
 class AST
 {
 public:
+    // Base methods
     AST();
     virtual ~AST() = default;
     virtual void printOn(std::ostream &out) const = 0;
     virtual void sem() {};
     void SemanticError(const char *msg);
-
     llvm::Value *LogErrorV(const char *Str) const;
     virtual llvm::Value *compile() {};
-
-    void llvm_compile_and_dump();
 
     // Functions for library functions
     void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);
     void llvmAddLibrary();
+    
+    // Function for initialization
+    void llvm_compile_and_dump();
+
+    // Function for optimizations
+    void FPM_Optimizations();
+
+    // Functions for Code Generation
+    llvm::Function *MainCodeGen(llvm::Value* main_function);
+    void emitLLVMIR(const std::string& outputTarget);
+    void emitAssembly(const std::string & outputTarget);
 
 protected:
     // Global LLVM variables related to the LLVM suite.
@@ -154,6 +179,11 @@ protected:
     int lineno;
 };
 
+
+/* ---------------------------------------------------------------------
+   ------------------------------- UTILS -------------------------------
+   --------------------------------------------------------------------- */
+
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 
 inline std::vector<bool> returnedFunction;
@@ -163,5 +193,9 @@ inline std::ostream &operator<<(std::ostream &out, const AST &t)
     t.printOn(out);
     return out;
 };
+
+// Flags and filename
+extern bool optimize, genFinal, genIntermediate;
+extern std::string filename;
 
 #endif

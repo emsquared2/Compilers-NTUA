@@ -16,6 +16,7 @@ public:
     virtual void sem() override;
     void ProgramSem();
     virtual llvm::Function *compile() override;
+    void optimizeFunc(llvm::Function *function);
 
 private:
     Header *header;

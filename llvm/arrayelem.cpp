@@ -40,55 +40,42 @@ void ArrayElem::sem()
     type = findArrayType(t);
 }
 
-llvm::Value *ArrayElem::compile_ptr()
+
+llvm::Value * ArrayElem::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
 {
-    return nullptr;
-    // llvm::Value* basePtr = left->compile_ptr(); // Get the base pointer to the array
-
-    // if (!basePtr)
-    //     return nullptr;
-
-    // // Ensure the pointer is indeed a pointer type
-    // llvm::PointerType* ptrType = llvm::dyn_cast<llvm::PointerType>(basePtr->getType());
-    // if (!ptrType)
-    //     return LogErrorV("Base pointer is not a pointer type.");
-
-    // std::vector<llvm::Value*> indices;
-    // std::vector<Expr*> expr_list = exprlist->getExprList();
-    
-    // // LLVM arrays are zero-indexed, push 0 as the first index for the base pointer
-    // indices.push_back(c64(0));
-    
-    // for (Expr* expr : expr_list) {
-    //     llvm::Value* index = expr->compile();
-    //     if (index) {
-    //         indices.push_back(index);
-    //     } else {
-    //         return LogErrorV("Index expression compilation failed.");
-    //     }
-    // }
-
-    // // Ensure that the basePtr points to an actual array
-    // if (ptrType->getElementType()->isArrayTy() || ptrType->getElementType()->isStructTy()) {
-    //     // Create the GEP instruction to calculate the element pointer
-    //     llvm::Value* elementPtr = Builder.CreateGEP(ptrType->getElementType(), basePtr, indices);
-    //     return elementPtr;
-    // } else {
-    //     return LogErrorV("Pointer type does not point to an array or struct.");
-    // }
+    std::vector<Expr *> expr_list = exprlist->getExprList();
+    for(auto e = expr_list.rbegin(); e != expr_list.rend(); ++e) {
+    // for (Expr *e : exprlist->getExprList()) {
+        llvm::Value *off = (*e)->compile();
+        *t = getLLVMType((*e)->getType(), TheContext);
+        if(!off)
+            return nullptr;
+        offsets->push_back(off);
+    }
+    return left->compile_arr(offsets, t);
 }
 
-llvm::Value *ArrayElem::compile()
-{
-    return nullptr;
-    // // Get the pointer to the element
-    // llvm::Value* elementPtr = this->compile_ptr();
+llvm::Value* ArrayElem::compile_ptr() {
+    std::vector<llvm::Value*> offsets;
+    llvmType* elementType;
+    llvm::Value* baseAddr = compile_arr(&offsets, &elementType);
+    if (!baseAddr)
+        return nullptr;
 
-    // // Load the value from the pointer
-    // if (elementPtr)
-    //     return Builder.CreateLoad(elementPtr->getType()->getPointerElementType(), elementPtr);
-    //     // return Builder.CreateLoad(getLLVMType(type, TheContext), elementPtr);
-    // else
-    //     return nullptr;
+    // Get the pointer type from the LLVM type of the element
+    llvm::PointerType* ptrType = llvm::PointerType::get(elementType, 0); // Assuming the first level of pointer (change if different levels are used)
+
+    // Generate a pointer to the element by applying the offsets to the base address
+    llvm::Value* elementPtr = Builder.CreateGEP(ptrType, baseAddr, offsets);
+    return elementPtr;
 }
 
+llvm::Value* ArrayElem::compile() 
+{
+    llvm::Value* Addr = compile_ptr();
+    if (!Addr)
+        return LogErrorV("ArrayElem Compile: Execution shouldn't reach this point.");
+        
+    Type t = findArrayType(left->getType());
+    return Builder.CreateLoad(getLLVMType(t, TheContext), Addr);    
+}

@@ -8,5 +8,8 @@ parser.hpp
 /syntax-gen/proper
 /syntax-gen/*.beam
 **/deprecated/
+*.asm
+*.imm
+/llvm/libgrc.a
 
 .DS_Store

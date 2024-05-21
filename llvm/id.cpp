@@ -1,6 +1,10 @@
 #include "id.hpp"
 
-Id::Id(std::string s) : name(s) {}
+Id::Id(std::string s) : name(s)
+{
+    if (name == "main")
+        name = "grc_main";
+}
 void Id::printOn(std::ostream &out) const
 {
     out << "Id(" << name << ")";

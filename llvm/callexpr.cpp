@@ -72,7 +72,6 @@ void CallExpr::sem()
 
 llvm::Value *CallExpr::compile()
 {
-
     llvm::StringRef Callee = id->getName();
     std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *> {};
 
@@ -90,11 +89,10 @@ llvm::Value *CallExpr::compile()
 
     for (int i = Args.size() - 1; i >= 0; --i)
     {
-        ExprV_A = ref[i] ? Args[i]->compile_ptr() : Args[i]->compile();
+        ExprV_A = ref[Args.size() - i - 1] ? Args[i]->compile_ptr() : Args[i]->compile();
         ArgsV.push_back(ExprV_A);
         if (!ArgsV.back())
             return nullptr;
     }
-
     return Builder.CreateCall(CalleeF, ArgsV, "callexprtmp");
 }

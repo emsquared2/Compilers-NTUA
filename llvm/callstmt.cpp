@@ -1,6 +1,5 @@
 #include "callstmt.hpp"
 
-
 CallStmt::CallStmt(Id *id, ExprList *e_list = nullptr) : id(id), expr_list(e_list) {}
 CallStmt::~CallStmt()
 {
@@ -98,7 +97,7 @@ llvm::Value *CallStmt::compile()
 
     for (int i = Args.size() - 1; i >= 0; --i)
     {
-        ExprV_A = ref[i] ? Args[i]->compile_ptr() : Args[i]->compile();
+        ExprV_A = ref[Args.size() - i - 1] ? Args[i]->compile_ptr() : Args[i]->compile();
         ArgsV.push_back(ExprV_A);
         if (!ArgsV.back())
             return nullptr;

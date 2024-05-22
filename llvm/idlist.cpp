@@ -33,14 +33,13 @@ void IdList::printOn(std::ostream &out) const
 }
 void IdList::sem()
 {
-    for (Id *i : idlist)
-        i->sem();
+    for (auto id = idlist.rbegin(); id != idlist.rend(); ++id)
+        (*id)->sem();
 }
 
 llvm::Value *IdList::compile()
 {
-    for (Id *i : idlist)
-        i->compile();
-
+    for (auto id = idlist.rbegin(); id != idlist.rend(); ++id)
+        (*id)->compile();
     return nullptr;
 }

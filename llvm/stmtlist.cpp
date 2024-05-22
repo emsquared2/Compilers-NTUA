@@ -25,14 +25,13 @@ void StmtList::printOn(std::ostream &out) const
 }
 void StmtList::sem()
 {
-    for (Stmt *s : stmt_list)
-        s->sem();
+    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+        (*s)->sem();
 }
 
 llvm::Value* StmtList::compile()
 {
-    for (Stmt *s : stmt_list)
-        s->compile();
-
+    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+        (*s)->compile();
     return nullptr;
 }

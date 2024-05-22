@@ -1,6 +1,9 @@
 .vscode
 grace
+
 lexer.cpp
+lexer
+
 parser.cpp
 parser.hpp
 *.o

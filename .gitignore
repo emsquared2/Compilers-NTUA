@@ -13,3 +13,5 @@ parser.hpp
 /llvm/libgrc.a
 
 .DS_Store
+
+tests

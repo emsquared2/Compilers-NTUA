@@ -2,6 +2,7 @@
 #define __BLOCK_HPP__
 
 #include "stmt.hpp"
+#include "return.hpp"
 #include <vector>
 
 class Block : public Stmt

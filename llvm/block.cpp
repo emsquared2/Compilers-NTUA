@@ -34,6 +34,10 @@ llvm::Value* Block::compile()
     for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
     {
         (*s)->compile();
+
+        // If statement s is a return statement, then do not compile anything else in the block.
+        if (dynamic_cast<Return *> (*s))
+            break;
     }
     return nullptr;
 }

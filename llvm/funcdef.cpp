@@ -71,8 +71,7 @@ llvm::Function *FuncDef::compile()
     for (auto &Arg : function->args())
     {
         // Create an alloca for this variable.
-        // llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm::StringRef(llvm_param_names[current_arg]), llvm_param_types[current_arg]);
-        llvm::AllocaInst *Alloca = Builder.CreateAlloca(llvm_param_types[current_arg], nullptr, llvm_param_names[current_arg]);  
+        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm::StringRef(llvm_param_names[current_arg]), llvm_param_types[current_arg]);
 
         // Store the initial value into the alloca.
         Builder.CreateStore(&Arg, Alloca);

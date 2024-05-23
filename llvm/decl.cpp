@@ -41,8 +41,7 @@ llvm::Value *Decl::compile()
     for (int i = 0; i < idlist->getIds().size(); ++i)
     {
         // Create an allocation in the entry block
-        // llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(mangled_names[i]), llvm_type);
-        llvm::AllocaInst *allocaInst = Builder.CreateAlloca(llvm_type, nullptr, mangled_names[i]);  
+        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(mangled_names[i]), llvm_type);
         NamedValues[mangled_names[i]] = allocaInst;
     }
     return nullptr;

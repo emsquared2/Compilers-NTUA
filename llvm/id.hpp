@@ -10,7 +10,6 @@ public:
     Id(std::string s);
     virtual void printOn(std::ostream &out) const override;
     virtual const char *getName() const override;
-    std::string getMangledName() const;
     virtual void sem() override;
     virtual llvm::Value *compile() override;
     virtual llvm::Value *compile_ptr() override;
@@ -18,6 +17,7 @@ public:
 
 private:
     std::string name;
+    std::string mangled_name;
 };
 
 #endif

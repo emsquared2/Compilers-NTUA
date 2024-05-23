@@ -14,9 +14,11 @@ public:
     void setSymbolEntry(SymbolEntry *f);
     Type getType();
     llvm::Value *compile() override;
+    llvm::Value* compile(std::vector<std::string> * signature_mangled_names, std::vector<llvmType*> * signature_types);
 
     IdList * getIdList();
     PassMode getPassMode();
+
 
 private:
     IdList *idlist;
@@ -26,6 +28,7 @@ private:
     bool ref;
 
     SymbolEntry *function;
+    unsigned int scope;
 };
 
 #endif

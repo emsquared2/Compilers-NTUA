@@ -27,7 +27,8 @@ void Decl::sem()
     for (Id *id : idlist->getIds())
     {
         SymbolEntry *var = newVariable(id->getName(), type);
-        id->setScope(var->scopeId);
+        // id->setScope(var->scopeId);
+        mangled_names.push_back(getMangledName(id->getName(), var->scopeId));
     }
     parser_type->sem();
 }
@@ -37,14 +38,11 @@ llvm::Value *Decl::compile()
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
     llvmType *llvm_type = getLLVMType(type, TheContext);
 
-    for (Id *id : idlist->getIds())
+    for (int i = 0; i < idlist->getIds().size(); ++i)
     {
-        // Use mangled name for llvm variable instead of real name to consider different scopes.
-        std::string mangled_name = id->getMangledName();
-
         // Create an allocation in the entry block
-        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(mangled_name), llvm_type);
-        NamedValues[mangled_name] = allocaInst;
+        llvm::AllocaInst *allocaInst = CreateEntryBlockAlloca(TheFunction, llvm::StringRef(mangled_names[i]), llvm_type);
+        NamedValues[mangled_names[i]] = allocaInst;
     }
     return nullptr;
 }

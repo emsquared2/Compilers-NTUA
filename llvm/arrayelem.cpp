@@ -8,11 +8,10 @@ ArrayElem::~ArrayElem()
 }
 void ArrayElem::printOn(std::ostream &out) const
 {
-    std::vector<Expr *> exprs = exprlist->getExprList();
     out << "ArrayElem(" << *left;
-    for (auto e = exprs.rbegin(); e != exprs.rend(); ++e)
+    for (Expr *e : exprlist->getExprList())
     {
-        out << "[" << **e << "]";
+        out << "[" << *e << "]";
     }
     out << ")";
 }
@@ -43,11 +42,9 @@ void ArrayElem::sem()
 
 llvm::Value * ArrayElem::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
 {
-    std::vector<Expr *> expr_list = exprlist->getExprList();
-    for(auto e = expr_list.rbegin(); e != expr_list.rend(); ++e) {
-    // for (Expr *e : exprlist->getExprList()) {
-        llvm::Value *off = (*e)->compile();
-        *t = getLLVMType((*e)->getType(), TheContext);
+    for (Expr *e :  exprlist->getExprList()) {
+        llvm::Value *off = e->compile();
+        *t = getLLVMType(e->getType(), TheContext);
         if(!off)
             return nullptr;
         offsets->push_back(off);

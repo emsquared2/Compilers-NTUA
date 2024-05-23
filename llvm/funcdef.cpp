@@ -77,12 +77,9 @@ llvm::Function *FuncDef::compile()
         NamedValues[std::string(llvm_param_names[current_arg++])] = Alloca;
     }
 
-    std::vector<LocalDef *> locals = local_def_list->getLocals();
-
-    for (auto l = locals.rbegin(); l != locals.rend(); ++l)
+    for (LocalDef *l : local_def_list->getLocals())
     {
-        (*l)->compile();
-        // test it outside of the loop
+        l->compile();
         Builder.SetInsertPoint(BB);
     }
 

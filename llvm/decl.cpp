@@ -39,9 +39,6 @@ llvm::Value *Decl::compile()
 
     for (Id *id : idlist->getIds())
     {
-        // Compile not needed as the variables are now declared
-        //id->compile();
-
         // Use mangled name for llvm variable instead of real name to consider different scopes.
         std::string mangled_name = id->getMangledName();
 

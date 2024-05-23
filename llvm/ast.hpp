@@ -186,6 +186,15 @@ protected:
    ------------------------------- UTILS -------------------------------
    --------------------------------------------------------------------- */
 
+template <typename T>
+std::vector<T> getReversed(const std::vector<T>& input)
+{
+    std::vector<T> reversed_vector(input.rbegin(), input.rend());
+    return reversed_vector;
+}
+
+std::string getMangledName(const char * name, int scope);
+
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 
 inline std::vector<bool> returnedFunction;

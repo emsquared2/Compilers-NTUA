@@ -31,7 +31,7 @@ void CallExpr::sem()
 
     int counter = 0;
 
-    for (auto e = e_list.rbegin(); e != e_list.rend(); ++e)
+    for (Expr *e : e_list)
     {
         // More parameters than expected
         if (!argument)
@@ -40,10 +40,10 @@ void CallExpr::sem()
             SemanticError(msg.c_str());
         }
 
-        (*e)->type_check(argument->u.eParameter.type);
+        e->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */
-        LValue *lvalue_ptr = dynamic_cast<LValue *>((*e));
+        LValue *lvalue_ptr = dynamic_cast<LValue *>(e);
         if (argument->u.eParameter.mode == PASS_BY_REFERENCE && !lvalue_ptr)
             SemanticError("Parameter defined as pass-by-reference must be an lvalue.");
 
@@ -87,9 +87,9 @@ llvm::Value *CallExpr::compile()
     std::vector<llvm::Value *> ArgsV;
     llvm::Value *ExprV_A = nullptr;
 
-    for (int i = Args.size() - 1; i >= 0; --i)
+    for (int i = 0; i < Args.size(); ++i)
     {
-        ExprV_A = ref[Args.size() - i - 1] ? Args[i]->compile_ptr() : Args[i]->compile();
+        ExprV_A = ref[i] ? Args[i]->compile_ptr() : Args[i]->compile();
         ArgsV.push_back(ExprV_A);
         if (!ArgsV.back())
             return nullptr;

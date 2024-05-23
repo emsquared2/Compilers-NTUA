@@ -16,6 +16,9 @@ void FuncDef::printOn(std::ostream &out) const
 void FuncDef::sem()
 {
     header->sem();
+
+    mangled_name = header->getHMangledName();
+
     local_def_list->sem();
     block->sem();
 
@@ -68,13 +71,14 @@ llvm::Function *FuncDef::compile()
     for (auto &Arg : function->args())
     {
         // Create an alloca for this variable.
-        llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm::StringRef(llvm_param_names[current_arg]), llvm_param_types[current_arg]);
+        // llvm::AllocaInst *Alloca = CreateEntryBlockAlloca(function, llvm::StringRef(llvm_param_names[current_arg]), llvm_param_types[current_arg]);
+        llvm::AllocaInst *Alloca = Builder.CreateAlloca(llvm_param_types[current_arg], nullptr, llvm_param_names[current_arg]);  
 
         // Store the initial value into the alloca.
         Builder.CreateStore(&Arg, Alloca);
 
         // Add arguments to variable symbol table.
-        NamedValues[std::string(llvm_param_names[current_arg++])] = Alloca;
+        NamedValues[llvm_param_names[current_arg++]] = Alloca;
     }
 
     for (LocalDef *l : local_def_list->getLocals())

@@ -5,11 +5,16 @@ tests/runtime/
     
     - err_const_string      --> assigning in array of chars...
     - escaped_*             -->
-    - main_writeString      --> should we be able to overwrite lib functions?
-    - nested_functions_*    --> 
-    - overload_*            --> should we support overloading?
     - pass_by_ref_arr_*     --> array related
-    
     - pass_by_ref_calls_pass_by_ref_arr_3.grc   --> array related
-
+    
     - str_at_operator_*     --> not sure
+
+
+Bug:
+    nested_functions_2.grc     --> works fine but also prints an error
+
+############ DONE ##############
+- main_writeString      --> should we be able to overwrite lib functions?
+- overload_*            --> should we support overloading?
+- nested_functions_*

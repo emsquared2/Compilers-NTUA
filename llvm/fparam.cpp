@@ -44,10 +44,13 @@ void FParam::sem()
         SemanticError("Arrays can only be passed by reference.");
     }
 
+    SymbolEntry *param;
     for (Id *id : idlist->getIds()) {
-        SymbolEntry *param = newParameter(id->getName(), type, pass_mode, function);
-        id->setScope(param->scopeId);        
+        param = newParameter(id->getName(), type, pass_mode, function);
+        // id->setScope(param->scopeId);        
     }
+
+    scope = param->scopeId;
 
     function = nullptr;
 }
@@ -65,4 +68,25 @@ PassMode FParam::getPassMode()
 llvm::Value *FParam::compile()
 {
     return LogErrorV("FParam->compile() should never be called!");
+}
+
+llvm::Value* FParam::compile(std::vector<std::string> * signature_mangled_names, std::vector<llvmType*> * signature_types)
+{
+    llvmType* t;
+    switch(pass_mode)
+    {
+    case PASS_BY_VALUE:
+        t = getLLVMType(type, TheContext);
+        break;
+    case PASS_BY_REFERENCE:
+        t = llvm::PointerType::get(getLLVMType(type, TheContext), 0);
+        break;
+    }
+    for (Id *id : idlist->getIds())
+    {
+        signature_types->push_back(t);
+        signature_mangled_names->push_back(getMangledName(id->getName(), scope));
+    }
+
+return nullptr;
 }

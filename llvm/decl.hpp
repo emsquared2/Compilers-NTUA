@@ -18,6 +18,7 @@ private:
     IdList *idlist;
     FParType *parser_type;
     Type type;
+    std::vector<std::string> mangled_names;
 };
 
 #endif

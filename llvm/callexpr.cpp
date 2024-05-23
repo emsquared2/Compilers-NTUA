@@ -18,6 +18,8 @@ void CallExpr::sem()
     // Check if the function exists
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
 
+    mangled_name = getMangledName(id->getName(), function->scopeId);
+
     if (function->entryType != ENTRY_FUNCTION)
         SemanticError("Could not find function name.");
 
@@ -72,13 +74,12 @@ void CallExpr::sem()
 
 llvm::Value *CallExpr::compile()
 {
-    llvm::StringRef Callee = id->getName();
     std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *> {};
 
     // Look up the name in the global module table.
-    llvm::Function *CalleeF = TheModule->getFunction(Callee);
+    llvm::Function *CalleeF = TheModule->getFunction(mangled_name);
     if (!CalleeF)
-        return LogErrorV("Unknown function referenced");
+        return LogErrorV("CallExpr: Unknown function referenced");
 
     // If argument mismatch error.
     if (CalleeF->arg_size() != Args.size())

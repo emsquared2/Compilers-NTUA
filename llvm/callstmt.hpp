@@ -20,6 +20,7 @@ private:
     Id *id;
     ExprList *expr_list = nullptr;
     std::vector<bool> ref;
+    std::string mangled_name;
 };
 
 #endif

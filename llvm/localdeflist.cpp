@@ -34,8 +34,7 @@ void LocalDefList::sem() {
 
 std::vector<LocalDef*> LocalDefList::getLocals()
 {
-    // return getReversed(locals);
-    return locals;
+    return getReversed(locals);
 }
 
 llvm::Value* LocalDefList::compile()

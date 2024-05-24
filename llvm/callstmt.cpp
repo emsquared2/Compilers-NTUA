@@ -86,7 +86,8 @@ llvm::Value *CallStmt::compile()
     // Look up the name in the global module table.
     llvm::Function *CalleeF = TheModule->getFunction(mangled_name);
     if (!CalleeF) {
-        return LogErrorV("CallStmt: Unknown function referenced");
+        std::string msg = "CallStmt: Unknown function referenced --> " + mangled_name;
+        return LogErrorV(msg.c_str());
     }
 
     // If argument mismatch error.

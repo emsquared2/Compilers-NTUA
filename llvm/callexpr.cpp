@@ -78,9 +78,10 @@ llvm::Value *CallExpr::compile()
 
     // Look up the name in the global module table.
     llvm::Function *CalleeF = TheModule->getFunction(mangled_name);
-    if (!CalleeF)
-        return LogErrorV("CallExpr: Unknown function referenced");
-
+    if (!CalleeF) {
+        std::string msg = "CallExpr: Unknown function referenced --> " + mangled_name;
+        return LogErrorV(msg.c_str());
+    }
     // If argument mismatch error.
     if (CalleeF->arg_size() != Args.size())
         return LogErrorV("Incorrect # arguments passed");

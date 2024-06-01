@@ -49,16 +49,9 @@ Id *Header::getId()
 }
 void Header::sem()
 {
-    /* Check if id exists in symbol table. If it exists, throw error.
-     * If not:
-     *  1) add it to the symbol table
-     *  2) open a new scope
-     *  3) store the return type
-     *  4) paramlit->sem()
-     *  5) close the scope?
-     */
-
     SymbolEntry *function = newFunction(id->getName());
+
+    mangled_name = getMangledName(id->getName(), function->scopeId);
 
     // add case when parser identifies forward declaration
     if (forward_declaration)
@@ -86,32 +79,39 @@ void Header::sem()
     endFunctionHeader(function, type);
 }
 
+llvm::Function *Header::compile()
+{
+    if (fparamlist)
+        fparamlist->compile(&llvm_param_names, &llvm_param_types);
+
+    llvm::Function *function = TheModule->getFunction(mangled_name);
+    if (!function)
+    {
+        llvmType *return_type = getLLVMType(type, TheContext);
+        // std::vector<llvmType *> llvm_param_types = (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
+
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, (fparamlist) ? llvm_param_types : std::vector<llvmType *>{}, false);
+        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, mangled_name, TheModule.get());
+    }
+
+    return function;
+}
+
+std::string Header::getHMangledName()
+{
+    return mangled_name;
+}
+
 std::vector<llvmType *> Header::getLLVM_param_types()
 {
-    return (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
+    return (fparamlist) ? llvm_param_types : std::vector<llvmType *>{};
+    return llvm_param_types;
 }
 
 // std::vector<llvm::StringRef> Header::getLLVM_param_names()
 std::vector<std::string> Header::getLLVM_param_names()
 {
     // return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<llvm::StringRef>{};
-    return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<std::string>{};
-}
-
-llvm::Function *Header::compile()
-{
-    // fparamlist->compile();
-    std::string id_name = id->getName();
-    // std::string id_name = id->getName() + '_' + std::to_string(id->getScope());
-    llvm::Function *function = TheModule->getFunction(id_name);
-    if (!function)
-    {
-        llvmType *return_type = getLLVMType(type, TheContext);
-        std::vector<llvmType *> llvm_param_types = (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
-
-        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
-        function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, id_name, TheModule.get());
-    }
-
-    return function;
+    // return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<std::string>{};
+    return (fparamlist) ? llvm_param_names : std::vector<std::string>{};
 }

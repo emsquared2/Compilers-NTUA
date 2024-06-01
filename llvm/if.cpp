@@ -11,7 +11,9 @@ If::~If()
 
 void If::printOn(std::ostream &out) const
 {
-    out << "If(" << *cond << ", " << *stmt1;
+    out << "If(" << *cond;
+    if (stmt1 != nullptr) 
+        out << ", " << *stmt1;
     if (stmt2 != nullptr)
         out << " Else " << *stmt2;
     out << ")";
@@ -20,7 +22,8 @@ void If::printOn(std::ostream &out) const
 void If::sem()
 {
     cond->type_check(typeBoolean);
-    stmt1->sem();
+    if (stmt1 != nullptr)
+        stmt1->sem();
     if (stmt2 != nullptr)
         stmt2->sem();
 }
@@ -45,7 +48,11 @@ llvm::Value *If::compile()
     Builder.SetInsertPoint(ThenBB);
 
     // Compile statement inside the 'then' block
-    stmt1->compile();
+    // Compile statement inside the 'else' block, if it exists
+    if (stmt1 != nullptr)
+    {
+        stmt1->compile();
+    }
 
     // Set insertion point for the 'else' block
     if (!Builder.GetInsertBlock()->getTerminator())

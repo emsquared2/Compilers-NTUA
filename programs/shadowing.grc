@@ -1,0 +1,18 @@
+fun main () : nothing
+
+    var x : int;
+
+    fun shadow () : nothing
+        var x : int;
+    {
+        x <- 7;
+        writeInteger(x);
+    }
+
+{ $ main
+   x <- 1;
+   writeInteger(x);
+   shadow();
+} $ main
+
+$ Output --> 17

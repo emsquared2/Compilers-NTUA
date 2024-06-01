@@ -1,6 +1,9 @@
 .vscode
 grace
+
 lexer.cpp
+lexer
+
 parser.cpp
 parser.hpp
 *.o
@@ -13,3 +16,5 @@ parser.hpp
 /llvm/libgrc.a
 
 .DS_Store
+
+tests

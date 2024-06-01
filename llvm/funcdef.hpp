@@ -22,6 +22,7 @@ private:
     Header *header;
     LocalDefList *local_def_list;
     Block *block;
+    std::string mangled_name;
 };
 
 #endif

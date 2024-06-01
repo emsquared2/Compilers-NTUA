@@ -2,8 +2,8 @@
 
 Id::Id(std::string s) : name(s)
 {
-    if (name == "main")
-        name = "grc_main";
+    // if (name == "main")
+    //     name = "grc_main";
 }
 void Id::printOn(std::ostream &out) const
 {
@@ -13,17 +13,11 @@ const char *Id::getName() const
 {
     return name.c_str();
 }
-std::string Id::getMangledName() const
-{
-    return name + '_' + std::to_string(scope) + '_';
-}
 
 void Id::sem()
 {
     // Check if the identifier exists.
     SymbolEntry *e = lookupEntry(this->getName(), LOOKUP_ALL_SCOPES, true);
-
-    setScope(e->scopeId);
 
     switch (e->entryType)
     {
@@ -49,12 +43,11 @@ void Id::sem()
         SemanticError("Invalid entry for identifier. This should never be reached");
         break;
     }
+    mangled_name = getMangledName(name.c_str(), e->scopeId);
 }
 
 llvm::Value * Id::compile_ptr()
 {
-    std::string mangled_name = getMangledName();
-
     // Look this variable up in the function.
     llvm::Value * LValAddr = NamedValues[mangled_name];
     if (!LValAddr) {
@@ -77,7 +70,7 @@ llvm::Value * Id::compile()
     llvm::Value *LValAddr = compile_ptr();
     if (!LValAddr) 
     {
-        std::string msg = "Id: Unknown variable name: " + getMangledName() + ".";
+        std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
     }
     return Builder.CreateLoad(getLLVMType(type, TheContext), LValAddr);

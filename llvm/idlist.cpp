@@ -11,6 +11,7 @@ IdList::~IdList()
 
 const std::vector<Id *> IdList::getIds()
 {
+    // return getReversed(idlist);
     return idlist;
 }
 
@@ -22,17 +23,24 @@ void IdList::printOn(std::ostream &out) const
 {
     out << "IdList(";
     bool first = true;
-    for (auto id = idlist.rbegin(); id != idlist.rend(); ++id)
+    for (Id *id : getReversed(idlist))
     {
         if (!first)
             out << ", ";
         first = false;
-        out << **id;
+        out << *id;
     }
     out << ")";
 }
 void IdList::sem()
 {
-    for (Id *i : idlist)
-        i->sem();
+    for (Id *id : getReversed(idlist))
+        id->sem();
+}
+
+llvm::Value *IdList::compile()
+{
+    for (Id *id : getReversed(idlist))
+        id->compile();
+    return nullptr;
 }

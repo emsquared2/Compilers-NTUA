@@ -386,8 +386,16 @@ llvm::AllocaInst *AST::CreateEntryBlockAlloca(llvm::Function *TheFunction,
 }
 
 /* ---------------------------------------------------------------------
-   ---------------------------- getLLVMType ----------------------------
+   ------------------------------- UTILS -------------------------------
    --------------------------------------------------------------------- */
+
+std::string getMangledName(const char * name, int scope)
+{
+    if (scope > 0)
+        return std::string(name) + "_" + std::to_string(scope) + '_';
+    else
+        return std::string(name);
+}
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context)
 {

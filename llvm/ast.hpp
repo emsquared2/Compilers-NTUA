@@ -127,6 +127,8 @@ public:
     void SemanticError(const char *msg);
     llvm::Value *LogErrorV(const char *Str) const;
     virtual llvm::Value *compile() { return nullptr; }
+    virtual llvm::Value *compile_ptr() { return nullptr; }
+    virtual llvm::Value * compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) { return nullptr; }
 
     // Functions for library functions
     void llvmAddLibraryFunction(const char *func_name, const std::vector<llvmType *> params_type, llvmType *return_type);
@@ -183,6 +185,15 @@ protected:
 /* ---------------------------------------------------------------------
    ------------------------------- UTILS -------------------------------
    --------------------------------------------------------------------- */
+
+template <typename T>
+std::vector<T> getReversed(const std::vector<T>& input)
+{
+    std::vector<T> reversed_vector(input.rbegin(), input.rend());
+    return reversed_vector;
+}
+
+std::string getMangledName(const char * name, int scope);
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 

@@ -1,6 +1,9 @@
 .vscode
 grace
+
 lexer.cpp
+lexer
+
 parser.cpp
 parser.hpp
 *.o
@@ -8,5 +11,10 @@ parser.hpp
 /syntax-gen/proper
 /syntax-gen/*.beam
 **/deprecated/
+*.asm
+*.imm
+/llvm/libgrc.a
 
 .DS_Store
+
+tests

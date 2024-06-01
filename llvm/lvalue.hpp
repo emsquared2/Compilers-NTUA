@@ -8,8 +8,7 @@ class LValue : public Expr
 public:
     virtual const char *getName() const;
     virtual llvm::Value * compile() override;
-    virtual llvm::Value * compile_ptr();
-    virtual llvm::Value * compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t);
+    virtual llvm::Value * compile_ptr() override;
 
     void setScope(int sc);
     int getScope();
@@ -18,7 +17,8 @@ public:
 
 protected:
     int scope = -1;
-    bool ref;
+    bool ref = false;
+    std::string name;
 };
 
 #endif

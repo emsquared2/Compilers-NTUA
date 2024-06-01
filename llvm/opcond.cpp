@@ -32,32 +32,66 @@ void OpCond::sem()
 
 llvm::Value *OpCond::compile()
 {
+    llvm::Value *L = nullptr;
+    llvm::Value *R = nullptr;
+    std::string opStr = std::string(op);
 
-    llvm::Value *R = right->compile();
-    std::string op_str = std::string(op);
-
-    if (left != nullptr)
-    {
-        llvm::Value *L = left->compile();
-
-        if (!L || !R)
+    // Case for unary operator (e.g., "not")
+    if (left == nullptr) {
+        R = right->compile();
+        if (!R) 
             return nullptr;
 
-        if (op_str == "and")
-            return Builder.CreateAnd(L, R, "andtemp");
-        else if (op_str == "or")
-            return Builder.CreateOr(L, R, "ortemp");
+        if (opStr == "not")
+            return Builder.CreateNot(R, "nottemp");
         else
-            return LogErrorV("invalid binary operator");
+            return LogErrorV("Invalid unary operator in opcond");
     }
-    else
-    {
+    // Case for binary operators (e.g., "and", "or")
+    else {
+        L = left->compile();
+        if (!L)
+            return nullptr;
+
+        llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
+        llvm::BasicBlock *EvaluateRightBB = llvm::BasicBlock::Create(TheContext, "evalright", TheFunction);
+        llvm::BasicBlock *SkipRightBB = llvm::BasicBlock::Create(TheContext, "skipright", TheFunction);
+        llvm::BasicBlock *CurrentBB = Builder.GetInsertBlock();
+
+        /* Case:
+         *      and:    If left is false, then we can skip the compilation of right 
+         *      or:     If left is true, the we can skip the compilation of right 
+        */
+       
+        // Create conditional branches based on the operator
+        if (opStr == "and")
+            Builder.CreateCondBr(L, EvaluateRightBB, SkipRightBB);
+        else if (opStr == "or")
+            Builder.CreateCondBr(L, SkipRightBB, EvaluateRightBB);
+        else
+            return LogErrorV("Invalid binary operator in opcond");
+
+        // Compile the right operand if necessary
+        Builder.SetInsertPoint(EvaluateRightBB);
+        R = right->compile();
         if (!R)
             return nullptr;
 
-        if (op_str == "not")
-            return Builder.CreateNot(R, "nottemp");
-        else
-            return LogErrorV("invalid binary operator");
+        llvm::Value *Result = nullptr;
+        if (opStr == "and")
+            Result = Builder.CreateAnd(L, R, "andtemp");
+        else if (opStr == "or")
+            Result = Builder.CreateOr(L, R, "ortemp");
+
+        llvm::BasicBlock *AfterRightBB = Builder.GetInsertBlock();
+        Builder.CreateBr(SkipRightBB);
+
+        Builder.SetInsertPoint(SkipRightBB);
+        llvm::PHINode *PhiNode = Builder.CreatePHI(L->getType(), 2, "result");
+        
+        PhiNode->addIncoming(L, CurrentBB);
+        PhiNode->addIncoming(Result, AfterRightBB);
+
+        return PhiNode;
     }
 }

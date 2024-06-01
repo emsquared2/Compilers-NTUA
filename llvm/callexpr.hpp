@@ -4,6 +4,8 @@
 #include "expr.hpp"
 #include "id.hpp"
 #include "exprlist.hpp"
+#include "conststr.hpp"
+#include "arrayelem.hpp"
 
 class CallExpr : public Expr
 {
@@ -17,6 +19,8 @@ public:
 private:
     Id *id;
     ExprList *expr_list = nullptr;
+    std::vector<bool> ref;
+    std::string mangled_name;
 };
 
 #endif

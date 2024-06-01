@@ -20,6 +20,7 @@ public:
 
     std::vector<llvmType *> getLLVM_param_types();
     std::vector<std::string> getLLVM_param_names();
+    std::string getHMangledName();
 
 private:
     Id *id;
@@ -27,6 +28,10 @@ private:
     FParamList *fparamlist;
     Type type;
     bool forward_declaration = false;
+
+    std::string mangled_name;
+    std::vector<llvmType*> llvm_param_types;
+    std::vector<std::string> llvm_param_names;
 };
 
 #endif

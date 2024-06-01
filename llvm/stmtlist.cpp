@@ -9,30 +9,32 @@ StmtList::~StmtList()
         delete stmt;
     }
 }
-void StmtList::append(Stmt *s) { stmt_list.push_back(s); }
+void StmtList::append(Stmt *s) 
+{ 
+    stmt_list.push_back(s); 
+}
 void StmtList::printOn(std::ostream &out) const
 {
     out << "StmtList(";
     bool first = true;
-    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+    for (Stmt *s : getReversed(stmt_list))
     {
         if (!first)
             out << ", ";
         first = false;
-        out << **s;
+        out << *s;
     }
     out << ")";
 }
 void StmtList::sem()
 {
-    for (Stmt *s : stmt_list)
+    for (Stmt *s : getReversed(stmt_list))
         s->sem();
 }
 
 llvm::Value* StmtList::compile()
 {
-    for (Stmt *s : stmt_list)
+    for (Stmt *s : getReversed(stmt_list))
         s->compile();
-
     return nullptr;
 }

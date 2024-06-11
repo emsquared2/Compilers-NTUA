@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <set>
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
@@ -144,6 +145,10 @@ public:
     llvm::Function *MainCodeGen(llvm::Value* main_function);
     void emitLLVMIR(const std::string& outputTarget);
     void emitAssembly(const std::string & outputTarget);
+
+
+    static std::set<std::string> CapturedVariables;
+    static std::map<std::string, unsigned int> FunctionDepth;
 
 protected:
     // Global LLVM variables related to the LLVM suite.

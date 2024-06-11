@@ -18,6 +18,11 @@ public:
 private:
     std::string name;
     std::string mangled_name;
+
+    unsigned int decl_depth;
+    unsigned int usage_depth;
+    bool is_captured = false;
+
 };
 
 #endif

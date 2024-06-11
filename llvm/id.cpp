@@ -44,10 +44,25 @@ void Id::sem()
         break;
     }
     mangled_name = getMangledName(name.c_str(), e->scopeId);
+    decl_depth = e->nestingLevel;
+    usage_depth = currentScope->nestingLevel;
+    if (decl_depth < usage_depth)
+    {
+        is_captured = true;
+        ref = true;
+        CapturedVariables.insert(mangled_name);
+    }
+
 }
 
 llvm::Value * Id::compile_ptr()
 {
+    // std::cout << mangled_name << " --> Declaration Depth: " << decl_depth << " , Usage Depth: " << usage_depth << " Captured: ";
+    // if (is_captured)
+    //     std::cout << "Yes\n";
+    // else 
+    //     std::cout << "No\n";
+
     // Look this variable up in the function.
     llvm::Value * LValAddr = NamedValues[mangled_name];
     if (!LValAddr) {

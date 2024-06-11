@@ -53,6 +53,8 @@
     std::unique_ptr<llvm::Module> AST::TheModule;
     std::unique_ptr<llvm::legacy::FunctionPassManager> AST::TheFPM;
     std::map<std::string, llvm::AllocaInst *> AST::NamedValues;
+    std::set<std::string> AST::CapturedVariables;
+    std::map<std::string, unsigned int> AST::FunctionDepth;
 
     llvmType *AST::i8 = llvm::IntegerType::get(TheContext, 8);
     llvmType *AST::i32 = llvm::IntegerType::get(TheContext, 32);

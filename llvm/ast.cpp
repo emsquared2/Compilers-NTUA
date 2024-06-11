@@ -27,6 +27,8 @@ void addLibraryFunction(const char *func_name, const std::vector<Parameter *> &p
 
     endFunctionHeader(f, return_type);
     closeScope();
+
+    AST::FunctionDepth[func_name] = currentScope->nestingLevel;
 }
 
 void addLibrary()

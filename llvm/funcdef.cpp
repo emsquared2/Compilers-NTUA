@@ -19,7 +19,13 @@ void FuncDef::sem()
 
     mangled_name = header->getHMangledName();
 
-    local_def_list->sem();
+    if (local_def_list) {
+        for(LocalDef *local : local_def_list->getLocals()) {
+            local->sem();
+            local->setOuterFunction(mangled_name);
+        }
+    }
+
     block->sem();
 
     lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
@@ -39,7 +45,7 @@ void FuncDef::ProgramSem()
 {
     /* Program should:
      *      1) NOT take parameters
-     *     2) Return nothing, i.e. have type typeVoid
+     *      2) Return nothing, i.e. have type typeVoid
      */
 
     if (header->getFParamList() != nullptr)
@@ -107,6 +113,11 @@ llvm::Function *FuncDef::compile()
     Builder.SetInsertPoint(BB_ofAbovelvelFunc);
 
     return function;
+}
+
+void FuncDef::setOuterFunction(std::string outer_func_name)
+{
+    OuterFunction[mangled_name] = outer_func_name;
 }
 
 void FuncDef::optimizeFunc(llvm::Function *function)

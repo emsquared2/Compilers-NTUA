@@ -20,6 +20,9 @@ void CallExpr::sem()
 
     mangled_name = getMangledName(id->getName(), function->scopeId);
 
+    callee_depth = FunctionDepth[mangled_name];
+    caller_depth = currentScope->nestingLevel;
+
     if (function->entryType != ENTRY_FUNCTION)
         SemanticError("Could not find function name.");
 

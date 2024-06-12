@@ -32,7 +32,7 @@ bool LValue::getRef()
 
 llvm::Value * LValue::compile_ptr()
 {
-    std::string mangled_name = name + '_' + std::to_string(scope) + '_';
+    std::string mangled_name = name + '_' + std::to_string(scope);
     llvm::Value * VarAddr = NamedValues[mangled_name];
     
     if (!VarAddr)

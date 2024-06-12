@@ -23,3 +23,8 @@ llvm::Value* FuncDecl::compile()
     header->compile();
     return nullptr;
 }
+
+void FuncDecl::setOuterFunction(std::string outer_func_name)
+{
+    OuterFunction[header->getHMangledName()] = outer_func_name;
+}

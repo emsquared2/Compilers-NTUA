@@ -148,7 +148,13 @@ public:
 
 
     static std::set<std::string> CapturedVariables;
+    static std::map<std::string, unsigned int> CapturedVariableOffset;
+
     static std::map<std::string, unsigned int> FunctionDepth;
+    static std::map<std::string, std::string> OuterFunction;
+
+    // TODO
+    llvm::Value *getCapturedVar() { return nullptr; }
 
 protected:
     // Global LLVM variables related to the LLVM suite.
@@ -201,6 +207,8 @@ std::vector<T> getReversed(const std::vector<T>& input)
 std::string getMangledName(const char * name, int scope);
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
+
+bool isTopLevel(std::string func_name);
 
 inline std::vector<bool> returnedFunction;
 

@@ -52,9 +52,12 @@
     llvm::IRBuilder<> AST::Builder(TheContext);
     std::unique_ptr<llvm::Module> AST::TheModule;
     std::unique_ptr<llvm::legacy::FunctionPassManager> AST::TheFPM;
+
     std::map<std::string, llvm::AllocaInst *> AST::NamedValues;
     std::set<std::string> AST::CapturedVariables;
+    std::map<std::string, unsigned int> AST::CapturedVariableOffset;
     std::map<std::string, unsigned int> AST::FunctionDepth;
+    std::map<std::string, std::string> AST::OuterFunction;
 
     llvmType *AST::i8 = llvm::IntegerType::get(TheContext, 8);
     llvmType *AST::i32 = llvm::IntegerType::get(TheContext, 32);
@@ -178,7 +181,29 @@ program:
     | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
         $$ = $1; 
         $1->ProgramSem();
+
+        std::cout << "Captured Variables: \n";
+        for (auto &var : AST::CapturedVariables)
+            std::cout << var << std::endl;
+        std::cout << "--------------------" << std::endl;
+
+        std::cout << "Captured Variables Offsets: \n";
+        for (auto &pair : AST::CapturedVariableOffset)
+            std::cout << pair.first << ": " << pair.second << std::endl;
+        std::cout << "--------------------" << std::endl;
+
+        std::cout << "Function Depth: \n";
+        for(auto &pair : AST::FunctionDepth)
+            std:: cout << pair.first << ": " << pair.second << std::endl;
+        std::cout << "--------------------" << std::endl;
+
+        std::cout << "Outer Function: \n";
+        for(auto &pair : AST::OuterFunction)
+            std:: cout << pair.first << ": " << pair.second << std::endl;
+        std::cout << "--------------------" << std::endl;
+
         $1->llvm_compile_and_dump();
+
         delete $$;
     }
 ;

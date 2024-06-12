@@ -394,9 +394,14 @@ llvm::AllocaInst *AST::CreateEntryBlockAlloca(llvm::Function *TheFunction,
 std::string getMangledName(const char * name, int scope)
 {
     if (scope > 0)
-        return std::string(name) + "_" + std::to_string(scope) + '_';
+        return std::string(name) + '_' + std::to_string(scope);
     else
         return std::string(name);
+}
+
+bool isTopLevel(std::string func_name)
+{
+    return AST::FunctionDepth[func_name] <= 2;
 }
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context)

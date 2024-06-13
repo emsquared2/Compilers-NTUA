@@ -22,6 +22,9 @@ public:
     std::vector<std::string> getLLVM_param_names();
     std::string getHMangledName();
 
+    void addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvm::Type*> *param_types);
+    void addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref);
+
 private:
     Id *id;
     RetType *ret_type;

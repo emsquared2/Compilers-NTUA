@@ -59,7 +59,6 @@ void FuncDef::ProgramSem()
 
 llvm::Function *FuncDef::compile()
 {
-
     llvm::BasicBlock *BB_ofAbovelvelFunc = Builder.GetInsertBlock();
 
     llvm::Function *function = header->compile();
@@ -86,11 +85,16 @@ llvm::Function *FuncDef::compile()
         NamedValues[llvm_param_names[current_arg++]] = Alloca;
     }
 
+    llvmType *stack_frame_type = createFunctionStructType();
+
     for (LocalDef *l : local_def_list->getLocals())
     {
         l->compile();
         Builder.SetInsertPoint(BB);
     }
+
+    createFunctionStackFrame(stack_frame_type);
+    populateFunctionStackFrame();
 
     block->compile();
 
@@ -118,6 +122,80 @@ llvm::Function *FuncDef::compile()
 void FuncDef::setOuterFunction(std::string outer_func_name)
 {
     OuterFunction[mangled_name] = outer_func_name;
+}
+
+/*
+ * This function builds the LLVM structure type for a function's stack frame.
+ * It includes captured variables, parameters, and a static link to the outer 
+ * function's stack frame (if the function is nested, i.e. non-top-level). 
+ */
+llvmType * FuncDef::createFunctionStructType()
+{
+    if (!isTopLevel(mangled_name))
+    {
+        // Add a static link to the function signature to access the outer function's stack frame
+        header->addStaticLinkToFunctionSignature(&captured_names, &captured_types);
+        // Mark the static link as a reference
+        captured_ref.push_back(true);
+        // Record the offset of the static link in the stack frame
+        CapturedVariableOffset["static_link_" + mangled_name] = 0;
+    }
+
+    // Add captured parameters to the function's stack frame
+    header->addCapturedParameters(&captured_names, &captured_types, &captured_ref);
+
+    // Add captured variables
+    if(local_def_list) 
+    {
+        for(LocalDef *l : local_def_list->getLocals())
+        {
+            Decl *decl = dynamic_cast<Decl*>(l);
+            if (decl)
+                decl->addCapturedParameters(&captured_names, &captured_types, &captured_ref);
+        }
+    }
+
+    // Generate the name for the function's stack frame structure
+    std::string struct_name = getFunctionStackFrameStructName(mangled_name);
+    // Create and return the LLVM structure type for the function's stack frame
+    return llvm::StructType::create(TheContext, captured_types, struct_name);
+}
+
+/*
+ * This function creates an allocation for the stack frame of a function.
+ * This stack frame holds all local variables, parameters, and any captured
+ * variables that need to be accessible within the function. 
+ */
+void FuncDef::createFunctionStackFrame(llvmType *stack_frame_type)
+{
+    std::string stack_frame_name = getStackFrameName(mangled_name);
+    // Allocate memory on the stack for the stack frame
+    llvm::AllocaInst *Alloca = Builder.CreateAlloca(stack_frame_type, nullptr, stack_frame_name);
+    // Store the allocation in the NamedValues map
+    NamedValues[stack_frame_name] = Alloca;
+}
+
+void FuncDef::populateFunctionStackFrame()
+{
+    // Retrieve the address and type of the function's stack frame
+    llvm::Value *stackFrameAddress = NamedValues[getStackFrameName(mangled_name)];
+    llvmType *stackFrameType = llvm::StructType::getTypeByName(TheContext, getFunctionStackFrameStructName(mangled_name));
+
+    for (int idx = 0; idx < captured_names.size(); idx++)
+    {
+        // Calculate the address within the stack frame where the captured variable will be stored
+        llvm::Value *stackFrameCapturedVarAddress = Builder.CreateStructGEP(stackFrameType, stackFrameAddress, idx);
+        
+        // Get the address where captured variable is stored
+        llvm::Value *capturedVariableAddress;
+        if (captured_ref[idx])
+            capturedVariableAddress = Builder.CreateLoad(captured_types[idx], NamedValues[captured_names[idx]]);
+        else
+            capturedVariableAddress = NamedValues[captured_names[idx]];
+
+        // Store the address of the captured variable into the stack frame
+        Builder.CreateStore(capturedVariableAddress, stackFrameCapturedVarAddress);
+    }
 }
 
 void FuncDef::optimizeFunc(llvm::Function *function)

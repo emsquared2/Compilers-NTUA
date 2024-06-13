@@ -6,21 +6,6 @@ arrayelem   :
 ast         : 
 conststr    : 
 decl        : 
-fparam      : 
-header      :           
+fparam      :          
 id          :
 lvalue      : 
-
-
-#33 LLVM - Enclosing Scopes
-
-ast
-callexpr
-callstmt
-decl
-fparam
-funcdef
-id              : TODO --> CapturedVarAddr()
-
-funcdecl        : DONE
-localdef        : DONE

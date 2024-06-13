@@ -181,29 +181,7 @@ program:
     | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
         $$ = $1; 
         $1->ProgramSem();
-
-        std::cout << "Captured Variables: \n";
-        for (auto &var : AST::CapturedVariables)
-            std::cout << var << std::endl;
-        std::cout << "--------------------" << std::endl;
-
-        std::cout << "Captured Variables Offsets: \n";
-        for (auto &pair : AST::CapturedVariableOffset)
-            std::cout << pair.first << ": " << pair.second << std::endl;
-        std::cout << "--------------------" << std::endl;
-
-        std::cout << "Function Depth: \n";
-        for(auto &pair : AST::FunctionDepth)
-            std:: cout << pair.first << ": " << pair.second << std::endl;
-        std::cout << "--------------------" << std::endl;
-
-        std::cout << "Outer Function: \n";
-        for(auto &pair : AST::OuterFunction)
-            std:: cout << pair.first << ": " << pair.second << std::endl;
-        std::cout << "--------------------" << std::endl;
-
         $1->llvm_compile_and_dump();
-
         delete $$;
     }
 ;

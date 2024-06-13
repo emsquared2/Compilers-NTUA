@@ -15,6 +15,7 @@ public:
     virtual llvm::Value* compile() override;
 
     virtual void setOuterFunction(std::string outer_func_name) override {};
+    void addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref);
 
 private:
     IdList *idlist;

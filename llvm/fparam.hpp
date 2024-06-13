@@ -19,6 +19,7 @@ public:
     IdList * getIdList();
     PassMode getPassMode();
 
+    void addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref);
 
 private:
     IdList *idlist;

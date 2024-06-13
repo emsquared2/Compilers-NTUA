@@ -77,19 +77,24 @@ void CallExpr::sem()
 
 llvm::Value *CallExpr::compile()
 {
-    std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *> {};
-
     // Look up the name in the global module table.
     llvm::Function *CalleeF = TheModule->getFunction(mangled_name);
     if (!CalleeF) {
         std::string msg = "CallExpr: Unknown function referenced --> " + mangled_name;
         return LogErrorV(msg.c_str());
     }
-    // If argument mismatch error.
-    if (CalleeF->arg_size() != Args.size())
-        return LogErrorV("Incorrect # arguments passed");
+
+    std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *> {};
 
     std::vector<llvm::Value *> ArgsV;
+
+    if (!isTopLevel(mangled_name))
+    {
+        ref.push_back(true);
+        llvm::Value *stackFrameAddr = getStackFrameAddr(callee_depth, caller_depth);
+        ArgsV.push_back(stackFrameAddr);
+    }
+
     llvm::Value *ExprV_A = nullptr;
 
     for (int i = 0; i < Args.size(); ++i)

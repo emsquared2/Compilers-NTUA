@@ -72,6 +72,9 @@ void Header::sem()
 
 llvm::Function *Header::compile()
 {
+    if (!isTopLevel(mangled_name))
+        addStaticLinkToFunctionSignature(&llvm_param_names, &llvm_param_types);
+
     if (fparamlist)
         fparamlist->compile(&llvm_param_names, &llvm_param_types);
 
@@ -80,11 +83,9 @@ llvm::Function *Header::compile()
     {
         llvmType *return_type = getLLVMType(type, TheContext);
 
-        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, (fparamlist) ? llvm_param_types : std::vector<llvmType *>{}, false);
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
         function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, mangled_name, TheModule.get());
     }
-
-    // std::cout << "Depth of " << mangled_name << " : " << FunctionDepth[mangled_name] << std::endl;
     return function;
 }
 
@@ -95,11 +96,56 @@ std::string Header::getHMangledName()
 
 std::vector<llvmType *> Header::getLLVM_param_types()
 {
-    return (fparamlist) ? llvm_param_types : std::vector<llvmType *>{};
+    // return (fparamlist) ? llvm_param_types : std::vector<llvmType *>{};
     return llvm_param_types;
 }
 
 std::vector<std::string> Header::getLLVM_param_names()
 {
-    return (fparamlist) ? llvm_param_names : std::vector<std::string>{};
+    // return (fparamlist) ? llvm_param_names : std::vector<std::string>{};
+    return llvm_param_names;
+}
+
+
+/*
+ * This function ensures that the inner function receives a pointer to the outer function's stack frame,
+ * allowing it to access variables from the outer scope. In the following example:
+ *  fun A() nothing:
+ *      var x : int;
+ *      fun B() : nothing
+ *      {
+ *          x <- x + 1;
+ *      }
+ *  {
+ *      x <- 10;
+ *      B();
+ *  }
+ * 
+ * - Function A will have its own stack frame.
+ * - Function B will have an additional parameter that is a pointer to A's stack frame struct.
+ * - The static link ensures that B can access x from A.
+ */
+
+void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvm::Type*> *param_types)
+{
+    // Get the mangled name of the outer function
+    std::string outer_func_mangled_name = OuterFunction[mangled_name];
+    
+    // Get the name of the stack frame structure for the outer function
+    std::string outer_func_stack_frame_struct_name = getFunctionStackFrameStructName(outer_func_mangled_name);
+    
+    // Add a pointer to the outer function's stack frame structure type to the list of types
+    param_types->push_back(llvm::StructType::getTypeByName(TheContext, outer_func_stack_frame_struct_name)->getPointerTo());
+    
+    // Add a name for the static link to the list of names
+    param_names->push_back("static_link_" + mangled_name);
+}
+
+void Header::addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref)
+{
+    if (fparamlist)
+    {
+        for(FParam *fparam : fparamlist->getParams())
+            fparam->addCapturedParameters(param_names, param_types, ref);
+    }
 }

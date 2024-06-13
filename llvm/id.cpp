@@ -54,7 +54,6 @@ void Id::sem()
         ref = true;
         CapturedVariables.insert(mangled_name);
     }
-
 }
 
 llvm::Value * Id::compile_ptr()
@@ -87,8 +86,14 @@ llvm::Value * Id::compile()
     return Builder.CreateLoad(getLLVMType(type, TheContext), LValAddr);
 }
 
-// TODO
 llvm::Value * Id::CapturedVarAddr()
 {
-    return NamedValues[mangled_name];
+    // Type of the stack frame
+    llvmType *stack_frame_type;
+    // Get the address of the stack frame
+    llvm::Value *stack_frame_addr = getStackFrameAddr(decl_depth, usage_depth, &stack_frame_type);
+    // Get the offset of the captured variable in the stack frame
+    unsigned int offset = CapturedVariableOffset[mangled_name];
+
+    return Builder.CreateStructGEP(stack_frame_type, stack_frame_addr, offset);
 }

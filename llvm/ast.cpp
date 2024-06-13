@@ -398,6 +398,43 @@ std::string getMangledName(const char * name, int scope)
     else
         return std::string(name);
 }
+std::string getFunctionStackFrameStructName(std::string func_name)
+{
+    return "stack_frame_struct_" + func_name;
+}
+
+std::string getStackFrameName(std::string func_name)
+{
+    return "stack_frame_" + func_name;
+}
+
+llvm::Value *AST::getStackFrameAddr(unsigned int decl_depth, unsigned int usage_depth, llvmType **final_stack_frame_type)
+{
+    // Get Caller
+    llvm::Function *Caller = Builder.GetInsertBlock()->getParent();
+    std::string func_name = Caller->getName().str();
+
+    // Get the address and type of the current stack frame
+    llvm::Value *stack_frame_addr = NamedValues[getStackFrameName(func_name)];
+    llvmType *stack_frame_type = llvm::StructType::getTypeByName(TheContext, getFunctionStackFrameStructName(func_name));
+
+    // Iterate through all stack frames between decl_depth and usage_depth
+    unsigned int diff = usage_depth - decl_depth;
+    while (diff-- > 0)
+    {
+        // Move to the next outer function
+        func_name = OuterFunction[func_name];
+
+        // Get the address and type of the next stack frame
+        llvmType *next_stack_frame_type = llvm::StructType::getTypeByName(TheContext, getFunctionStackFrameStructName(func_name));
+        stack_frame_addr = Builder.CreateLoad(next_stack_frame_type->getPointerTo(), Builder.CreateStructGEP(stack_frame_type, stack_frame_addr, 0));
+        stack_frame_type = next_stack_frame_type;
+    }
+    if (final_stack_frame_type)
+        *final_stack_frame_type = stack_frame_type;
+
+    return stack_frame_addr;
+}
 
 bool isTopLevel(std::string func_name)
 {

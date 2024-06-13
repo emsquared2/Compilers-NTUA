@@ -5,6 +5,7 @@
 #include "header.hpp"
 #include "block.hpp"
 #include "localdeflist.hpp"
+#include "decl.hpp"
 
 
 class FuncDef : public LocalDef
@@ -26,6 +27,14 @@ private:
     LocalDefList *local_def_list;
     Block *block;
     std::string mangled_name;
+
+    std::vector<std::string> captured_names;
+    std::vector<llvmType *> captured_types;
+    std::vector<bool> captured_ref;
+
+    llvmType *createFunctionStructType();
+    void createFunctionStackFrame(llvmType *stack_frame_type);
+    void populateFunctionStackFrame();
 };
 
 #endif

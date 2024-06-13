@@ -154,7 +154,7 @@ public:
     static std::map<std::string, std::string> OuterFunction;
 
     // TODO
-    llvm::Value *getCapturedVar() { return nullptr; }
+    llvm::Value *getStackFrameAddr(unsigned int decl_depth, unsigned int usage_depth, llvmType **final_stack_frame_type = nullptr);
 
 protected:
     // Global LLVM variables related to the LLVM suite.
@@ -205,6 +205,8 @@ std::vector<T> getReversed(const std::vector<T>& input)
 }
 
 std::string getMangledName(const char * name, int scope);
+std::string getFunctionStackFrameStructName(std::string func_name);
+std::string getStackFrameName(std::string func_name);
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 

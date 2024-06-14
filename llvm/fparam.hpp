@@ -14,7 +14,7 @@ public:
     void setSymbolEntry(SymbolEntry *f);
     Type getType();
     llvm::Value *compile() override;
-    llvm::Value* compile(std::vector<std::string> * signature_mangled_names, std::vector<llvmType*> * signature_types);
+    llvm::Value* compile(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types);
 
     IdList * getIdList();
     PassMode getPassMode();
@@ -29,7 +29,7 @@ private:
     bool ref;
 
     SymbolEntry *function;
-    unsigned int scope;
+    unsigned int scope_id;
 };
 
 #endif

@@ -17,9 +17,7 @@ public:
     virtual void sem() override;
     void ProgramSem();
     virtual llvm::Function *compile() override;
-
     virtual void setOuterFunction(std::string outer_func_name) override;
-
     void optimizeFunc(llvm::Function *function);
 
 private:

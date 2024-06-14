@@ -9,14 +9,10 @@ Header::~Header()
 {
     delete id;
     if (fparamlist != nullptr)
-    {
         delete fparamlist;
-    }
     delete ret_type;
     if (type)
-    {
         destroyType(type);
-    }
 }
 void Header::printOn(std::ostream &out) const
 {
@@ -29,7 +25,7 @@ void Header::printOn(std::ostream &out) const
     out << ")";
 }
 
-void Header::set_forward_declaration()
+void Header::setForwardDeclaration()
 {
     forward_declaration = true;
 }
@@ -49,16 +45,19 @@ Id *Header::getId()
 }
 void Header::sem()
 {
+    // Create a new symbol entry for the function
     SymbolEntry *function = newFunction(id->getName());
 
     mangled_name = getMangledName(id->getName(), function->scopeId);
     FunctionDepth[mangled_name] = function->nestingLevel;
 
-    // add case when parser identifies forward declaration
+    // Handle forward declaration of the function
     if (forward_declaration)
         forwardFunction(function);
 
+    // Open a new scope for the function's body
     openScope();
+    // Indicate that the function has not a return statement yet
     returnedFunction.push_back(false);
 
     if (fparamlist != nullptr)
@@ -72,6 +71,7 @@ void Header::sem()
 
 llvm::Function *Header::compile()
 {
+    // If the function is not a top-level function, then add a static link to the function signature.
     if (!isTopLevel(mangled_name))
         addStaticLinkToFunctionSignature(&llvm_param_names, &llvm_param_types);
 
@@ -82,7 +82,6 @@ llvm::Function *Header::compile()
     if (!function)
     {
         llvmType *return_type = getLLVMType(type, TheContext);
-
         llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
         function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, mangled_name, TheModule.get());
     }
@@ -96,20 +95,18 @@ std::string Header::getHMangledName()
 
 std::vector<llvmType *> Header::getLLVM_param_types()
 {
-    // return (fparamlist) ? llvm_param_types : std::vector<llvmType *>{};
     return llvm_param_types;
 }
 
 std::vector<std::string> Header::getLLVM_param_names()
 {
-    // return (fparamlist) ? llvm_param_names : std::vector<std::string>{};
     return llvm_param_names;
 }
 
-
 /*
- * This function ensures that the inner function receives a pointer to the outer function's stack frame,
- * allowing it to access variables from the outer scope. In the following example:
+ * This function adds a static link to the function signature, allowing inner functions to access
+ * variables from the outer function's scope.
+ * Example:
  *  fun A() nothing:
  *      var x : int;
  *      fun B() : nothing
@@ -121,11 +118,11 @@ std::vector<std::string> Header::getLLVM_param_names()
  *      B();
  *  }
  * 
+ * Here:
  * - Function A will have its own stack frame.
- * - Function B will have an additional parameter that is a pointer to A's stack frame struct.
- * - The static link ensures that B can access x from A.
+ * - Function B will have an additional parameter that is a pointer to A's stack frame.
+ * - The static link ensures that B can access the variable x defined in A.
  */
-
 void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvm::Type*> *param_types)
 {
     // Get the mangled name of the outer function
@@ -134,14 +131,15 @@ void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_na
     // Get the name of the stack frame structure for the outer function
     std::string outer_func_stack_frame_struct_name = getFunctionStackFrameStructName(outer_func_mangled_name);
     
-    // Add a pointer to the outer function's stack frame structure type to the list of types
+    // Add a pointer to the outer function's stack frame structure to the parameter types
     param_types->push_back(llvm::StructType::getTypeByName(TheContext, outer_func_stack_frame_struct_name)->getPointerTo());
     
-    // Add a name for the static link to the list of names
+    // Add a name for the static link to the parameter names
     param_names->push_back("static_link_" + mangled_name);
 }
 
-void Header::addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref)
+// It adds captured parameters to the function signature
+void Header::addCapturedParametersToSignature(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref)
 {
     if (fparamlist)
     {

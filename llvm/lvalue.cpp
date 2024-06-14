@@ -26,10 +26,6 @@ bool LValue::getRef()
     return ref;
 }
 
-// llvm::Value * LValue::compile() { return nullptr; }
-// llvm::Value * LValue::compile_ptr() { return nullptr; }
-// llvm::Value * LValue::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) { return nullptr; }
-
 llvm::Value * LValue::compile_ptr()
 {
     std::string mangled_name = name + '_' + std::to_string(scope);

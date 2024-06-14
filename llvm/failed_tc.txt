@@ -1,20 +1,17 @@
 tests/runtime/
-    
-    - alloca_bug/test.grc
+
     - leetcode/*
-    
     - err_const_string      --> assigning in array of chars...
-    - escaped_*             -->
     - pass_by_ref_arr_*     --> array related
     - pass_by_ref_calls_pass_by_ref_arr_3.grc   --> array related
-    
-    - str_at_operator_*     --> not sure
 
+- escaped:
 
-Bug:
-    nested_functions_2.grc     --> works fine but also prints an error
+// MultiDimension Arrays
+escaped_param_by_ref_arr_element.grc 
+escaped_param_by_ref_autocomplete_2.grc
+escaped_param_by_ref_partial_array.grc 
+escaped_param_by_value_arr_element.grc  
 
-############ DONE ##############
-- main_writeString      --> should we be able to overwrite lib functions?
-- overload_*            --> should we support overloading?
-- nested_functions_*
+// Other
+escaped_param_by_ref_two_vars.grc

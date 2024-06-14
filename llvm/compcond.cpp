@@ -21,14 +21,15 @@ void CompCond::sem()
     Type left_type = left->getType();
     Type right_type = right->getType();
 
-    // Check operands' type (typeInteher or typeChar)
+    // Check that the left operand's type is either typeInteger or typeChar.
     if (!equalType(left_type, typeInteger) && !equalType(left_type, typeChar))
         SemanticError("CompCond: Left operand should be typeInteger or typeChar");
 
+    // Check that the right operand's type is either typeInteger or typeChar.
     if (!equalType(right_type, typeInteger) && !equalType(right_type, typeChar))
         SemanticError("CompCond: Right operand should be typeInteger or typeChar");
 
-    // Check if right and left operand have the same type
+    // Ensure both operands have the same type.
     if (!equalType(left_type, right_type))
         SemanticError("CompCond: Operands should have the same type.");
 

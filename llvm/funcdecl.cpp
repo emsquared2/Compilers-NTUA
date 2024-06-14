@@ -8,10 +8,10 @@ void FuncDecl::printOn(std::ostream &out) const
 }
 void FuncDecl::sem()
 {
-    // FuncDecl is for forward declaring function.
-    // Header class is for both forward and non forward functions.
-    // Set forward_declaration to true to specify a header that represents a forward declared function.
-    header->set_forward_declaration();
+    // FuncDecl is used for forward declaring functions.
+    // The Header class is used for both forward declarations and regular function definitions.
+    // Setting forward_declaration to true specifies that the Header represents a forward declared function.
+    header->setForwardDeclaration();
     header->sem();
 
     returnedFunction.pop_back();

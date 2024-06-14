@@ -10,9 +10,7 @@ FParam::~FParam()
     delete idlist;
     delete fpartype;
     if (fpartype)
-    {
         destroyType(type);
-    }
 }
 void FParam::printOn(std::ostream &out) const
 {
@@ -46,11 +44,9 @@ void FParam::sem()
 
     SymbolEntry *param;
     for (Id *id : idlist->getIds()) {
-        param = newParameter(id->getName(), type, pass_mode, function);
-        // id->setScope(param->scopeId);        
+        param = newParameter(id->getName(), type, pass_mode, function);      
     }
-
-    scope = param->scopeId;
+    scope_id = param->scopeId;
 
     function = nullptr;
 }
@@ -67,10 +63,10 @@ PassMode FParam::getPassMode()
 
 llvm::Value *FParam::compile()
 {
-    return LogErrorV("FParam->compile() should never be called!");
+    return LogErrorV("FParam::compile() should never be called!");
 }
 
-llvm::Value* FParam::compile(std::vector<std::string> * signature_mangled_names, std::vector<llvmType*> * signature_types)
+llvm::Value* FParam::compile(std::vector<std::string> * param_names, std::vector<llvmType*> * param_types)
 {
     llvmType* t;
     switch(pass_mode)
@@ -84,17 +80,19 @@ llvm::Value* FParam::compile(std::vector<std::string> * signature_mangled_names,
     }
     for (Id *id : idlist->getIds())
     {
-        signature_types->push_back(t);
-        signature_mangled_names->push_back(getMangledName(id->getName(), scope));
+        param_types->push_back(t);
+        param_names->push_back(getMangledName(id->getName(), scope_id));
     }
 
 return nullptr;
 }
 
 /*
- * This function adds captured variables (parameters) to the function's parameter lists if they are used in an inner function.
- * It ensures that the innfer function's parameter list includes pointers to these captured variables so that they can be accessed
- * within the inner function. For example:
+ * This function identifies and adds captured parameters to the inner function's parameter list.
+ * Captured parameters are those that are parameters of an outer function but are used in an inner function.
+ * Pointers to these parameters are later added to the stack frame struct of the corresponding function.
+ * It ensures that the inner function has pointers to these captured parameters, enabling their access within the inner function.
+ * Example:
  * fun outer(x : int) : nothing
  *      fun inner() : nothing
  *      {
@@ -105,16 +103,20 @@ return nullptr;
  *      inner();
  * }
  * 
- * - Variable x is a parameter of `outer` and is captured by `inner`, so var x needs to be included in `inner`'s parameter list.
+ * Here, variable x is a parameter of `outer` and is captured by `inner`, so `x` needs to be included in `inner`'s parameter list.
  */
 void FParam::addCapturedParameters(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref)
 {
+    // Get the LLVM type for pointers to the declared type.
     llvmType *t = llvm::PointerType::get(getLLVMType(type, TheContext), 0);
 
     if (idlist) {
+        // Check each identifier to see if it's a captured variable.
         for (Id *id : idlist->getIds()) {
-            std::string mangled_name = getMangledName(id->getName(), scope);
-            if(CapturedVariables.find(mangled_name) != CapturedVariables.end()) {
+            std::string mangled_name = getMangledName(id->getName(), scope_id);
+            if(CapturedVariables.find(mangled_name) != CapturedVariables.end()) 
+            {
+                // Add the captured parameter to the parameter lists.
                 param_names->push_back(mangled_name);
                 param_types->push_back(t);
                 CapturedVariableOffset[mangled_name] = param_names->size() - 1;

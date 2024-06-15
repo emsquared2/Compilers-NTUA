@@ -1,17 +1,20 @@
 tests/runtime/
 
-    - leetcode/*
-    - err_const_string      --> assigning in array of chars...
-    - pass_by_ref_arr_*     --> array related
-    - pass_by_ref_calls_pass_by_ref_arr_3.grc   --> array related
 
-- escaped:
 
 // MultiDimension Arrays
-escaped_param_by_ref_arr_element.grc 
-escaped_param_by_ref_autocomplete_2.grc
 escaped_param_by_ref_partial_array.grc 
-escaped_param_by_value_arr_element.grc  
+
+pass_by_ref_arr_both_with_auto_and_without.grc
+pass_by_ref_arr_partial_autocomplete.grc 
+pass_by_ref_arr_partial_autocomplete_2.grc 
+
 
 // Other
 escaped_param_by_ref_two_vars.grc
+
+leetcode/count_common_strings.grc  
+happy_number_recursion.grc 
+is_palindrome.grc 
+roman_to_int.grc
+two_sum.grc  

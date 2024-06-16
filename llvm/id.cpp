@@ -30,7 +30,7 @@ void Id::sem()
     case ENTRY_PARAMETER:
         type = e->u.eParameter.type;
         if (e->u.eParameter.mode == PASS_BY_REFERENCE)
-            ref = true;
+            ref = true;  
         break;
     // Can it be Temporary?
     case ENTRY_TEMPORARY:
@@ -40,7 +40,7 @@ void Id::sem()
         SemanticError("Invalid entry for identifier. This should never be reached");
         break;
     }
-    dereference = e->u.eParameter.type->size != UNKNOWN_DIMENSION;
+    dereference = e->u.eParameter.type->size != UNKNOWN_SIZE;
     mangled_name = getMangledName(name.c_str(), e->scopeId);
 
     decl_depth = e->nestingLevel;

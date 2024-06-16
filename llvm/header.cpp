@@ -59,6 +59,7 @@ void Header::sem()
     openScope();
     // Indicate that the function has not a return statement yet
     returnedFunction.push_back(false);
+    returnType.push_back(type);
 
     if (fparamlist != nullptr)
     {

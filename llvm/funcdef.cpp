@@ -41,6 +41,7 @@ void FuncDef::sem()
 
     // Remove the current function from the stack of returned functions and close the scope.
     returnedFunction.pop_back();
+    returnType.pop_back();
     closeScope();
 }
 

@@ -39,7 +39,11 @@ llvm::Value* Block::compile()
     {
         s->compile();
 
-        // If statement s is a return statement, then do not compile anything else in the block.
+        /*
+         * If the current statement is a return statement, terminate the loop.
+         * This ensures that any statements after the return statement are not compiled,
+         * as they would be unreachable in the actual program execution.
+         */
         if (dynamic_cast<Return *> (s))
             break;
     }

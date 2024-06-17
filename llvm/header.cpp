@@ -9,14 +9,10 @@ Header::~Header()
 {
     delete id;
     if (fparamlist != nullptr)
-    {
         delete fparamlist;
-    }
     delete ret_type;
     if (type)
-    {
         destroyType(type);
-    }
 }
 void Header::printOn(std::ostream &out) const
 {
@@ -29,7 +25,7 @@ void Header::printOn(std::ostream &out) const
     out << ")";
 }
 
-void Header::set_forward_declaration()
+void Header::setForwardDeclaration()
 {
     forward_declaration = true;
 }
@@ -49,27 +45,21 @@ Id *Header::getId()
 }
 void Header::sem()
 {
+    // Create a new symbol entry for the function
     SymbolEntry *function = newFunction(id->getName());
 
     mangled_name = getMangledName(id->getName(), function->scopeId);
+    FunctionDepth[mangled_name] = function->nestingLevel;
 
-    // add case when parser identifies forward declaration
+    // Handle forward declaration of the function
     if (forward_declaration)
         forwardFunction(function);
 
+    // Open a new scope for the function's body
     openScope();
+    // Indicate that the function has not a return statement yet
     returnedFunction.push_back(false);
-    /*
-    Here we have to add all the parameters to the symbol entry.
-    The SymbolEntry of the function (look *function above) is also needed when creating a new function parameter.
-    We have 2 options:
-    Option 1: Pass the function SymbolEntry to the ParamList and handle the sem() function inside the ParamList class
-    Option 2: Add a method to the ParamList class that returns the private vector of Parameters. Then handle each Param in this sem() function.
 
-    Option 1 might be easier to implement but having a field of SymbolEntry on a Class might seem a little be counterintuitive.
-
-    Option 2 on the other hand might be a cleaner option as the SymbolEntry is abstracted from the classes.
-    */
     if (fparamlist != nullptr)
     {
         fparamlist->setSymbolEntry(function);
@@ -81,6 +71,10 @@ void Header::sem()
 
 llvm::Function *Header::compile()
 {
+    // If the function is not a top-level function, then add a static link to the function signature.
+    if (!isTopLevel(mangled_name))
+        addStaticLinkToFunctionSignature(&llvm_param_names, &llvm_param_types);
+
     if (fparamlist)
         fparamlist->compile(&llvm_param_names, &llvm_param_types);
 
@@ -88,12 +82,9 @@ llvm::Function *Header::compile()
     if (!function)
     {
         llvmType *return_type = getLLVMType(type, TheContext);
-        // std::vector<llvmType *> llvm_param_types = (fparamlist) ? fparamlist->getLLVM_params() : std::vector<llvmType *>{};
-
-        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, (fparamlist) ? llvm_param_types : std::vector<llvmType *>{}, false);
+        llvm::FunctionType *funcType = llvm::FunctionType::get(return_type, llvm_param_types, false);
         function = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, mangled_name, TheModule.get());
     }
-
     return function;
 }
 
@@ -104,14 +95,55 @@ std::string Header::getHMangledName()
 
 std::vector<llvmType *> Header::getLLVM_param_types()
 {
-    return (fparamlist) ? llvm_param_types : std::vector<llvmType *>{};
     return llvm_param_types;
 }
 
-// std::vector<llvm::StringRef> Header::getLLVM_param_names()
 std::vector<std::string> Header::getLLVM_param_names()
 {
-    // return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<llvm::StringRef>{};
-    // return (fparamlist) ? fparamlist->getLLVM_param_names() : std::vector<std::string>{};
-    return (fparamlist) ? llvm_param_names : std::vector<std::string>{};
+    return llvm_param_names;
+}
+
+/*
+ * This function adds a static link to the function signature, allowing inner functions to access
+ * variables from the outer function's scope.
+ * Example:
+ *  fun A() nothing:
+ *      var x : int;
+ *      fun B() : nothing
+ *      {
+ *          x <- x + 1;
+ *      }
+ *  {
+ *      x <- 10;
+ *      B();
+ *  }
+ * 
+ * Here:
+ * - Function A will have its own stack frame.
+ * - Function B will have an additional parameter that is a pointer to A's stack frame.
+ * - The static link ensures that B can access the variable x defined in A.
+ */
+void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvm::Type*> *param_types)
+{
+    // Get the mangled name of the outer function
+    std::string outer_func_mangled_name = OuterFunction[mangled_name];
+    
+    // Get the name of the stack frame structure for the outer function
+    std::string outer_func_stack_frame_struct_name = getFunctionStackFrameStructName(outer_func_mangled_name);
+    
+    // Add a pointer to the outer function's stack frame structure to the parameter types
+    param_types->push_back(llvm::StructType::getTypeByName(TheContext, outer_func_stack_frame_struct_name)->getPointerTo());
+    
+    // Add a name for the static link to the parameter names
+    param_names->push_back("static_link_" + mangled_name);
+}
+
+// It adds captured parameters to the function signature
+void Header::addCapturedParametersToSignature(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref)
+{
+    if (fparamlist)
+    {
+        for(FParam *fparam : fparamlist->getParams())
+            fparam->addCapturedParameters(param_names, param_types, ref);
+    }
 }

@@ -21,6 +21,9 @@ private:
     ExprList *expr_list = nullptr;
     std::vector<bool> ref;
     std::string mangled_name;
+
+    unsigned int caller_depth;
+    unsigned int callee_depth;
 };
 
 #endif

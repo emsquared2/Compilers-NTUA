@@ -1,43 +1,11 @@
-array       :
-arraydim    : not needed
-arrayelem   :
-assign      : DONE
-ast         : DONE
-binop       : DONE
-block       : DONE
-callexpr    : DONE                  might change
-callstmt    : DONE (?)              might change
-compcond    : DONE
-cond        : not needed, abstract
-const       : DONE
-constchar   : DONE
-conststr    : DONE
-customtype  : not needed, type
-decl        : DONE                  might
-expr        : not needed, abstract
-exprlist    : DONE
-fparam      :
-fparamlist  : DONE
-fpartype    : 
-funcdecl    : DONE
-funcdef     : DONE
-header      : DONE                      perhaps compile fparamlist too
-id          : DONE
-idlist      : DONE
-if          : DONE
-localdef    : not needed, abstract
-localdeflist: DONE
-lvalue      : not needed, abstract
-nothing     : DONE
-opcond      : DONE                      might change
-rettype     : not needed, type
-return      : DONE
-stmt        : not needed, abstract
-stmtlist    : DONE
-unop        : DONE
-while       : DONE
+#34 LLVM - Arrays
 
-Issues #24:
-1. Regarding if-then-else clause. We are diregarding in our current approach the nested if-then-else and no implementation of the phi node. - wrongly attributed as issue
-2. Implement phi node in while->compile() - wrongly attributed as issue
-3. StringRef can be reverted back - fix could be to just use a temp string 
+array       :
+arraydim    : 
+arrayelem   :
+ast         : 
+conststr    : 
+decl        : 
+fparam      :          
+id          :
+lvalue      : 

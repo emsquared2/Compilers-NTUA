@@ -16,21 +16,22 @@ void CallStmt::printOn(std::ostream &out) const
 
 void CallStmt::sem()
 {
-    // Check if the function exists
+    // Look up the function in the symbol table
     SymbolEntry *function = lookupEntry(id->getName(), LOOKUP_ALL_SCOPES, true);
 
     mangled_name = getMangledName(id->getName(), function->scopeId);
 
+    // Get the callee and caller depths for scope handling
+    callee_depth = FunctionDepth[mangled_name];
+    caller_depth = currentScope->nestingLevel;
+
+    // Check if the looked-up entry is indeed a function
     if (function->entryType != ENTRY_FUNCTION)
         SemanticError("Could not find function name.");
 
-    // Check if function is called with correct number and type of arguments
+    // Check the function's parameters against the provided arguments
     SymbolEntry *argument = function->u.eFunction.firstArgument;
-
-    std::vector<Expr *> e_list;
-
-    if (expr_list != nullptr)
-        e_list = expr_list->getExprList();
+    std::vector<Expr *> e_list = (expr_list != nullptr) ? expr_list->getExprList() : std::vector<Expr *>{};
 
     int counter = 0;
 
@@ -42,25 +43,25 @@ void CallStmt::sem()
             std::string msg = "Expected " + std::to_string(counter) + " arguments, but got " + std::to_string(e_list.size()) + ".";
             SemanticError(msg.c_str());
         }
+        // Type check the argument
+        e->typeCheck(argument->u.eParameter.type);
 
-        e->type_check(argument->u.eParameter.type);
-
-        /* Check if Expr e is a LValue */
+        // Check if the argument is a LValue for pass-by-reference
         LValue * lvalue_ptr = dynamic_cast<LValue *>(e);
         if (argument->u.eParameter.mode == PASS_BY_REFERENCE && !lvalue_ptr)
             SemanticError("Parameter defined as pass-by-reference must be an lvalue.");
 
         ref.push_back(argument->u.eParameter.mode == PASS_BY_REFERENCE);
 
+        // Move to the next parameter
         argument = argument->u.eParameter.next;
-
         counter++;
     }
 
     // Fewer parameters than expected
     if (argument != NULL)
     {
-        // Find true number of arguments
+        // Calculate the true number of arguments
         while (argument != NULL)
         {
             argument = argument->u.eParameter.next;
@@ -71,7 +72,7 @@ void CallStmt::sem()
         SemanticError(msg.c_str());
     }
 
-    /* I think this is the only difference:
+    /* 
      * CallStmt is not an Expr so it does not have a type.
      * Function statements should have void return type.
      */
@@ -81,30 +82,34 @@ void CallStmt::sem()
 
 llvm::Value *CallStmt::compile()
 {
-    std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *>{};
-
-    // Look up the name in the global module table.
+    // Look up the function in the LLVM module
     llvm::Function *CalleeF = TheModule->getFunction(mangled_name);
     if (!CalleeF) {
         std::string msg = "CallStmt: Unknown function referenced --> " + mangled_name;
         return LogErrorV(msg.c_str());
     }
 
-    // If argument mismatch error.
-    if (CalleeF->arg_size() != Args.size())
-        return LogErrorV("Incorrect # arguments passed");
-
+    // Get the list of arguments for the function call
+    std::vector<Expr *> Args = (expr_list) ? expr_list->getExprList() : std::vector<Expr *>{};
     std::vector<llvm::Value *> ArgsV;
-    llvm::Value *ExprV_A = nullptr;
 
+    // If the function is not top-level, add a static link for accessing the outer function's stack frame
+    if (!isTopLevel(mangled_name))
+    {
+        ref.push_back(true);
+        llvm::Value *stackFrameAddr = getStackFrameAddr(callee_depth, caller_depth);
+        ArgsV.push_back(stackFrameAddr);
+    }
+
+    // Compile each argument
     for (int i = 0; i < Args.size(); ++i)
     {
-        ExprV_A = ref[i] ? Args[i]->compile_ptr() : Args[i]->compile();
+        llvm::Value *ExprV_A = ref[i] ? Args[i]->compile_ptr() : Args[i]->compile();
         ArgsV.push_back(ExprV_A);
         if (!ArgsV.back())
             return nullptr;
     }
-
+    // Create the function call instruction
     Builder.CreateCall(CalleeF, ArgsV);
     return nullptr;
 }

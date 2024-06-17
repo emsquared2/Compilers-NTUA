@@ -12,7 +12,6 @@ void ExprList::append(Expr *e)
 { 
     expr_list.push_back(e); 
 }
-
 void ExprList::printOn(std::ostream &out) const
 {
     out << "ExprList(";
@@ -39,7 +38,6 @@ void ExprList::sem()
     for (Expr *e : getReversed(expr_list))
         e->sem();
 }
-
 llvm::Value *ExprList::compile()
 {
     for (Expr *e : getReversed(expr_list))

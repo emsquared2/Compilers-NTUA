@@ -52,8 +52,15 @@
     llvm::IRBuilder<> AST::Builder(TheContext);
     std::unique_ptr<llvm::Module> AST::TheModule;
     std::unique_ptr<llvm::legacy::FunctionPassManager> AST::TheFPM;
-    std::map<std::string, llvm::AllocaInst *> AST::NamedValues;
 
+    // Define AST static structures 
+    std::map<std::string, llvm::AllocaInst *> AST::NamedValues;
+    std::set<std::string> AST::CapturedVariables;
+    std::map<std::string, unsigned int> AST::CapturedVariableOffset;
+    std::map<std::string, unsigned int> AST::FunctionDepth;
+    std::map<std::string, std::string> AST::OuterFunction;
+
+    // Define LLVM types
     llvmType *AST::i8 = llvm::IntegerType::get(TheContext, 8);
     llvmType *AST::i32 = llvm::IntegerType::get(TheContext, 32);
     llvmType *AST::i64 = llvm::IntegerType::get(TheContext, 64);
@@ -127,15 +134,10 @@
 %token T_le         "<="
 %token<op> T_assign "<-"
 
-//%token<id> T_id
 %token<str> T_id
-//%token<cons> T_const
 %token<num> T_const      
 %token<c> T_const_char 
 %token<str> T_const_str 
-/* %token<constchar> T_const_char 
-%token<conststr> T_const_str   */
-
 
 %left<op> T_or
 %left<op> T_and
@@ -149,11 +151,11 @@
 %type<funcdef> func_def program
 %type<exprlist> expr_list array_elem_l_value
 
-%type<expr> expr func_call_expr                 /* l_value*/ /* func_call */
+%type<expr> expr func_call_expr
 %type<lvalue> l_value l_value_helper
 %type<decl> var_def
 %type<cond> cond
-%type<stmt> stmt func_call_stmt                 /* func_call */ 
+%type<stmt> stmt func_call_stmt
 %type<fparam> fpar_def
 %type<header> header
 %type<localdef> local_def
@@ -163,7 +165,6 @@
 %type<fparamlist> fpar_def_list
 %type<arraydim> bracket_extended
 %type<data_type> data_type
-// %type<type> type 
 %type<ret_type> ret_type
 %type<fpar_type> fpar_type type
 %type<cons> const
@@ -220,7 +221,7 @@ fpar_type:
 
 bracket_extended: 
     /* nothing */                                  { $$ = new ArrayDim();      }
-    | '[' /* T_const*/ const ']' bracket_extended  { $4->append($2); $$ = $4;  }
+    | '[' const ']' bracket_extended  { $4->append($2); $$ = $4;  }
 ; 
 
 data_type:
@@ -313,7 +314,6 @@ id :
 ;
 
 expr:
-    // T_const             { $$ = new Const($1); }
     const               { /* Eliminate warning */ }
     | T_const_char      { $$ = new ConstChar($1); }
     | l_value           { $$ = $1; }
@@ -374,13 +374,13 @@ int main(int argc, char **argv)
     while ((opt = getopt(argc, argv, "ifo")) != -1) {
         switch (opt) {
             case 'i':
-                genIntermediate = true;
+                genIntermediate = true; // Generate intermediate code
                 break;
             case 'f':
-                genFinal = true;
+                genFinal = true; // Generate final code
                 break;
             case 'o':
-                optimize = true;
+                optimize = true; // Enable optimizations
                 break;
             default:
                 fprintf(stderr, "Usage: %s [-i] [-f] [-o] <input_file>\n", argv[0]);
@@ -403,19 +403,16 @@ int main(int argc, char **argv)
         exit(EXIT_FAILURE);
     }
 
-    yyin = fp;
+    yyin = fp;  // Set the input file for the lexer
     filename = argv[optind];  // This will always be valid as we exit if no file is specified
 
-
-    // Initialize the symbol table with hash table of size 1024
+    // Initialize the symbol table with a hash table of size 1024
     initSymbolTable(1024);
 
     // Open scope for library functions
     openScope();
-
     // Add library functions
     addLibrary();
-
     // Open program scope
     openScope();
 
@@ -426,7 +423,6 @@ int main(int argc, char **argv)
 
     // Close library functions' scope
     closeScope();
-
     // Close program scope
     closeScope();
 

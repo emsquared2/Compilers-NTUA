@@ -13,6 +13,8 @@ parser.hpp
 **/deprecated/
 *.asm
 *.imm
+llvm/a.out
+
 /llvm/libgrc.a
 
 .DS_Store

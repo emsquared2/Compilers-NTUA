@@ -14,6 +14,9 @@ public:
     virtual void sem() override;
     virtual llvm::Value* compile() override;
 
+    virtual void setOuterFunction(std::string outer_func_name) override {};
+    void addCapturedVariables(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref);
+
 private:
     IdList *idlist;
     FParType *parser_type;

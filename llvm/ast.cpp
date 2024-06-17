@@ -27,6 +27,8 @@ void addLibraryFunction(const char *func_name, const std::vector<Parameter *> &p
 
     endFunctionHeader(f, return_type);
     closeScope();
+
+    AST::FunctionDepth[func_name] = currentScope->nestingLevel;
 }
 
 void addLibrary()
@@ -220,7 +222,6 @@ llvm::Function * AST::MainCodeGen(llvm::Value* main_function)
     llvm::FunctionType *funcType = llvm::FunctionType::get(i64, {}, false); // false indicates the function does not take variadic arguments.
     llvm::Function *main = llvm::Function::Create(funcType, llvm::Function::ExternalLinkage, "main", TheModule.get());
     
-
     // Create the basic block for the main function
     llvm::BasicBlock *BB = llvm::BasicBlock::Create(TheContext, "entry", main);
     Builder.SetInsertPoint(BB);
@@ -392,9 +393,64 @@ llvm::AllocaInst *AST::CreateEntryBlockAlloca(llvm::Function *TheFunction,
 std::string getMangledName(const char * name, int scope)
 {
     if (scope > 0)
-        return std::string(name) + "_" + std::to_string(scope) + '_';
+        return std::string(name) + '_' + std::to_string(scope);
     else
         return std::string(name);
+}
+std::string getFunctionStackFrameStructName(std::string func_name)
+{
+    return "stack_frame_struct_" + func_name;
+}
+
+std::string getStackFrameName(std::string func_name)
+{
+    return "stack_frame_" + func_name;
+}
+
+/**
+ * This function retrieves the address of a stack frame based on the declaration and usage depths.
+ * It navigates through nested stack frames if necessary and returns the final stack frame address.
+ *
+ * Parameters:
+ * @param decl_depth: The depth at which the variable (orfunction) was declared.
+ * @param usage_depth: The depth at which the variable (or function) is used.
+ * @param final_stack_frame_type: A pointer to store the type of the final stack frame (optional).
+ *
+ * @returns: An llvm::Value pointer representing the address of the stack frame.
+ */
+llvm::Value *AST::getStackFrameAddr(unsigned int decl_depth, unsigned int usage_depth, llvmType **final_stack_frame_type)
+{
+    // Retrieve the current function (caller).
+    llvm::Function *Caller = Builder.GetInsertBlock()->getParent();
+    std::string func_name = Caller->getName().str();
+
+    // Get the address and type of the current stack frame.
+    llvm::Value *stack_frame_addr = NamedValues[getStackFrameName(func_name)];
+    llvmType *stack_frame_type = llvm::StructType::getTypeByName(TheContext, getFunctionStackFrameStructName(func_name));
+
+    // Calculate the difference between usage depth and declaration depth.
+    unsigned int depth_difference = usage_depth - decl_depth;
+    while (depth_difference-- > 0)
+    {
+        // Move to the next outer function.
+        func_name = OuterFunction[func_name];
+
+        // Get the address and type of the next stack frame.
+        llvmType *next_stack_frame_type = llvm::StructType::getTypeByName(TheContext, getFunctionStackFrameStructName(func_name));
+        stack_frame_addr = Builder.CreateLoad(next_stack_frame_type->getPointerTo(), Builder.CreateStructGEP(stack_frame_type, stack_frame_addr, 0));
+        stack_frame_type = next_stack_frame_type;
+    }
+    // If provided, store the type of the final stack frame in final_stack_frame_type.
+    if (final_stack_frame_type)
+        *final_stack_frame_type = stack_frame_type;
+
+    // Return the address of the final stack frame.
+    return stack_frame_addr;
+}
+
+bool isTopLevel(std::string func_name)
+{
+    return AST::FunctionDepth[func_name] <= 2;
 }
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context)

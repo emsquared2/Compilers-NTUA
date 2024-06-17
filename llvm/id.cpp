@@ -1,10 +1,7 @@
 #include "id.hpp"
 
-Id::Id(std::string s) : name(s)
-{
-    // if (name == "main")
-    //     name = "grc_main";
-}
+Id::Id(std::string s) : name(s) {}
+
 void Id::printOn(std::ostream &out) const
 {
     out << "Id(" << name << ")";
@@ -44,12 +41,22 @@ void Id::sem()
         break;
     }
     mangled_name = getMangledName(name.c_str(), e->scopeId);
+
+    decl_depth = e->nestingLevel;
+    usage_depth = currentScope->nestingLevel;
+    
+    if (decl_depth < usage_depth)
+    {
+        is_captured = true;
+        ref = true;
+        CapturedVariables.insert(mangled_name);
+    }
 }
 
 llvm::Value * Id::compile_ptr()
 {
     // Look this variable up in the function.
-    llvm::Value * LValAddr = NamedValues[mangled_name];
+    llvm::Value *LValAddr = is_captured ? getCapturedVarAddr() : NamedValues[mangled_name];
     if (!LValAddr) {
         std::string msg = "Id: Unknown variable name: " + mangled_name + ".";
         return LogErrorV(msg.c_str());
@@ -74,4 +81,17 @@ llvm::Value * Id::compile()
         return LogErrorV(msg.c_str());
     }
     return Builder.CreateLoad(getLLVMType(type, TheContext), LValAddr);
+}
+
+llvm::Value * Id::getCapturedVarAddr()
+{
+    // Type of the stack frame
+    llvmType *stack_frame_type;
+    // Get the address of the stack frame
+    llvm::Value *stack_frame_addr = getStackFrameAddr(decl_depth, usage_depth, &stack_frame_type);
+    // Get the index of the captured variable in the stack frame
+    unsigned int index = CapturedVariableOffset[mangled_name];
+
+    // Create a GEP (GetElementPtr) instruction to access the captured variable's address within the stack frame.
+    return Builder.CreateStructGEP(stack_frame_type, stack_frame_addr, index);
 }

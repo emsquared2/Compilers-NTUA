@@ -15,8 +15,8 @@ void BinOp::printOn(std::ostream &out) const
 
 void BinOp::sem()
 {  
-    left->type_check(typeInteger);
-    right->type_check(typeInteger);
+    left->typeCheck(typeInteger);
+    right->typeCheck(typeInteger);
     type = typeInteger;
 }
 

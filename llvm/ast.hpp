@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <set>
 
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
@@ -145,6 +146,14 @@ public:
     void emitLLVMIR(const std::string& outputTarget);
     void emitAssembly(const std::string & outputTarget);
 
+    // Static Structures
+    static std::set<std::string> CapturedVariables;
+    static std::map<std::string, unsigned int> CapturedVariableOffset;
+    static std::map<std::string, unsigned int> FunctionDepth;
+    static std::map<std::string, std::string> OuterFunction;
+
+    llvm::Value *getStackFrameAddr(unsigned int decl_depth, unsigned int usage_depth, llvmType **final_stack_frame_type = nullptr);
+
 protected:
     // Global LLVM variables related to the LLVM suite.
     static llvm::LLVMContext TheContext;
@@ -194,9 +203,14 @@ std::vector<T> getReversed(const std::vector<T>& input)
 }
 
 std::string getMangledName(const char * name, int scope);
+std::string getFunctionStackFrameStructName(std::string func_name);
+std::string getStackFrameName(std::string func_name);
 
 llvmType *getLLVMType(Type t, llvm::LLVMContext& context);
 
+bool isTopLevel(std::string func_name);
+
+// A vector indicating whether a function has a return statement or not.
 inline std::vector<bool> returnedFunction;
 
 inline std::ostream &operator<<(std::ostream &out, const AST &t)

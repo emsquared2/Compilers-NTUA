@@ -5,10 +5,5 @@ tests/runtime/
     escaped_param_by_ref_two_vars.grc               : FAIL (wrong output)
     happy_number_recursion.grc                      : FAIL (wrong output)
     two_sum.grc                                     : FAIL (wrong output)
-
-
-    // Semantic
-    escaped_param_by_ref_partial_array.grc          : TYPE MISSMATCH
-    pass_by_ref_arr_partial_autocomplete.grc        : TYPE MISSMATCH
-    pass_by_ref_arr_partial_autocomplete_2.grc      : TYPE MISSMATCH
-    leetcode/count_common_strings.grc               : TYPE MISSMATCH
+    pass_by_ref_arr_partial_autocomplete.grc        : FAIL (wrong output)
+    pass_by_ref_arr_partial_autocomplete_2.grc      : FAIL (wrong output)

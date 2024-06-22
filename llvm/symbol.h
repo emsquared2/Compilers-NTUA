@@ -76,7 +76,6 @@ struct Type_tag {
        TYPE_POINTER                      /* Pointers                  */
     } kind;
     Type           refType;              /* Reference type            */
-   //  bool           autocompleteSize;     /* Size is unknown           */
     RepInteger     size;                 /* Size, if an array         */
     unsigned int   refCount;             /* Reference counter         */
 };
@@ -236,7 +235,7 @@ void          printMode          (PassMode mode);
 
 void          destroyType        (Type type);
 
-Type          findArrayType      (Type type);
+Type          findArrayType      (Type type, int dims);
 
 
 #endif

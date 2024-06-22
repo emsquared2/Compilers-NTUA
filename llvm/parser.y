@@ -220,7 +220,7 @@ fpar_type:
 ;
 
 bracket_extended: 
-    /* nothing */                                  { $$ = new ArrayDim();      }
+    /* nothing */                     { $$ = new ArrayDim();      }
     | '[' const ']' bracket_extended  { $4->append($2); $$ = $4;  }
 ; 
 

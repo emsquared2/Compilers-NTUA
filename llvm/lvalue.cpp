@@ -25,3 +25,8 @@ bool LValue::getRef()
 {
     return ref;
 }
+
+bool LValue::getDereference()
+{
+    return dereference;
+}

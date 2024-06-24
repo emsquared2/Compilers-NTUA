@@ -1,9 +1,11 @@
+Issue 1: Array dimensions should be in reversed order in llvm
+Issue 2: Variable are in reversed order in llvm
+
 tests/runtime/
 
-    pass_by_ref_arr_both_with_auto_and_without.grc  : FAIL (wrong output)
-    leetcode/is_palindrome.grc                      : FAIL (wrong output)
-    escaped_param_by_ref_two_vars.grc               : FAIL (wrong output)
-    happy_number_recursion.grc                      : FAIL (wrong output)
-    two_sum.grc                                     : FAIL (wrong output)
-    pass_by_ref_arr_partial_autocomplete.grc        : FAIL (wrong output)
-    pass_by_ref_arr_partial_autocomplete_2.grc      : FAIL (wrong output)
+    pass_by_ref_arr_both_with_auto_and_without.grc  : FAIL (wrong output due to issue 1)
+    pass_by_ref_arr_partial_autocomplete.grc        : FAIL (wrong output due to issue 1)
+    pass_by_ref_arr_partial_autocomplete_2.grc      : FAIL (wrong output due to issue 1)
+
+    pass_by_ref_arr_partial.grc                     : TYPE MISMATCH
+

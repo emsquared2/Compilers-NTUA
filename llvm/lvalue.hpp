@@ -12,6 +12,7 @@ public:
     int getScope();
     void setRef(bool r);
     bool getRef();
+    bool getDereference();
 
 protected:
     int scope = -1;

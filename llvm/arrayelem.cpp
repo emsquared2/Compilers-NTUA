@@ -51,7 +51,7 @@ llvm::Value * ArrayElem::compile_arr(std::vector<llvm::Value*> *offsets, llvm::T
 
 llvm::Value* ArrayElem::compile_ptr() {
     std::vector<llvm::Value*> offsets;
-    llvm::Type* elementType;
+    llvmType* elementType;
     llvm::Value* baseAddr = compile_arr(&offsets, &elementType);
     if (!baseAddr)
         return nullptr;

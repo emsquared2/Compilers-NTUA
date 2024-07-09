@@ -1,6 +1,6 @@
 #include "id.hpp"
 
-Id::Id(std::string s) : name(s) {}
+Id::Id(std::string s) : name(s) { dereference = false; }
 
 void Id::printOn(std::ostream &out) const
 {
@@ -30,7 +30,7 @@ void Id::sem()
     case ENTRY_PARAMETER:
         type = e->u.eParameter.type;
         if (e->u.eParameter.mode == PASS_BY_REFERENCE)
-            ref = true;
+            ref = true;  
         break;
     // Can it be Temporary?
     case ENTRY_TEMPORARY:
@@ -40,6 +40,7 @@ void Id::sem()
         SemanticError("Invalid entry for identifier. This should never be reached");
         break;
     }
+    dereference = e->u.eParameter.type->size != UNKNOWN_SIZE;
     mangled_name = getMangledName(name.c_str(), e->scopeId);
 
     decl_depth = e->nestingLevel;
@@ -66,8 +67,11 @@ llvm::Value * Id::compile_ptr()
 
 llvm::Value * Id::compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t)
 {
-    /* push 0 in the beginning of the offsets to dereference the GEP pointer */
-    // offsets->insert(offsets->begin(), c64(0));
+    // Insert zero index at the beginning of offsets
+    // This is necessary to dereference the array base address and access the array itself
+    if (dereference)
+        offsets->insert(offsets->begin(), c64(0));
+    
     *t = getLLVMType(type, TheContext);
     return compile_ptr();
 }

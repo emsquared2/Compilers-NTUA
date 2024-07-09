@@ -467,11 +467,9 @@ llvmType *getLLVMType(Type t, llvm::LLVMContext& context)
 
         // Array
         if (t->size > 0)
-        {
             return llvm::ArrayType::get(elementType, t->size);
-        }
         else
-            return llvm::PointerType::get(elementType, 0);
+            return elementType;
     }
 }
 

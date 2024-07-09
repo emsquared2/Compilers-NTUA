@@ -13,7 +13,7 @@ parser.hpp
 **/deprecated/
 *.asm
 *.imm
-llvm/a.out
+llvm/*.out
 
 /llvm/libgrc.a
 

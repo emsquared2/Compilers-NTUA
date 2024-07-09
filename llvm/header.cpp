@@ -59,6 +59,7 @@ void Header::sem()
     openScope();
     // Indicate that the function has not a return statement yet
     returnedFunction.push_back(false);
+    returnType.push_back(type);
 
     if (fparamlist != nullptr)
     {
@@ -123,7 +124,7 @@ std::vector<std::string> Header::getLLVM_param_names()
  * - Function B will have an additional parameter that is a pointer to A's stack frame.
  * - The static link ensures that B can access the variable x defined in A.
  */
-void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvm::Type*> *param_types)
+void Header::addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types)
 {
     // Get the mangled name of the outer function
     std::string outer_func_mangled_name = OuterFunction[mangled_name];

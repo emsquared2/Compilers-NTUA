@@ -11,7 +11,7 @@ public:
     virtual void printOn(std::ostream &out) const override;
     virtual const char *getName() const override;
     virtual void sem() override;
-    // virtual llvm::Value* compile() override;
+    virtual llvm::Value* compile() override;
     virtual llvm::Value* compile_ptr() override;
     llvm::Value * compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) override;
 

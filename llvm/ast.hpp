@@ -73,6 +73,8 @@ extern "C"
     extern void destroyType(Type type);
 }
 
+#define UNKNOWN_SIZE -1
+
 /* ---------------------------------------------------------------------
    ----------------------------- Parameter -----------------------------
    --------------------------------------------------------------------- */
@@ -212,6 +214,7 @@ bool isTopLevel(std::string func_name);
 
 // A vector indicating whether a function has a return statement or not.
 inline std::vector<bool> returnedFunction;
+inline std::vector<Type> returnType;
 
 inline std::ostream &operator<<(std::ostream &out, const AST &t)
 {

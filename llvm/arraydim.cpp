@@ -38,7 +38,7 @@ void ArrayDim::append(Const *num)
 
 std::vector<Const *> ArrayDim::getDims() const
 { 
-    return getReversed(dims);
+    return dims;
 }
 
 bool ArrayDim::getUnknown() const

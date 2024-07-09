@@ -12,11 +12,8 @@ void Return::printOn(std::ostream &out) const
 
 void Return::sem()
 {
-    // Get the symbol entry for the current function
-    SymbolEntry *func = lookupLastFunction();
-
     // Get the return type of the function
-    Type return_type = func->u.eFunction.resultType;
+    Type return_type = returnType.back();
 
     // Check if the function's return type is void
     if (equalType(return_type, typeVoid))

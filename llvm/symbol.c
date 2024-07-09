@@ -562,37 +562,6 @@ SymbolEntry * lookupEntry (const char * name, LookupType type, bool err)
     return NULL;
 }
 
-SymbolEntry *lookupLastFunction() {
-    /*
-    Scope is opened AFTER the function is entered in the symbol table. 
-    So we expect to find the function in the parent scope and not the current scope. 
-    This fixes the issue of nested functions return statements.
-    */
-    Scope *scope = currentScope->parent;
-
-    // Traverse scopes from the current scope upwards
-    while (scope != NULL) {
-        // printf("Nesting level: %d\n", scope->nestingLevel);
-        SymbolEntry *entry = scope->entries;
-
-        // Traverse all entries in the current scope
-        while (entry != NULL) {
-            // printf("Entry: %s\n", entry->id);
-            if (entry->entryType == ENTRY_FUNCTION) {
-                // Return the first function entry found
-                return entry;
-            }
-            entry = entry->nextInScope;
-        }
-
-        // Move to the parent scope
-        scope = scope->parent;
-    }
-
-    // Return NULL if no function was found in any of the scopes
-    return NULL;
-}
-
 Type findArrayType(Type t, int dims)
 {
     for (int i = 0; i < dims; i++)

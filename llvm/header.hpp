@@ -12,7 +12,7 @@ public:
     ~Header();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;
-    void set_forward_declaration();
+    void setForwardDeclaration();
     FParamList *getFParamList();
     Type getReturnType();
     Id *getId();
@@ -21,6 +21,9 @@ public:
     std::vector<llvmType *> getLLVM_param_types();
     std::vector<std::string> getLLVM_param_names();
     std::string getHMangledName();
+
+    void addStaticLinkToFunctionSignature(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types);
+    void addCapturedParametersToSignature(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types, std::vector<bool> *ref);
 
 private:
     Id *id;

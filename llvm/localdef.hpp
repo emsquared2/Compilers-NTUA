@@ -6,6 +6,7 @@
 class LocalDef : public AST
 {
 public:
+    virtual void setOuterFunction(std::string outer_func_name) = 0;
 };
 
 #endif

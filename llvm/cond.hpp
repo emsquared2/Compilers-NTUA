@@ -7,7 +7,7 @@ class Cond : public AST
 {
 public:
     Type getType();
-    void type_check(Type t);
+    void typeCheck(Type t);
 
 protected:
     Type type = nullptr;

@@ -18,20 +18,18 @@ void Assign::sem()
     l_value->sem();
     expr->sem();
 
-    // this probably will existin in l_value sem so it will not be needed here
-    // lookupEntry(l_value->getName(), LOOKUP_ALL_SCOPES, true);
-
     Type l_value_type = l_value->getType();
     Type expr_type = expr->getType();
 
-    // Check that types match
+    // Ensure that the types of the LValue and the expression are the same.
     if (!equalType(l_value_type, expr_type))
         SemanticError("Assign: L_value and Expr type mismatch.");
 
-    // Check that their type is typeInteger or typeChar
+    // Check that the type of the LValue is either typeInteger or typeChar.
     if (!equalType(l_value_type, typeInteger) && !equalType(l_value_type, typeChar))
         SemanticError("Assign: L_value's type should be typeInteger or typeChar");
 
+    // Check that the type of the expression is either typeInteger or typeChar.
     if (!equalType(expr_type, typeInteger) && !equalType(expr_type, typeChar))
         SemanticError("Assign: Expr's type should be typeInteger or typeChar");
 }

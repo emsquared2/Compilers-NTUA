@@ -14,10 +14,16 @@ public:
     virtual llvm::Value *compile() override;
     virtual llvm::Value *compile_ptr() override;
     virtual llvm::Value *compile_arr(std::vector<llvm::Value*> *offsets, llvmType ** t) override;
+    llvm::Value *getCapturedVarAddr();
 
 private:
     std::string name;
     std::string mangled_name;
+
+    unsigned int decl_depth;
+    unsigned int usage_depth;
+    bool is_captured = false;
+
 };
 
 #endif

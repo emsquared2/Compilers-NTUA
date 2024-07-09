@@ -21,7 +21,7 @@ void If::printOn(std::ostream &out) const
 
 void If::sem()
 {
-    cond->type_check(typeBoolean);
+    cond->typeCheck(typeBoolean);
     if (stmt1 != nullptr)
         stmt1->sem();
     if (stmt2 != nullptr)
@@ -33,49 +33,38 @@ llvm::Value *If::compile()
     // Compile condition
     llvm::Value *v = cond->compile();
 
-    // Grab current function
+    // Get the current function
     llvm::Function *TheFunction = Builder.GetInsertBlock()->getParent();
 
-    // Create basic blocks for different paths
+    // Create basic blocks for 'then', 'else', and 'endif' sections
     llvm::BasicBlock *ThenBB = llvm::BasicBlock::Create(TheContext, "then", TheFunction);
     llvm::BasicBlock *ElseBB = llvm::BasicBlock::Create(TheContext, "else", TheFunction);
     llvm::BasicBlock *AfterBB = llvm::BasicBlock::Create(TheContext, "endif", TheFunction);
 
-    // Branch based on the condition
+    // Create a conditional branch based on the condition value
     Builder.CreateCondBr(v, ThenBB, ElseBB);
 
-    // Set insertion point for the 'then' block
+    // Set insertion point to 'then' block and compile the 'then' statement
     Builder.SetInsertPoint(ThenBB);
-
-    // Compile statement inside the 'then' block
-    // Compile statement inside the 'else' block, if it exists
     if (stmt1 != nullptr)
-    {
         stmt1->compile();
-    }
 
-    // Set insertion point for the 'else' block
+    // Create a branch to 'endif' block if 'then' block has no terminator
     if (!Builder.GetInsertBlock()->getTerminator())
-        Builder.CreateBr(AfterBB); // Create branch to the 'endif' block
+        Builder.CreateBr(AfterBB); 
 
+    // Set insertion point to 'else' block and compile the 'else' statement
     Builder.SetInsertPoint(ElseBB);
-
-    // Compile statement inside the 'else' block, if it exists
     if (stmt2 != nullptr)
-    {
         stmt2->compile();
-    }
 
-
-    // Create branch to the 'endif' block if 'else' block exists or conditionally if not
-    // Branch should also exist on empty stmt2 to endif. Otherwise we have wrong code flow.
+    // Create a branch to 'endif' block if 'else' block has no terminator
     if (!Builder.GetInsertBlock()->getTerminator())
         Builder.CreateBr(AfterBB);
 
-    // Set insertion point for the 'endif' block
-
+    // Set insertion point to 'endif' block
     Builder.SetInsertPoint(AfterBB);
 
-    // Return null since If statement doesn't produce a value
+    // Return nullptr since an if statement does not produce a value
     return nullptr;
 }

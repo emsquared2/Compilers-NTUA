@@ -4,9 +4,7 @@ LocalDefList::LocalDefList() : locals() {}
 LocalDefList::~LocalDefList()
 {
     for (LocalDef *l : locals)
-    {
         delete l;
-    }
 }
 void LocalDefList::printOn(std::ostream &out) const
 {
@@ -40,6 +38,6 @@ std::vector<LocalDef*> LocalDefList::getLocals()
 llvm::Value* LocalDefList::compile()
 {
     for (LocalDef *l : getReversed(locals))
-    l->compile();
+        l->compile();
     return nullptr;
 }

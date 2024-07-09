@@ -5,9 +5,7 @@ StmtList::StmtList() : stmt_list() {}
 StmtList::~StmtList()
 {
     for (Stmt *stmt : stmt_list)
-    {
         delete stmt;
-    }
 }
 void StmtList::append(Stmt *s) 
 { 

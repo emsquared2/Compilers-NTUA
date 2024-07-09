@@ -76,7 +76,6 @@ struct Type_tag {
        TYPE_POINTER                      /* Pointers                  */
     } kind;
     Type           refType;              /* Reference type            */
-   //  bool           autocompleteSize;     /* Size is unknown           */
     RepInteger     size;                 /* Size, if an array         */
     unsigned int   refCount;             /* Reference counter         */
 };
@@ -220,10 +219,6 @@ void          endFunctionHeader  (SymbolEntry * f, Type type);
 void          destroyEntry       (SymbolEntry * e);
 SymbolEntry * lookupEntry        (const char * name, LookupType type,
                                   bool err);
-// function to find the closest defined function
-// Used in semantic analysis on Return. 
-// 1st implementation
-SymbolEntry * lookupLastFunction (void);
 
 Type          typeArray          (RepInteger size, Type refType);
 Type          typeIArray         (Type refType);
@@ -236,7 +231,7 @@ void          printMode          (PassMode mode);
 
 void          destroyType        (Type type);
 
-Type          findArrayType      (Type type);
+Type          findArrayType      (Type type, int dims);
 
 
 #endif

@@ -11,8 +11,7 @@ IdList::~IdList()
 
 const std::vector<Id *> IdList::getIds()
 {
-    // return getReversed(idlist);
-    return idlist;
+    return getReversed(idlist);
 }
 
 void IdList::append(Id *id)

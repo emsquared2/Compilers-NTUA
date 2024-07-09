@@ -14,10 +14,8 @@ public:
     void append(FParam *param);
     void setSymbolEntry(SymbolEntry *f);
     virtual llvm::Value *compile() override;
-    llvm::Value* compile(std::vector<std::string> * signature_mangled_names, std::vector<llvmType*> * signature_types);
+    llvm::Value* compile(std::vector<std::string> *param_names, std::vector<llvmType*> *param_types);
 
-    // std::vector<llvmType*> getLLVM_params();
-    // std::vector<std::string> getLLVM_param_names();
     std::vector<FParam *> getParams();
 
 private:

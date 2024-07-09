@@ -13,6 +13,8 @@ public:
     virtual void sem() override;
     virtual llvm::Value* compile() override;
 
+    virtual void setOuterFunction(std::string outer_func_name) override;
+
 private:
     Header *header;
 };

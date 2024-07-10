@@ -44,8 +44,18 @@
     #include "unop.hpp"
     #include "while.hpp"
 
-    #define YYDEBUG 1
+    #include <getopt.h>     // For command line options parsing    
+    extern FILE* yyin;      // File stream for lexer input
 
+    void show_help(const char *program_name) {
+    std::cout << "Usage: " << program_name << " [options] <input_file>\n"
+              << "Options:\n"
+              << "  -a             Print the Abstract Syntax Tree (AST)\n"
+              << "  -h             Show this help message\n";
+
+}
+    #define YYDEBUG 1
+    
 %}
 
 %expect 1
@@ -165,6 +175,9 @@
 program:
     /* nothing */   { std::cout << "Empty program" << std::endl; }
     | func_def      { /* std::cout << "AST: " << *$1 << std::endl; */
+        if (printAst) {
+            std::cout << "AST: " << *$1 << std::endl;
+        }
         $$ = $1; 
         $1->ProgramSem();
         delete $$;
@@ -355,7 +368,42 @@ cond:
 
 %%
 
-int main() {
+int main(int argc, char *argv[]) {
+    int opt;
+
+    // Process command line options
+    while ((opt = getopt(argc, argv, "ha")) != -1) {
+        switch (opt) {
+            case 'a':
+                printAst = true; // Print the Abstract Syntax Tree (AST)
+                break;
+            case 'h':
+                show_help(argv[0]);
+                exit(EXIT_SUCCESS);
+            default:
+                show_help(argv[0]);
+                exit(EXIT_FAILURE);
+        }
+    }
+
+    // Determine the input source based on command line arguments
+    FILE* fp;
+    if (optind < argc) {
+        // A file is specified on the command line
+        fp = fopen(argv[optind], "r");
+        if (fp == NULL) {
+            fprintf(stderr, "Error opening file %s\n", argv[optind]);
+            exit(EXIT_FAILURE);
+        }
+    } else {
+        // If no file is specified, also print usage information and exit
+        show_help(argv[0]);
+        exit(EXIT_FAILURE);
+    }
+
+    yyin = fp;  // Set the input file for the lexer
+    filename = argv[optind];  // This will always be valid as we exit if no file is specified
+
 
     // Initialize the symbol table with hash table of size 1024
     initSymbolTable(1024);

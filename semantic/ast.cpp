@@ -125,3 +125,6 @@ void addLibrary() {
     destroyType(string);
 
 }
+
+bool printAst;
+std::string filename;

@@ -104,4 +104,8 @@ inline std::ostream &operator<<(std::ostream &out, const AST &t)
     return out;
 };
 
+// Flags and filename
+extern bool printAst;
+extern std::string filename;
+
 #endif

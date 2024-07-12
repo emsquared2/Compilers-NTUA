@@ -50,8 +50,9 @@ Below are a few example programs written in Grace, demonstrating the language's 
 This simple program prints "Hello, World!" to the console.
 
 ```grace
-fun main() {
-    print("Hello, World!")
+fun hello () : nothing
+{
+   writeString("Hello world!\n");
 }
 ```
 
@@ -60,19 +61,62 @@ fun main() {
 A program to compute and display prime numbers.
 
 ```grace
-fun isPrime(n: int): bool {
-    if (n <= 1) return false
-    for (i in 2 to n/2) {
-        if (n % i == 0) return false
-    }
-    return true
-}
+fun main () : nothing
+   
+   fun prime (n : int) : int
+      var i : int;
+   {
+      if n < 0            then return prime(-n);
+      else if n < 2       then return 0;
+      else if n = 2       then return 1;
+      else if n mod 2 = 0 then return 0;
+      else {
+         i <- 3;
+         while i <= n div 2 do {
+            if n mod i = 0 then
+               return 0;
+            i <- i + 2;
+         }
+         return 1;
+      }
+   }
+   
+   var limit, number, counter : int;
+   
+{ $ main
+   writeString("Please, give me the upper limit: ");
+   limit <- readInteger();
+   writeString("Prime numbers between 0 and ");
+   writeInteger(limit);
+   writeString(":\n\n");
+   counter <- 0;
+   if limit >= 2 then {
+      counter <- counter + 1;
+      writeString("2\n");
+   }
+   if limit >= 3 then {
+      counter <- counter + 1;
+      writeString("3\n");
+   }
+   number <- 6;
+   while number <= limit do {
+      if prime(number - 1) = 1 then {
+         counter <- counter + 1;
+         writeInteger(number - 1);
+         writeString("\n");
+      }
+      if number # limit and prime(number + 1) = 1 then {
+         counter <- counter + 1;
+         writeInteger(number + 1);
+         writeString("\n");
+      }
+      number <- number + 6;
+   }
 
-fun main() {
-    for (i in 1 to 100) {
-        if (isPrime(i)) print(i)
-    }
-}
+   writeString("\n");
+   writeInteger(counter);
+   writeString(" prime number(s) were found.\n");
+} $ main
 ```
 
 - ### Bubble Sort
@@ -80,27 +124,63 @@ fun main() {
 An implementation of the bubble sort algorithm.
 
 ```grace
-fun bubbleSort(arr: ref int[]) {
-    var n: int = arr.length
-    var swapped: bool
-    do {
-        swapped = false
-        for (i in 1 to n-1) {
-            if (arr[i-1] > arr[i]) {
-                var temp: int = arr[i-1]
-                arr[i-1] = arr[i]
-                arr[i] = temp
-                swapped = true
-            }
-        }
-    } while (swapped)
-}
+fun main () : nothing
 
-fun main() {
-    var arr: ref int[] = [64, 34, 25, 12, 22, 11, 90]
-    bubbleSort(arr)
-    print(arr)
-}
+   fun bsort (n : int; ref x : int[]) : nothing
+   
+      fun swap (ref x, y : int) : nothing
+         var t : int;
+      {
+         t <- x;
+         x <- y;
+         y <- t;
+      }
+   
+      var changed, i : int;
+      
+   { $ bsort
+      changed <- 1;
+      while changed > 0 do {
+         changed <- 0;
+         i <- 0;
+         while i < n-1 do {
+            if x[i] > x[i+1] then {
+               swap(x[i], x[i+1]);
+               changed <- 1;
+            }
+            i <- i+1;
+         }
+      }
+   } $ bsort
+
+   fun writeArray (ref msg : char[]; n : int; ref x : int[]) : nothing
+      var i : int;
+   {
+      writeString(msg);
+      i <- 0;
+      while i < n do {
+         if i > 0 then writeString(", ");
+         writeInteger(x[i]);
+         i <- i+1;
+      }
+      writeString("\n");
+   }
+   
+   var seed, i : int;
+   var x       : int[16];
+   
+{ $ main
+   seed <- 65;
+   i <- 0;
+   while i < 16 do {
+      seed <- (seed * 137 + 221 + i) mod 101;
+      x[i] <- seed;
+      i <- i+1;
+   }
+   writeArray("Initial array: ", 16, x);
+   bsort(16, x);
+   writeArray("Sorted  array: ", 16, x);
+} $ main
 ```
 
 ## Project Structure

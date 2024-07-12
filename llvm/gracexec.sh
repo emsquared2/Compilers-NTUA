@@ -38,6 +38,12 @@ base_name="${input_file%.grc}"
 asm_file="${base_name}.asm"
 out_file="${base_name}.out"
 
+# Determine the directory of the ./grace executable
+grace_dir="$(dirname "$(realpath "$0")")"
+
+# Change to the ./grace directory
+pushd "$grace_dir" > /dev/null
+
 # Run the compilation steps
 ./grace $optimize "$input_file"
 
@@ -45,6 +51,9 @@ out_file="${base_name}.out"
 if [ $? -ne 0 ]; then
     exit 1
 fi
+
+# Change back to the original directory
+popd > /dev/null
 
 # Check if the asm file was created
 if [ ! -f "$asm_file" ]; then

@@ -3,6 +3,25 @@ Project assignment for the course "Compilers" of the School of Electrical and Co
 
 Compiler for the Grace programming language.
 
+## Table of Contents
+
+- [About the Grace Programming Language](#about-the-grace-programming-language)
+  - [Language Specification](#language-specification)
+  - [Example Programs](#example-programs)
+    - [Hello, World!](#hello-world)
+    - [Prime Numbers](#prime-numbers)
+    - [Bubble Sort](#bubble-sort)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Compiling Grace Programs](#compiling-grace-programs)
+  - [Hello World example](#hello-world-example)
+  - [More functionalities / Error Examples](#more-functionalities--error-examples)
+    - [Lexical Analysis](#lexical-analysis)
+    - [Syntax Analysis](#syntax-analysis)
+    - [Semantic Analysis](#semantic-analysis)
+- [Contributors](#contributors)
+
 ## About the Grace Programming Language
 
 Grace is a simple imperative programming language designed with a focus on ease of use and readability. Its design principles are influenced by the aesthetics and structure of languages such as Pascal and C, providing a familiar syntax and straightforward constructs. Here are the main features of Grace:
@@ -98,7 +117,262 @@ We have kept the original project development path to keep the internal compiler
 
 - `flex 2.6.4` tool for lexical analysis
 - `bison 3.8.2` tool for parser generation
+- `llvm 18 or later` c++ library for Intermediate Code generation
+- `clang/clang++`
 
+### Installation
+
+- `flex` installation
+
+```console
+$ sudo apt-get update
+$ sudo apt-get install flex
+```
+
+
+- `bison` installation
+
+```console
+$ sudo apt-get update
+$ sudo apt-get install bison
+```
+
+- `llvm` installation
+
+Install llvm by using the automatic installation script that LLVM provides.
+
+```
+# bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+```
+> Note! It will download the latest stable version of the llvm libary
+
+- `clang` installation
+
+```console
+$ sudo apt-get update
+$ sudo apt-get install clang
+```
+
+## Compiling Grace Programs
+
+First of all, for the main compiler functionalities you have to go to the `llvm` directory and run `make`. 
+
+```console
+$ cd llvm/
+$ make
+```
+
+
+To compile your grace program to an executable program you can use the `gracexec.sh` script as follows:
+
+```console
+$ ./gracexec.sh -o ../path/to/program.grc
+```
+
+> The `-o` is an optional flag to enable compiler optimizations.
+
+> The output files will be to the path where the `.grc` program is located with a `.out` suffix.
+
+The shell script is using the main `grace` compiler that creates the final code (in assembly) from a `grace` program.
+
+You can also use the `grace` backbone and see more information about the compilation and code generation from the initial grace program. 
+
+```console
+$ ./grace -ifo /path/to/file.grc
+Usage: ./grace [options] <input_file>
+Options:
+  -i             Print the intermediate code
+  -f             Print the final code
+  -o             Optimize code
+  -h             Show this help message
+```
+
+### Hello World example
+
+In this section we will show an example on how to use our grace compiler on a simple hello world program. 
+
+```console
+$ ls 
+hello.grc
+
+$ ./gracexec.sh -o hello.grc
+hello.asm hello.grc hello.imm hello.out
+
+$ ./hello.out
+Hello World!
+
+$ ./grace -i hello.grc
+ ; ModuleID = 'grace program'
+source_filename = "grace program"
+target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-pc-linux-gnu"
+
+%stack_frame_struct_hello_13 = type {}
+
+@0 = private unnamed_addr constant [14 x i8] c"Hello world!\0A\00", align 1
+
+declare void @writeInteger(i64)
+
+declare void @writeChar(i8)
+
+declare void @writeString(ptr)
+
+declare i64 @readInteger()
+
+declare i8 @readChar()
+
+declare void @readString(i64, ptr)
+
+declare i64 @ascii(i8)
+
+declare i8 @chr(i64)
+
+declare i64 @strlen(ptr)
+
+declare i64 @strcmp(ptr, ptr)
+
+declare void @strcpy(ptr, ptr)
+
+declare void @strcat(ptr, ptr)
+
+define void @hello_13() {
+entry:
+  %stack_frame_hello_13 = alloca %stack_frame_struct_hello_13, align 8
+  call void @writeString(ptr @0)
+  ret void
+}
+
+define i64 @main() {
+entry:
+  call void @hello_13()
+  ret i64 0
+}
+
+$ ./grace -f hello.grc
+        .text
+        .file   "grace program"
+        .globl  hello_13
+        .p2align        4, 0x90
+        .type   hello_13,@function
+hello_13:
+        .cfi_startproc
+        pushq   %rax
+        .cfi_def_cfa_offset 16
+        leaq    .L__unnamed_1(%rip), %rdi
+        callq   writeString@PLT
+        popq    %rax
+        .cfi_def_cfa_offset 8
+        retq
+.Lfunc_end0:
+        .size   hello_13, .Lfunc_end0-hello_13
+        .cfi_endproc
+
+        .globl  main
+        .p2align        4, 0x90
+        .type   main,@function
+main:
+        .cfi_startproc
+        pushq   %rax
+        .cfi_def_cfa_offset 16
+        callq   hello_13@PLT
+        xorl    %eax, %eax
+        popq    %rcx
+        .cfi_def_cfa_offset 8
+        retq
+.Lfunc_end1:
+        .size   main, .Lfunc_end1-main
+        .cfi_endproc
+
+        .type   .L__unnamed_1,@object
+        .section        .rodata.str1.1,"aMS",@progbits,1
+.L__unnamed_1:
+        .asciz  "Hello world!\n"
+        .size   .L__unnamed_1, 14
+
+        .section        ".note.GNU-stack","",@progbits
+```
+
+### More functionalities / Error Examples
+
+If you do not wish to compile a grace program but only to check the syntax or semantic correctness of a grace program you can use the early functionalities that our compiler had (we chose to keep in them in seperated folders) and are used to the end result for each discrete function.
+
+#### Lexical Analysis
+There is no way to only do lexical analysis in our project so we only show an example of a program with a lexical error and how it shown in our compiler
+
+```console 
+$ cat helloworld_with_lexerror.grc
+fun hello () : nothing
+{
+   x <- 3%
+   writeString("Hello world!\n");
+}
+
+$ ./grace < helloworld_with_lexerror.grc
+Illegal character % at line 3
+```
+
+#### Syntax Analysis
+
+Go to `parser` folder and run `make`. Input a grace program to the `grace` executable as follows:
+
+```console 
+$ ./grace < path/to/file.grc
+Success!
+```
+
+If `Success!` is shown then the program is syntactically correct. Otherwise a syntax error is shown with the corresponding description.
+
+```console
+$ ./grace < path/to/syntax/error/file.grc
+syntax error, unexpected '=', expecting <-
+```
+
+### Semantic Analysis
+
+Go to `semantic` folder and run `make`. Input a grace program to the `grace` executable as follows:
+
+```console 
+$ ./grace -a hello.grc
+AST: FuncDef(Header(fun Id(hello)() : RetType(void)) LocalDefList() Block(CallStmt(Id(writeString)(ExprList(ConstStr("Hello world!\n"))))))
+Success.
+```
+
+> With the `-a` you can also see the AST generating by the parser from the previous step.
+
+If `Success` is shown then the program is syntactically correct. Otherwise a semantic error is shown with the corresponding description.
+
+```console
+$ cat semerror.grc
+$$
+  In this erroneous grace program an integer is added to a character with the
+  simple plus operator.
+
+  In the block of the while-do statement, the addition of c and 1 is not allowed.
+$$
+
+fun main() : nothing
+  var i : int;
+  var c : char;
+  var result : int;
+
+{ $ main
+  $ Will compute the ascii code of 'f'
+  result <- 0;
+  c <- 'a';
+  while c # 'f' do {
+    c <- c + 1;
+    result <- result + 1;
+  }
+  writeString("The ascii code of \'f\' is ");
+  writeInteger(result);
+  writeString(".\n");
+} $ main
+
+$ ./grace semerror.grc
+Error: Type mismatch at line 18
+```
+
+Ofcourse the above errors are just some examples of the full error detection capabilities of our compiler. Also, the finished compiler has the same capabilities regarding error detecting as each discrete building block of the project.
 
 
 

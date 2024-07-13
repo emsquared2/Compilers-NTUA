@@ -20,7 +20,10 @@ Compiler for the Grace programming language.
     - [Lexical Analysis](#lexical-analysis)
     - [Syntax Analysis](#syntax-analysis)
     - [Semantic Analysis](#semantic-analysis)
-    - [Testing Suite](#testing-suite)
+  - [Testing Suite](#testing-suite)
+    - [Syntax Analysis Test](#syntax-analysis-test)
+    - [Semantic Analysis Test](#semantic-analysis-test)
+    - [Codegen Test](#codegen-test)
 - [Contributors](#contributors)
 
 ## About the Grace Programming Language

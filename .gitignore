@@ -2,7 +2,8 @@
 grace
 
 lexer.cpp
-lexer
+lexer/lexer
+lexer.hpp
 
 parser.cpp
 parser.hpp

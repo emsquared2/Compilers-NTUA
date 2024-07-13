@@ -1,6 +1,17 @@
 #!/bin/bash
 
-# Comment out line 435 in parser.y
+# This script runs the gracexec.sh executable on all .grc files in a specified directory
+# and reports the number of successful and failed executions.
+
+# Usage: ./script.sh <program_directory>
+
+# Note: Comment out line 435 in parser.y
+
+# Check if the directory argument is provided
+if [ -z "$1" ]; then
+    echo "Usage: $0 <program_directory>"
+    exit 1
+fi
 
 # Counter for correct program results
 successes=0
@@ -9,18 +20,18 @@ successes=0
 declare -a failures
 
 # Paths to the directory and executable
-program_dir="../programs/"
-grace_executable="../llvm/grace"
+program_dir="$1"
+grace_executable="./gracexec.sh"
 
 # Total programs counter
 total_programs=0
 
-# Check each file in the programs directory
-for file in "${program_dir}"*; do
+# Check each .grc file in the programs directory
+for file in "${program_dir}"*.grc; do
     ((total_programs++))  # Increment total programs counter
 
     # Run the grace executable with this file and capture the output
-    result=$( "$grace_executable" -io "$file" )
+    result=$( "$grace_executable" -o "$file" )
 
     # Extract the last line of the result
     last_line=$(echo "$result" | tail -n 1)

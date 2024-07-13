@@ -20,6 +20,7 @@ Compiler for the Grace programming language.
     - [Lexical Analysis](#lexical-analysis)
     - [Syntax Analysis](#syntax-analysis)
     - [Semantic Analysis](#semantic-analysis)
+    - [Testing Suite](#testing-suite)
 - [Contributors](#contributors)
 
 ## About the Grace Programming Language
@@ -185,13 +186,13 @@ fun main () : nothing
 
 ## Project Structure
 
-We have kept the original project development path to keep the internal compiler routines (e.g. parsing, AST gen etc.) accessible to the user by keeping each project folder (e.g `lexer`, `parser` etc.) with the discrete compiler functionality. Moreover for the folders below: 
+We have kept the original project development path to keep the internal compiler routines (e.g. parsing, AST gen etc.) accessible to the user by keeping each project folder (e.g `lexer`, `parser` etc.) with the discrete compiler functionality. Moreover, for the folders below: 
 
-- `lexer`: only contains the `lexer.l` file used by the `flex` tool to generate the tokens used by the parser.
-- `parser`: grace compiler can check if a `grace` program has syntactical correctness.
-- `semantic`: semantic actions are added on our compiler. Type checking, variable declaration are some of the semantic actions that are being implemented. Compiler checks if a programs is semantically correct along side the above functions. The AST can also be printed in this stage.
-- `llvm`: the full formed grace compiler that provides an end-to-end compilation of a grace program.
-- `syntax-gen`: a syntactically correct grace program generator from the following repo [kostis/ntua_compilers/grace](https://github.com/kostis/ntua_compilers/tree/master/grace/syntax_gen). Was used to check the correctness of our parser on an arbitrarely large amount of grace programs. Though that does not conclude to a necessarely correct parser...
+- `lexer`: Only contains the `lexer.l` file used by the `flex` tool to generate the tokens used by the parser.
+- `parser`: The grace compiler can check if a `grace` program has syntactical correctness.
+- `semantic`: Semantic actions are added on our compiler. Type checking, variable declaration are some of the semantic actions that are being implemented. Compiler checks if a programs is semantically correct along side the above functions. The AST can also be printed in this stage.
+- `llvm`: The fully formed grace compiler that provides an end-to-end compilation of a grace program.
+- `syntax-gen`: A syntactically correct grace program generator from the following repo [kostis/ntua_compilers/grace](https://github.com/kostis/ntua_compilers/tree/master/grace/syntax_gen). Was used to check the correctness of our parser on an arbitrarely large amount of grace programs. Though that does not conclude to a necessarely correct parser...
 
 ## Prerequisites
 
@@ -235,37 +236,38 @@ $ sudo apt-get install clang
 
 ## Compiling Grace Programs
 
-First of all, for the main compiler functionalities you have to go to the `llvm` directory and run `make`. 
-
+To compile Grace programs, follow these steps:
+1. Navigate to the LLVM Directory and Build:
 ```console
 $ cd llvm/
 $ make
 ```
+This will build the main compiler functionalities.
 
-
-To compile your grace program to an executable program you can use the `gracexec.sh` script as follows:
-
+2. Compile Your Grace Program:
 ```console
 $ ./gracexec.sh -o ../path/to/program.grc
 ```
+> The `-o` flag is optional and enables compiler optimizations.
 
-> The `-o` is an optional flag to enable compiler optimizations.
+The compiled output files will be placed in the same directory as the `.grc` program file, with a `.out` suffix. Additionally, a `.imm` and a `.asm` file is created with the intermediate and final assembly code of the input file.
 
-> The output files will be to the path where the `.grc` program is located with a `.out` suffix.
+The `gracexec.sh` script uses the main `grace` compiler to generate the final code (in assembly) from a `grace` program.
 
-The shell script is using the main `grace` compiler that creates the final code (in assembly) from a `grace` program.
+For more detailed information about the compilation process and code generation, you can refer to the Grace backbone documentation.
 
-You can also use the `grace` backbone and see more information about the compilation and code generation from the initial grace program. 
 
 ```console
 $ ./grace -ifo /path/to/file.grc
 Usage: ./grace [options] <input_file>
 Options:
-  -i             Print the intermediate code
-  -f             Print the final code
-  -o             Optimize code
+  -i             Print the intermediate code to stdout
+  -f             Print the final code to stdout
+  -o             Enable optimizations
   -h             Show this help message
 ```
+
+The default behavior which is retained with any use of option is to create a `.imm` and a `.asm` file containing the intermediate and final assembly code respectively of the inputed file.
 
 ### Hello World example
 
@@ -374,10 +376,39 @@ main:
 
 ### More functionalities / Error Examples
 
-If you do not wish to compile a grace program but only to check the syntax or semantic correctness of a grace program you can use the early functionalities that our compiler had (we chose to keep in them in seperated folders) and are used to the end result for each discrete function.
+If you do not wish to compile a Grace program but only want to check its lexical, syntax or semantic correctness, you can use the early functionalities of our compiler. We have retained these functionalities in separate folders, allowing you to use them for discrete functions without compiling the entire program.
 
 #### Lexical Analysis
-There is no way to only do lexical analysis in our project so we only show an example of a program with a lexical error and how it shown in our compiler
+To perform lexical analysis to your grace program you have to go to the `lexer` folder and run `make`. Input a grace file to the `lexer` ass follows:
+
+```console 
+$ cat hello.grc
+fun hello () : nothing
+{
+   writeString("Hello world!\n");
+}
+
+$ ./lexer -l ../programs/hello.grc
+token = 1005, lexeme = "fun"
+token = 1017, lexeme = "hello"
+token = 40, lexeme = "("
+token = 41, lexeme = ")"
+token = 58, lexeme = ":"
+token = 1010, lexeme = "nothing"
+token = 123, lexeme = "{"
+token = 1017, lexeme = "writeString"
+token = 40, lexeme = "("
+token = 1020, lexeme = ""Hello world!\n""
+token = 41, lexeme = ")"
+token = 59, lexeme = ";"
+token = 125, lexeme = "}"
+token = 0, lexeme = ""
+Success.
+```
+
+> Use the -l flag to print the lexical tokens.
+
+If `Success` is printed then the program is lexically correct. Otherwise a lexical error is shown with the corresponding description.
 
 ```console 
 $ cat helloworld_with_lexerror.grc
@@ -387,7 +418,7 @@ fun hello () : nothing
    writeString("Hello world!\n");
 }
 
-$ ./grace < helloworld_with_lexerror.grc
+$ ./lexer helloworld_with_lexerror.grc
 Illegal character % at line 3
 ```
 
@@ -397,10 +428,10 @@ Go to `parser` folder and run `make`. Input a grace program to the `grace` execu
 
 ```console 
 $ ./grace < path/to/file.grc
-Success!
+Success.
 ```
 
-If `Success!` is shown then the program is syntactically correct. Otherwise a syntax error is shown with the corresponding description.
+If `Success.` is printed then the program is syntactically correct. Otherwise a syntax error is shown with the corresponding description.
 
 ```console
 $ ./grace < path/to/syntax/error/file.grc
@@ -412,14 +443,14 @@ syntax error, unexpected '=', expecting <-
 Go to `semantic` folder and run `make`. Input a grace program to the `grace` executable as follows:
 
 ```console 
-$ ./grace -a hello.grc
+$ ./grace -a ../programs/hello.grc
 AST: FuncDef(Header(fun Id(hello)() : RetType(void)) LocalDefList() Block(CallStmt(Id(writeString)(ExprList(ConstStr("Hello world!\n"))))))
 Success.
 ```
 
-> With the `-a` you can also see the AST generating by the parser from the previous step.
+> Use the -a flag to print the AST generated by the parser to stdout.
 
-If `Success` is shown then the program is syntactically correct. Otherwise a semantic error is shown with the corresponding description.
+If `Success` is printed then the program is syntactically correct. Otherwise a semantic error is shown with the corresponding description.
 
 ```console
 $ cat semerror.grc
@@ -452,7 +483,69 @@ $ ./grace semerror.grc
 Error: Type mismatch at line 18
 ```
 
-Ofcourse the above errors are just some examples of the full error detection capabilities of our compiler. Also, the finished compiler has the same capabilities regarding error detecting as each discrete building block of the project.
+These errors are just examples showcasing the comprehensive error detection capabilities of our compiler. Moreover, the final compiler retains these capabilities across each individual building block of the project.
+
+## Testing Suite 
+
+For each compiling stage (parsing, semantic analysis and codegen) besides lexical analysis we have created a testing script to verify each stage's integrity. We inputted both correct and erroneous programs to ensure that correct programs succeed while erroneous programs fail on the respective stage. 
+
+### Syntax analysis test
+
+1. Change to the appropriate paths in the `gen.sh` in `syntax-gen` folder
+
+```shell
+readonly ERL=/path/to/erl
+export ERL_LIBS=/path/to/syntax-gen/proper
+```
+
+> You will need to have `erlang` installed in your machine.
+
+2. Run the testing script
+
+```console
+$ ./syntax-gen/test_parser.sh
+```
+
+The script will ask you for the number of syntacticaly correct programs to test on the `parser`.
+
+### Semantic analysis test
+
+1. If you haven't previously built the semantic checked in `semantic` folder run:
+
+```console
+$ cd semantic/
+$ make
+```
+
+2. Run the testing script
+
+```console  
+$ ./test_sem.sh
+```
+
+The tester inputs both the semanticaly correct programs (from the `programs/` directory) and the erroneous programs (from the `programs-erroneous/` directory) with semantic errors to the compiler.
+
+### Codegen test
+
+1. Uncomment the following line from the `parser.y` in `llvm` directory
+
+```cpp
+    // Comment out in order to run test_llvm.sh
+    if (result == 0) printf("Success.\n");
+```
+
+2. Run the testing script
+
+```console
+$ ./test_llvm.sh
+```
+
+Note! This test will check only if the codegen succeeded and not if the logic of the generated executable is correct based on the original grace program.
+
+
+
+
+
 
 
 

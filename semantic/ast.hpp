@@ -40,6 +40,7 @@ extern "C"
     extern void destroyType(Type type);
 }
 
+#define UNKNOWN_SIZE -1
 
 /* ---------------------------------------------------------------------
    ----------------------------- Parameter -----------------------------
@@ -95,9 +96,21 @@ protected:
     int lineno;
 };
 
+/* ---------------------------------------------------------------------
+   ------------------------------- UTILS -------------------------------
+   --------------------------------------------------------------------- */
+
+template <typename T>
+std::vector<T> getReversed(const std::vector<T>& input)
+{
+    std::vector<T> reversed_vector(input.rbegin(), input.rend());
+    return reversed_vector;
+}
+
 
 inline std::vector<bool> returnedFunction;
- 
+inline std::vector<Type> returnType;
+
 inline std::ostream &operator<<(std::ostream &out, const AST &t)
 {
     t.printOn(out);

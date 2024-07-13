@@ -14,9 +14,9 @@ void ArrayDim::printOn(std::ostream &out) const
 {
     if (unknown)
         out << "[ ]";
-    for (auto num = dims.rbegin(); num != dims.rend(); ++num)
+    for (auto num : getReversed(dims))
     {
-        out << "[" << **num << "]";
+        out << "[" << *num << "]";
     }
 }
 

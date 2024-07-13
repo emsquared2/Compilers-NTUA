@@ -28,6 +28,7 @@ void FuncDef::sem()
     }
 
     returnedFunction.pop_back();
+    returnType.pop_back();
     closeScope();
 }
 

@@ -35,5 +35,5 @@ void ArrayElem::sem()
         SemanticError(msg.c_str());
     }
     
-    type = findArrayType(t);
+    type = findArrayType(t, exprlist->getExprList().size());
 }

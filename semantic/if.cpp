@@ -20,7 +20,8 @@ void If::printOn(std::ostream &out) const
 void If::sem() 
 {
     cond->type_check(typeBoolean);
-    stmt1->sem();
+    if (stmt1 != nullptr)
+        stmt1->sem();
     if (stmt2 != nullptr)
         stmt2->sem();
 }

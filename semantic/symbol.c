@@ -587,14 +587,12 @@ SymbolEntry *lookupLastFunction() {
     return NULL;
 }
 
-Type findArrayType(Type t)
+Type findArrayType(Type t, int dims)
 {
-    while(t->kind == TYPE_ARRAY || t->kind == TYPE_IARRAY) {
+    for (int i = 0; i < dims; i++)
         t = t->refType;
-    }
     return t;
 }
-
 
 Type typeArray (RepInteger size, Type refType)
 {

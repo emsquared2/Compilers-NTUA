@@ -6,8 +6,8 @@
 # To use it, you need to first declare the dirs
 # where Erlang/OTP and PropEr are in your system.
 
-readonly ERL=/usr/bin/erl
-export ERL_LIBS=/mnt/c/Users/manos/Documents/GitHub/Compilers-NTUA/syntax-gen/proper
+readonly ERL=/path/to/erl
+export ERL_LIBS=/path/to/syntax-gen/proper
 
 ${ERL}c -pa ${ERL_LIBS}/ebin +debug_info ./*.erl
 

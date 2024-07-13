@@ -430,6 +430,7 @@ int main(int argc, char **argv)
 
     // Parse the input
     int result = yyparse();
+    
     // Comment out in order to run test_llvm.sh
     // if (result == 0) printf("Success.\n");
 

@@ -18,7 +18,7 @@ correct_total=0
 erroneous_total=0
 
 # Check each file in the correct programs directory
-for correct_file in "${correct_dir}"*; do
+for correct_file in "${correct_dir}"*.grc; do
     ((correct_total++))
 
     # Run the grace executable with this file

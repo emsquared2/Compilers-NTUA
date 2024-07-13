@@ -8,8 +8,6 @@ default: grace
 lexer.cpp: lexer.l
 	flex -s -o lexer.cpp lexer.l
 
-lexer.o: lexer.cpp lexer.hpp
-
 grace: lexer.o
 	$(CXX) $(CXXFLAGS) -o lexer lexer.o
 

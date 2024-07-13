@@ -318,7 +318,7 @@ id :
 
 expr:
     // T_const             { $$ = new Const($1); }
-    const
+    const               { /* Eliminate warning */ }
     | T_const_char      { $$ = new ConstChar($1); }
     | l_value           { $$ = $1; }
     | '(' expr ')'      { $$ = $2; }
@@ -417,9 +417,9 @@ int main(int argc, char *argv[]) {
     // Open program scope
     openScope();
 
-    #ifdef YYDEBUG
-        int yydebug = 1;
-    #endif
+    // #ifdef YYDEBUG
+    //     int yydebug = 1;
+    // #endif
 
     int result = yyparse();
     if (result == 0) printf("Success.\n");

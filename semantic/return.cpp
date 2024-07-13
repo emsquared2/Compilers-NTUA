@@ -10,11 +10,6 @@ void Return::printOn(std::ostream &out) const
     out << ")";
 }
 
-int Return::ReturnValue() 
-{
-    // return (expr != nullptr) ? expr->eval() : 0;
-}
-
 void Return::sem()
 {
     /* TODO: Get return type.

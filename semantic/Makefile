@@ -9,8 +9,8 @@ HPP_FILES := $(wildcard *.hpp)
 
 OBJECT_FILES := $(patsubst %.cpp,%.o,$(CPP_FILES))
 
-CXX=c++
-CXXFLAGS=-Wall -std=c++11 -g
+CXX=clang++
+CXXFLAGS=-Wall -g
 
 default: grace
 

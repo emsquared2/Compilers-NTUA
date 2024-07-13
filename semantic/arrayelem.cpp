@@ -16,10 +16,7 @@ void ArrayElem::printOn(std::ostream &out) const
     }
     out << ")";
 }
-std::string ArrayElem::getArrayElem()
-{
-    // return left->getName() + "[" + std::to_string(expr->eval()) + "]";
-}
+
 void ArrayElem::sem()
 {
     std::vector<Expr *> expr_list = exprlist->getExprList();

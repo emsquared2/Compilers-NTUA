@@ -12,6 +12,6 @@ const char *ConstStr::getName() const
 void ConstStr::sem()
 {
     RepInteger len = str.length() + 1;
-    // type = typeArray(len, typeChar);
-    type = typeIArray(typeChar);
+    type = typeArray(len, typeChar);
+    // type = typeIArray(typeChar);
 }

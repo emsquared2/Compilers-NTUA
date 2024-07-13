@@ -9,7 +9,6 @@ class Return : public Stmt
 public:
     Return(Expr *e = nullptr);
     virtual void printOn(std::ostream &out) const override;
-    int ReturnValue();
     virtual void sem() override;
 
 private:

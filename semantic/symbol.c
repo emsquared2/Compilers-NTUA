@@ -313,7 +313,9 @@ SymbolEntry * newConstant (const char * name, Type type, ...)
             case TYPE_ARRAY:
                 strcpy(buffer, "\"");
                 strAppendString(buffer, value.vString);
-                strcat(buffer, "\"");           
+                strcat(buffer, "\"");
+            default:
+                break; // The purpose of this line is to eliminate warnings
         }
         e = newEntry(buffer);
     }
@@ -339,6 +341,8 @@ SymbolEntry * newConstant (const char * name, Type type, ...)
                 break;
             case TYPE_ARRAY:
                 e->u.eConstant.value.vString = value.vString;
+            default:
+                break; // The purpose of this line is to eliminate warnings
         }
     }
     return e;
@@ -642,6 +646,8 @@ void destroyType (Type type)
                 destroyType(type->refType);
                 delete(type);
             }
+        default:
+            break; // The purpose of this line is to eliminate warnings
     }
 }
 
@@ -668,13 +674,6 @@ unsigned int sizeOfType (Type type)
 
 bool equalType (Type type1, Type type2)
 {
-    // printf("Type 1 in equalType ");
-    // printType(type1);
-    // printf("\n");
-
-    // printf("Type 2 in equalType ");
-    // printType(type2);
-    // printf("\n");
     if (type1->kind != type2->kind) {
         if ((type1->kind != TYPE_ARRAY && type1->kind != TYPE_IARRAY) ||
             (type2->kind != TYPE_ARRAY && type2->kind != TYPE_IARRAY))
@@ -694,6 +693,8 @@ bool equalType (Type type1, Type type2)
         case TYPE_IARRAY:
         case TYPE_POINTER:
             return equalType(type1->refType, type2->refType);
+        default:
+            break; // The purpose of this line is to eliminate warnings
     }
     return true;        
 }

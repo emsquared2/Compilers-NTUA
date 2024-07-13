@@ -19,7 +19,7 @@ void FuncDef::sem()
     local_def_list->sem();
     block->sem();
 
-    SymbolEntry * function = lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
+    lookupEntry(header->getId()->getName(), LOOKUP_ALL_SCOPES, true);
 
     if(!equalType(header->getReturnType(), typeVoid) && !returnedFunction.back()) {
         std::string func_name = header->getId()->getName();

@@ -1,6 +1,6 @@
 #include "unop.hpp"
 
-UnOp::UnOp(char *s, Expr *e) : op(s), right(e) {}
+UnOp::UnOp(const char *s, Expr *e) : op(s), right(e) {}
 
 UnOp::~UnOp()
 {

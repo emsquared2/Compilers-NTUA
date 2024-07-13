@@ -6,7 +6,7 @@
 class LValue : public Expr
 {
 public:
-    virtual const char *getName() const {};
+    virtual const char *getName() const { return ""; } 
 };
 
 #endif

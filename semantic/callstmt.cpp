@@ -26,14 +26,11 @@ void CallStmt::sem()
     // Check if function is called with correct number and type of arguments
     SymbolEntry *argument = function->u.eFunction.firstArgument;
 
-    std::vector<Expr *> e_list;
-
-    if (expr_list != nullptr)
-        e_list = expr_list->getExprList();
+    std::vector<Expr *> e_list = (expr_list != nullptr) ? expr_list->getExprList() : std::vector<Expr *>{};
 
     int counter = 0;
 
-    for (auto e = e_list.rbegin(); e != e_list.rend(); ++e)
+    for (Expr *e : e_list)
     {
         // More parameters than expected
         if (argument == NULL)
@@ -42,10 +39,10 @@ void CallStmt::sem()
             SemanticError(msg.c_str());
         }
 
-        (*e)->type_check(argument->u.eParameter.type);
+        e->type_check(argument->u.eParameter.type);
 
         /* Check if Expr e is a LValue */
-        LValue * lvalue_ptr = dynamic_cast<LValue *>((*e));
+        LValue * lvalue_ptr = dynamic_cast<LValue *>(e);
         if (argument->u.eParameter.mode == PASS_BY_REFERENCE && !lvalue_ptr)
             SemanticError("Parameter defined as pass-by-reference must be an lvalue.");
 

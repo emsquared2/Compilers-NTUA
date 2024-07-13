@@ -66,6 +66,15 @@
     llvmType *AST::i64 = llvm::IntegerType::get(TheContext, 64);
     llvmType *AST::voidTy = llvmType::getVoidTy(TheContext);
 
+    void show_help(const char *program_name) {
+    std::cout << "Usage: " << program_name << " [options] <input_file>\n"
+              << "Options:\n"
+              << "  -i             Print the intermediate code\n"
+              << "  -f             Print the final code\n"
+              << "  -o             Optimize code\n"
+              << "  -h             Show this help message\n";
+    }
+
     #define YYDEBUG 1       // Enable Bison's debug mode
 
 %}
@@ -371,7 +380,7 @@ int main(int argc, char **argv)
     optimize = false;
 
     // Process command line options
-    while ((opt = getopt(argc, argv, "ifo")) != -1) {
+    while ((opt = getopt(argc, argv, "hifo")) != -1) {
         switch (opt) {
             case 'i':
                 genIntermediate = true; // Generate intermediate code
@@ -382,8 +391,11 @@ int main(int argc, char **argv)
             case 'o':
                 optimize = true; // Enable optimizations
                 break;
+            case 'h':
+                show_help(argv[0]);
+                exit(EXIT_SUCCESS);
             default:
-                fprintf(stderr, "Usage: %s [-i] [-f] [-o] <input_file>\n", argv[0]);
+                show_help(argv[0]);
                 exit(EXIT_FAILURE);
         }
     }
@@ -399,7 +411,7 @@ int main(int argc, char **argv)
         }
     } else {
         // If no file is specified, also print usage information and exit
-        fprintf(stderr, "Usage: %s [-i] [-f] [-o] <input_file>\n", argv[0]);
+        show_help(argv[0]);
         exit(EXIT_FAILURE);
     }
 
@@ -418,6 +430,7 @@ int main(int argc, char **argv)
 
     // Parse the input
     int result = yyparse();
+    
     // Comment out in order to run test_llvm.sh
     // if (result == 0) printf("Success.\n");
 

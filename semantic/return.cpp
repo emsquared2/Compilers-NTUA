@@ -10,11 +10,6 @@ void Return::printOn(std::ostream &out) const
     out << ")";
 }
 
-int Return::ReturnValue() 
-{
-    // return (expr != nullptr) ? expr->eval() : 0;
-}
-
 void Return::sem()
 {
     /* TODO: Get return type.
@@ -23,9 +18,10 @@ void Return::sem()
      *      b) Implement a method in symbol.c in order to get the return type from the last function in scope.
      */
 
-    SymbolEntry *func = lookupLastFunction();
-
-    Type return_type = func->u.eFunction.resultType;
+    // SymbolEntry *func = lookupLastFunction();
+    // Type return_type = func->u.eFunction.resultType;
+    
+    Type return_type = returnType.back();
 
     // If return type is void, then expr should be nullptr
     if (equalType(return_type, typeVoid))

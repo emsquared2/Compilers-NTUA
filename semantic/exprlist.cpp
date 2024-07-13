@@ -14,18 +14,18 @@ void ExprList::printOn(std::ostream &out) const
     out << "ExprList(";
     bool first = true;
     // for (Expr *e : expr_list)
-    for (auto e = expr_list.rbegin(); e != expr_list.rend(); ++e)
+    for (Expr *e : getReversed(expr_list))
     {
         if (!first)
             out << ", ";
         first = false;
-        out << **e;
+        out << *e;
     }
     out << ")";
 }
 std::vector<Expr *> ExprList::getExprList()
 {
-    return expr_list;
+    return getReversed(expr_list);
 }
 bool ExprList::isEmpty()
 {
@@ -33,6 +33,6 @@ bool ExprList::isEmpty()
 }
 void ExprList::sem()
 {
-    for (Expr *e : expr_list)
+    for (Expr *e : getReversed(expr_list))
         e->sem();
 }

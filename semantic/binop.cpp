@@ -1,6 +1,6 @@
 #include "binop.hpp"
 
-BinOp::BinOp(Expr *l, char *s, Expr *r) : left(l), op(s), right(r) {}
+BinOp::BinOp(Expr *l, const char *s, Expr *r) : left(l), op(s), right(r) {}
 
 BinOp::~BinOp()
 {

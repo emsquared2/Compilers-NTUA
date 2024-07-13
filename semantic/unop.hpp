@@ -6,7 +6,7 @@
 class UnOp : public Expr
 {
 public:
-    UnOp(char *s, Expr *e);
+    UnOp(const char *s, Expr *e);
     ~UnOp();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;

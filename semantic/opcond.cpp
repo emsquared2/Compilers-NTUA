@@ -1,8 +1,8 @@
 #include "opcond.hpp"
 
-OpCond::OpCond(Cond *l, char *s, Cond *r) : left(l), op(s), right(r) {}
+OpCond::OpCond(Cond *l, const char *s, Cond *r) : left(l), op(s), right(r) {}
 
-OpCond::OpCond(char *s, Cond *r) : left(), op(s), right(r) {}
+OpCond::OpCond(const char *s, Cond *r) : left(), op(s), right(r) {}
 
 OpCond::~OpCond()
 {

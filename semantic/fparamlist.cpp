@@ -13,12 +13,12 @@ void FParamList::printOn(std::ostream &out) const
 {
     bool first = true;
     out << "FParamList(";
-    for (auto param = params.rbegin(); param != params.rend(); ++param)
+    for (FParam *param : getReversed(params))
     {
         if (!first)
             out << "; ";
         first = false;
-        out << **param;
+        out << *param;
     }
     out << ")";
 }
@@ -35,9 +35,9 @@ void FParamList::setSymbolEntry(SymbolEntry *f)
 
 void FParamList::sem()
 {
-    for (auto param = params.rbegin(); param != params.rend(); ++param)
+    for (FParam *param : getReversed(params))
     {
-        (*param)->setSymbolEntry(function);
-        (*param)->sem();
+        param->setSymbolEntry(function);
+        param->sem();
     }
 }

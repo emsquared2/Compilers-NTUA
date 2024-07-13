@@ -1,6 +1,6 @@
 #include "compcond.hpp"
 
-CompCond::CompCond(Expr *l, char *s, Expr *r) : left(l), op(s), right(r) {}
+CompCond::CompCond(Expr *l, const char *s, Expr *r) : left(l), op(s), right(r) {}
 
 CompCond::~CompCond()
 {

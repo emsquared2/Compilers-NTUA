@@ -6,7 +6,7 @@
 class BinOp : public Expr
 {
 public:
-    BinOp(Expr *l, char *s, Expr *r);
+    BinOp(Expr *l, const char *s, Expr *r);
     ~BinOp();
     virtual void printOn(std::ostream &out) const override;
     virtual void sem() override;

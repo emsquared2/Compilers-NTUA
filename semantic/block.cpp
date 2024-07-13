@@ -23,8 +23,8 @@ std::vector<Stmt *> Block::getList() { return stmt_list; }
 
 void Block::sem()
 {
-    for (auto s = stmt_list.rbegin(); s != stmt_list.rend(); ++s)
+    for (Stmt *s : getReversed(stmt_list))
     {
-        (*s)->sem();
+        s->sem();
     }
 }

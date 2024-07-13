@@ -339,9 +339,12 @@ void AST::llvm_compile_and_dump()
         std::exit(1);
     }
 
-    // // Print out the IR.
-    // TheModule->print(llvm::outs(), nullptr);
-    // std::cout << std::endl;
+    /* Dump intermidiate code to *.imm file */
+    std::string imm_filename = filename.substr(0, filename.find_last_of('.')) + ".imm";
+    emitLLVMIR(imm_filename);
+    /* Dump final code to *.asm file */
+    std::string asm_filename = filename.substr(0, filename.find_last_of('.')) + ".asm";
+    emitAssembly(asm_filename);
 
     /* Dump IR and final code to correct files/stdout */
     if (genIntermediate)
@@ -350,15 +353,7 @@ void AST::llvm_compile_and_dump()
     else if (genFinal)
         /* Dump final code to stdout */
         emitAssembly("-");
-    else
-    {
-        /* Dump intermidiate code to *.imm file */
-        std::string imm_filename = filename.substr(0, filename.find_last_of('.')) + ".imm";
-        emitLLVMIR(imm_filename);
-        /* Dump final code to *.asm file */
-        std::string asm_filename = filename.substr(0, filename.find_last_of('.')) + ".asm";
-        emitAssembly(asm_filename);
-    }
+
     if (optimize)
         TheFPM->run(*main);
 }

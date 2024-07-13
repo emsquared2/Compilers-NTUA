@@ -66,6 +66,7 @@ void Header::sem()
 
     openScope();
     returnedFunction.push_back(false);
+    returnType.push_back(type);
     /*
     Here we have to add all the parameters to the symbol entry.
     The SymbolEntry of the function (look *function above) is also needed when creating a new function parameter.

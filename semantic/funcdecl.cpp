@@ -15,5 +15,6 @@ void FuncDecl::sem()
     header->sem();
 
     returnedFunction.pop_back();
+    returnType.pop_back();
     closeScope();
 }

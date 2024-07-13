@@ -22,7 +22,7 @@ for correct_file in "${correct_dir}"*; do
     ((correct_total++))
 
     # Run the grace executable with this file
-    result=$( "$grace_executable" < "$correct_file" | tr -d '[:space:]' )
+    result=$( "$grace_executable" "$correct_file" | tr -d '[:space:]' )
 
     # Check if the result matches the expected "Success."
     if [[ "$result" == "Success." ]]; then

@@ -14,6 +14,8 @@ Compiler for the Grace programming language.
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+    - [Ubuntu](#ubuntu)
+    - [macOS](#macos)
 - [Compiling Grace Programs](#compiling-grace-programs)
   - [Hello World example](#hello-world-example)
   - [More functionalities / Error Examples](#more-functionalities--error-examples)
@@ -201,10 +203,12 @@ We have kept the original project development path to keep the internal compiler
 
 - `flex 2.6.4` tool for lexical analysis
 - `bison 3.8.2` tool for parser generation
-- `llvm 18 or later` c++ library for Intermediate Code generation
+- `llvm 16 or later` c++ library for Intermediate Code generation
 - `clang/clang++`
 
 ### Installation
+
+### Ubuntu
 
 - `flex` installation
 
@@ -237,7 +241,57 @@ $ sudo apt-get update
 $ sudo apt-get install clang
 ```
 
+### macOS
+
+- `flex` installation
+```console
+$ brew install flex
+```
+
+- `bison` installation
+```console
+$ brew install bison
+```
+
+- `llvm` installation
+```console
+$ brew install llvm@16
+```
+Add the LLVM binaries to your PATH. Add the following lines to your shell configuration file (~/.bashrc, ~/.zshrc, etc.):
+```console
+export PATH="/opt/homebrew/opt/llvm@16/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/llvm@16/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/llvm@16/include"
+```
+
+Then, source the configuration file to apply the changes:
+```console
+$ source ~/.zshrc  # or source ~/.bashrc
+```
+
+> Note! If you encounter issues running on macOS, you may need to adjust the following line in your Makefile:
+> ```console
+> LLVMCONFIG=llvm-config-18
+> ```
+> Change it to:
+> ```Makefile
+> LLVMCONFIG=llvm-config
+> ```
+
+
 ## Compiling Grace Programs
+
+> Note: If you are using LLVM version 18 or later, follow these steps in ast.cpp:
+
+> Uncomment line 307 by removing the leading //:
+> ```c++
+> auto FileType = llvm::CodeGenFileType::ObjectFile
+> ```
+> Comment out line 310 by adding // at the beginning:
+> ```c++
+> auto FileType = llvm::CGFT_AssemblyFile;
+> ```
+> This adjustment is necessary for compatibility with LLVM versions 18 and later.
 
 To compile Grace programs, follow these steps:
 1. Navigate to the LLVM Directory and Build:

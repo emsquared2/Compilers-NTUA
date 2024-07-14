@@ -300,8 +300,14 @@ void AST::emitAssembly(const std::string & Filename)
     }
 
     llvm::legacy::PassManager pass;
+
     // auto FileType = llvm::CodeGenFileType::ObjectFile;
-    auto FileType = llvm::CodeGenFileType::AssemblyFile;
+    
+    // for llvm-18
+    //auto FileType = llvm::CodeGenFileType::AssemblyFile;
+
+    // for llvm-16
+    auto FileType = llvm::CGFT_AssemblyFile;
 
     if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
         llvm::errs() << "TheTargetMachine can't emit a file of this type";

@@ -309,18 +309,6 @@ $ source ~/.zshrc  # or source ~/.bashrc
 
 ## Compiling Grace Programs
 
-> Note: If you are using LLVM version 18 or later, follow these steps in ast.cpp:
-
-> Uncomment line 307 by removing the leading //:
-> ```c++
-> auto FileType = llvm::CodeGenFileType::ObjectFile
-> ```
-> Comment out line 310 by adding // at the beginning:
-> ```c++
-> auto FileType = llvm::CGFT_AssemblyFile;
-> ```
-> This adjustment is necessary for compatibility with LLVM versions 18 and later.
-
 To compile Grace programs, follow these steps:
 1. Navigate to the LLVM Directory and Build:
 ```console

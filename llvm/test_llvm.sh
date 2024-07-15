@@ -31,7 +31,7 @@ for file in "${program_dir}"*.grc; do
     ((total_programs++))  # Increment total programs counter
 
     # Run the grace executable with this file and capture the output
-    result=$( "$grace_executable" -o "$file" )
+    result=$( "$grace_executable" -O "$file" )
 
     # Extract the last line of the result
     last_line=$(echo "$result" | tail -n 1)

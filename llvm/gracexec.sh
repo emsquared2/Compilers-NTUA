@@ -2,7 +2,7 @@
 
 # Function to display usage
 usage() {
-    echo "Usage: $0 [-o] <input file>"
+    echo "Usage: $0 [-O] <input file>"
     exit 1
 }
 
@@ -10,10 +10,10 @@ usage() {
 optimize=""
 
 # Parse options
-while getopts ":o" opt; do
+while getopts ":O" opt; do
     case $opt in
-        o)
-            optimize="-o"
+        O)
+            optimize="-O"
             ;;
         \?)
             usage
@@ -32,10 +32,11 @@ fi
 input_file="$1"
 
 # Remove the extension to get the base name (including the path)
-base_name="${input_file%.grc}"
+base_dir=$(dirname "$input_file")
+base_name=$(basename "$input_file" .grc)
 
 # Generate intermediate and final output file names
-asm_file="${base_name}.asm"
+asm_file="${base_dir}/${base_name}.asm"
 out_file="${base_name}.out"
 
 # Determine the directory of the ./grace executable

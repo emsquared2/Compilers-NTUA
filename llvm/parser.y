@@ -71,7 +71,7 @@
               << "Options:\n"
               << "  -i             Print the intermediate code\n"
               << "  -f             Print the final code\n"
-              << "  -o             Optimize code\n"
+              << "  -O             Optimize code\n"
               << "  -h             Show this help message\n";
     }
 
@@ -380,7 +380,7 @@ int main(int argc, char **argv)
     optimize = false;
 
     // Process command line options
-    while ((opt = getopt(argc, argv, "hifo")) != -1) {
+    while ((opt = getopt(argc, argv, "hifO")) != -1) {
         switch (opt) {
             case 'i':
                 genIntermediate = true; // Generate intermediate code
@@ -388,7 +388,7 @@ int main(int argc, char **argv)
             case 'f':
                 genFinal = true; // Generate final code
                 break;
-            case 'o':
+            case 'O':
                 optimize = true; // Enable optimizations
                 break;
             case 'h':

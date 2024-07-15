@@ -303,9 +303,9 @@ This will build the main compiler functionalities.
 
 2. Compile Your Grace Program:
 ```console
-$ ./gracexec.sh -o ../path/to/program.grc
+$ ./gracexec.sh -O ../path/to/program.grc
 ```
-> The `-o` flag is optional and enables compiler optimizations.
+> The `-O` flag is optional and enables compiler optimizations.
 
 The compiled output files will be placed in the same directory as the `.grc` program file, with a `.out` suffix. Additionally, a `.imm` and a `.asm` file is created with the intermediate and final assembly code of the input file.
 
@@ -320,7 +320,7 @@ Usage: ./grace [options] <input_file>
 Options:
   -i             Print the intermediate code to stdout
   -f             Print the final code to stdout
-  -o             Enable optimizations
+  -O             Enable optimizations
   -h             Show this help message
 ```
 
@@ -334,7 +334,7 @@ In this section we will show an example on how to use our grace compiler on a si
 $ ls 
 hello.grc
 
-$ ./gracexec.sh -o hello.grc
+$ ./gracexec.sh -O hello.grc
 hello.asm hello.grc hello.imm hello.out
 
 $ ./hello.out

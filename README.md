@@ -14,6 +14,8 @@ Compiler for the Grace programming language.
 - [Project Structure](#project-structure)
 - [Prerequisites](#prerequisites)
   - [Installation](#installation)
+    - [Ubuntu](#ubuntu)
+    - [macOS](#macos)
 - [Compiling Grace Programs](#compiling-grace-programs)
   - [Hello World example](#hello-world-example)
   - [More functionalities / Error Examples](#more-functionalities--error-examples)
@@ -201,10 +203,12 @@ We have kept the original project development path to keep the internal compiler
 
 - `flex 2.6.4` tool for lexical analysis
 - `bison 3.8.2` tool for parser generation
-- `llvm 18 or later` c++ library for Intermediate Code generation
+- `llvm 16 or later` c++ library for Intermediate Code generation
 - `clang/clang++`
 
 ### Installation
+
+### Ubuntu
 
 - `flex` installation
 
@@ -223,12 +227,40 @@ $ sudo apt-get install bison
 
 - `llvm` installation
 
-Install llvm by using the automatic installation script that LLVM provides.
+1. Import the GPG key for the LLVM repository
+
+```console
+$ wget https://apt.llvm.org/llvm-snapshot.gpg.key
+$ sudo apt-key add llvm-snapshot.gpg.key
 
 ```
-# bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+
+2. Add the LLVM repository to your list of sources
+
+```console
+$ sudo add-apt-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-16 main"
+
 ```
-> Note! It will download the latest stable version of the llvm libary
+
+3. Update package lists
+
+```console
+$ sudo apt update
+```
+
+4. Install LLVM 16
+
+```console
+$ sudo apt install llvm-16
+```
+
+5. Set LLVM 16 as the default version
+
+```console
+$ sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-16 100
+```
+
+> Note! If you have previously installed llvm with the ```sudo apt install llvm``` command it will install package names `llvm-config` in your machine. Newer versions, as used in this project, are installed as `llvm-config-XX` where XX the llvm version installed. So if you have this type of llvm package then either check the step 5 on this section or manually change the default llvm package with the command  ```sudo update-alternatives --config llvm-config``` so that the default `llvm-config` package is pointing to your llvm version.
 
 - `clang` installation
 
@@ -236,6 +268,44 @@ Install llvm by using the automatic installation script that LLVM provides.
 $ sudo apt-get update
 $ sudo apt-get install clang
 ```
+
+### macOS
+
+- `flex` installation
+```console
+$ brew install flex
+```
+
+- `bison` installation
+```console
+$ brew install bison
+```
+
+- `llvm` installation
+```console
+$ brew install llvm@16
+```
+Add the LLVM binaries to your PATH. Add the following lines to your shell configuration file (~/.bashrc, ~/.zshrc, etc.):
+```console
+export PATH="/opt/homebrew/opt/llvm@16/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/llvm@16/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/llvm@16/include"
+```
+
+Then, source the configuration file to apply the changes:
+```console
+$ source ~/.zshrc  # or source ~/.bashrc
+```
+
+> Note! If you encounter issues running on macOS, you may need to adjust the following line in your Makefile:
+> ```console
+> LLVMCONFIG=llvm-config-18
+> ```
+> Change it to:
+> ```Makefile
+> LLVMCONFIG=llvm-config
+> ```
+
 
 ## Compiling Grace Programs
 

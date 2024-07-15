@@ -6,6 +6,8 @@
 #include <map>
 #include <set>
 
+#include <llvm/Config/llvm-config.h>
+
 #include <llvm/IR/Value.h>
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/Module.h>

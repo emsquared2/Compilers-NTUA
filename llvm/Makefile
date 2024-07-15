@@ -1,6 +1,6 @@
 .PHONY: clean distclean default
 
-LLVMCONFIG=llvm-config-16
+LLVMCONFIG=llvm-config
 
 # Options for lib generation
 LIB_CC := clang

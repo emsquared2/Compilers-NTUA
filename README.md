@@ -227,12 +227,40 @@ $ sudo apt-get install bison
 
 - `llvm` installation
 
-Install llvm by using the automatic installation script that LLVM provides.
+1. Import the GPG key for the LLVM repository
+
+```console
+$ wget https://apt.llvm.org/llvm-snapshot.gpg.key
+$ sudo apt-key add llvm-snapshot.gpg.key
 
 ```
-# bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+
+2. Add the LLVM repository to your list of sources
+
+```console
+$ sudo add-apt-repository "deb http://apt.llvm.org/$(lsb_release -sc)/ llvm-toolchain-$(lsb_release -sc)-16 main"
+
 ```
-> Note! It will download the latest stable version of the llvm libary
+
+3. Update package lists
+
+```console
+$ sudo apt update
+```
+
+4. Install LLVM 16
+
+```console
+$ sudo apt install llvm-16
+```
+
+5. Set LLVM 16 as the default version
+
+```console
+$ sudo update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-16 100
+```
+
+> Note! If you have previously installed llvm with the ```sudo apt install llvm``` command it will install package names `llvm-config` in your machine. Newer versions, as used in this project, are installed as `llvm-config-XX` where XX the llvm version installed. So if you have this type of llvm package then either check the step 5 on this section or manually change the default llvm package with the command  ```sudo update-alternatives --config llvm-config``` so that the default `llvm-config` package is pointing to your llvm version.
 
 - `clang` installation
 

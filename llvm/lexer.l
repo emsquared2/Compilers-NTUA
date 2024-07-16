@@ -159,6 +159,7 @@ char* Const_String(const char* yytext) {
                 case 'r': buffer[j++] = '\r'; i++; break;
                 case '\\': buffer[j++] = '\\'; i++; break;
                 case '"': buffer[j++] = '"'; i++; break;
+                case '\'': buffer[j++] = '\''; i++; break;
                 case '0': buffer[j++] = '\0'; i++; break;
                 default:
                     buffer[j++] = '\\';
